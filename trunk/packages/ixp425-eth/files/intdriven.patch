@@ -1,0 +1,18 @@
+--- ixp425-eth-1.1-r0/ixp425_eth.c.patched	2005-03-05 10:14:39.841274016 -0500
++++ ixp425-eth-1.1-r0/ixp425_eth.c	2005-03-05 10:16:13.737999544 -0500
+@@ -2676,10 +2676,13 @@
+        * the datapath in polling mode for better performances.
+        */
+ 
+-        if ((res = ethAcc_datapath_poll_setup()))
++        /* Enable Interrupt driven driver
++	 * see http://www.nslu2-linux.org/wiki/OpenSlug/StabilizeEthernetDriver
++	if ((res = ethAcc_datapath_poll_setup()))
+ 	{
+            return res;
+-	}
++	} 
++	*/
+     }
+ 
+     TRACE;
