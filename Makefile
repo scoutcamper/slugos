@@ -1,3 +1,5 @@
+# Makefile for OpenSlug
+
 BITBAKE_TAG = -r 154
 
 openslug-firmware:
