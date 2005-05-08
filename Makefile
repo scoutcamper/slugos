@@ -1,4 +1,5 @@
 # Makefile for OpenSlug
+# Licensed under the GPL
 
 BITBAKE_TAG = -r 154
 
