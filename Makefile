@@ -1,5 +1,11 @@
 BITBAKE_TAG = -r 154
 
+openslug-firmware:
+	(source setup-env ; bitbake openslug-packages)
+
+openslug-source:
+	tar zcvf openslug-source.tar.gz Makefile conf openembedded nslu2-linux
+
 bitbake:
 	svn co ${BITBAKE_TAG} svn://svn.berlios.de/bitbake/trunk/bitbake
 
