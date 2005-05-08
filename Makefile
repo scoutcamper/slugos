@@ -11,3 +11,6 @@ bitbake:
 
 clobber:
 	rm -rf bitbake tmp
+
+update-ignore:
+	svn propset svn:ignore -F .svnignore .
