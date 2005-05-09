@@ -52,7 +52,7 @@ OEINCLUDELOGS = "yes"
 
 # Specifies a location to search for pre-generated tarballs when fetching
 # a cvs:// URI.  Uncomment this, if you not want to pull directly from CVS.
-CVS_TARBALL_STASH = "http://www.treke.net/oe/source/"
+CVS_TARBALL_STASH = "http://www.oesources.org/source/current/"
 
 # INHERIT += "src_distribute_local pkg_distribute"
 
