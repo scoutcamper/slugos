@@ -1,4 +1,4 @@
-OEROOT = "/home/openslug"
+OEROOT = "%%%OEROOT%%%"
 
 # Use this to specify where OE should place the downloaded sources into
 DL_DIR = "${OEROOT}/downloads"
