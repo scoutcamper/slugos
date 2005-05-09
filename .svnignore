@@ -1,4 +1,5 @@
 bitbake
 downloads
 openslug-source.tar.gz
+setup-env
 tmp
