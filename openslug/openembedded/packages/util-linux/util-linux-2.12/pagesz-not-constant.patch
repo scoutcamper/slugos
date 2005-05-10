@@ -1,0 +1,16 @@
+Index: util-linux-2.12o/disk-utils/fsck.cramfs.c
+===================================================================
+--- util-linux-2.12o.orig/disk-utils/fsck.cramfs.c	2004-12-12 01:53:16.000000000 +1100
++++ util-linux-2.12o/disk-utils/fsck.cramfs.c	2005-04-02 13:48:10.325897000 +1000
+@@ -76,10 +76,7 @@
+ 
+ #define PAD_SIZE 512
+ 
+-#include <asm/page.h>
+-#ifdef PAGE_SIZE
+-#define PAGE_CACHE_SIZE ((int) PAGE_SIZE)
+-#elif defined __ia64__
++#if defined __ia64__
+ #define PAGE_CACHE_SIZE (16384)
+ #elif defined __alpha__
+ #define PAGE_CACHE_SIZE (8192)
