@@ -1,0 +1,5 @@
+#!/bin/sh
+
+# Turn the Ready/Status LED Green 
+# This program does that to signify the end of init
+/usr/sbin/leds

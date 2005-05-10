@@ -1,0 +1,11 @@
+--- busybox-1.00/util-linux/mount.c	2005-05-08 11:38:19.169094015 -0700
++++ busybox-1.00/util-linux/mount.c	2005-05-08 11:41:26.181895826 -0700
+@@ -460,6 +460,8 @@
+ 
+ 			strcpy(device, m->mnt_fsname);
+ 			strcpy(directory, m->mnt_dir);
++			if (all && got_filesystemType && strcmp(filesystemType, m->mnt_type) != 0)
++				continue;
+ 			filesystemType = bb_xstrdup(m->mnt_type);
+ 		  singlemount:
+ 			extra_opts = string_flags;
