@@ -1,13 +1,8 @@
 # Makefile for OpenSlug
 # Licensed under the GPL v2 or later
 
-BITBAKE_TAG = -r 154
-
-openslug-firmware: bitbake setup-env conf/local.conf
+openslug-firmware: setup-env conf/local.conf
 	(source setup-env ; bitbake openslug-packages)
-
-bitbake:
-	svn co ${BITBAKE_TAG} svn://svn.berlios.de/bitbake/trunk/bitbake
 
 setup-env:
 	echo 'OEROOT='`pwd` > setup-env
@@ -26,7 +21,7 @@ conf/local.conf:
 	sed -e "s|%%%OEROOT%%%|`pwd`|" conf/local.conf.template > conf/local.conf
 
 clobber:
-	rm -rf bitbake tmp
+	rm -rf tmp
 
 update-ignore:
 	svn propset svn:ignore -F .svnignore .
