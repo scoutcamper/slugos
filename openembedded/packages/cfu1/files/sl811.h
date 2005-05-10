@@ -241,12 +241,12 @@ sl811_read_buf(struct sl811 *sl811, int addr, void *buf, size_t count)
 }
 
 /*-------------------------------------------------------------------------*/
-//FIXME
-//#ifdef DEBUG
-#define DBG(stuff...)           printk(KERN_DEBUG "sl811: " stuff)
-//#else
-//#define DBG(stuff...)           do{}while(0)
-//#endif
+
+#ifdef DEBUG
+#define DBG(stuff...)		printk(KERN_DEBUG "sl811: " stuff)
+#else
+#define DBG(stuff...)		do{}while(0)
+#endif
 
 #ifdef VERBOSE
 #    define VDBG		DBG

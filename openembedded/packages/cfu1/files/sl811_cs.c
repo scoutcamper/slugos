@@ -33,8 +33,8 @@
 
 #include <linux/usb_sl811.h>
 
-MODULE_AUTHOR("Yukio Yamamoto");
-MODULE_DESCRIPTION("REX-CFU1 PCMCIA driver");
+MODULE_AUTHOR("Botond Botyanszki");
+MODULE_DESCRIPTION("REX-CFU1 PCMCIA driver for 2.6");
 MODULE_LICENSE("GPL");
 
 
@@ -42,12 +42,11 @@ MODULE_LICENSE("GPL");
 /* MACROS                                                             */
 /*====================================================================*/
 
-/* FIXME */
-//#ifdef DEBUG
+#if defined(DEBUG) || defined(CONFIG_USB_DEBUG)
 #define DBG(n, args...) printk(KERN_DEBUG "sl811_cs: " args)
-//#else
-//#define DBG(n, args...) do{}while(0)
-//#endif
+#else
+#define DBG(n, args...) do{}while(0)
+#endif
 
 #define INFO(args...) printk(KERN_INFO "sl811_cs: " args)
 
@@ -123,7 +122,6 @@ static struct platform_device platform_dev = {
 /* EXTERNAL FUNCTIONS                                                 */
 /*====================================================================*/
 int sl811h_probe(void *dev);
-int sl811h_remove(struct device *dev);
 
 /*====================================================================*/
 
@@ -131,13 +129,6 @@ int sl811h_remove(struct device *dev);
 /*====================================================================*/
 static void release_platform_dev(struct device * dev) {
 	DBG(0, "sl811_cs platform_dev release\n");
-}
-
-/*====================================================================*/
-static void sl811_cs_error(client_handle_t handle, int func, int ret)
-{
-  error_info_t err = { func, ret };
-  pcmcia_report_error(handle, &err);
 }
 
 /*====================================================================*/
@@ -181,9 +172,9 @@ static dev_link_t *sl811_cs_attach(void)
   client_reg.event_callback_args.client_data = link;
   ret = pcmcia_register_client(&link->handle, &client_reg);
   if (ret != CS_SUCCESS) {
-    sl811_cs_error(link->handle, RegisterClient, ret);
-    sl811_cs_detach(link);
-    return NULL;
+	  cs_error(link->handle, RegisterClient, ret);
+	  sl811_cs_detach(link);
+	  return NULL;
   }
   
   return link;
@@ -242,9 +233,9 @@ static int sl811_hc_init(void)
 
 	platform_dev.dev.release = release_platform_dev;
 	platform_device_register(&platform_dev);
+	/* FIXME: we register the platform device with 0 resources 
+	 otherwise the unregister call won't work*/
 
-	/* FIXME: resources already claimed by pcmcia, so we cannot register
-	   the device with the irq and io ports */
 	platform_dev.num_resources = 3;
 	platform_dev.resource      = (struct resource *) &resources;
 
@@ -365,9 +356,6 @@ static void sl811_cs_config(dev_link_t *link)
       release_region(link->io.BasePort1, link->io.NumPorts1);
   }
 
-  /* IRQ is requested by the sl811-hcd driver */
-  pcmcia_release_irq(link->handle, &link->irq);
-
   sprintf(dev->node.dev_name, "cf_usb0");
   dev->node.major = dev->node.minor = 0;
   link->dev = &dev->node;
@@ -392,13 +380,16 @@ static void sl811_cs_config(dev_link_t *link)
   
   link->state &= ~DEV_CONFIG_PENDING;
 
+  /* Release resources claimed by PCMCIA for the sl811h driver */
+  release_region(link->io.BasePort1, link->io.NumPorts1);
+  
   if (sl811_hc_init() == 0) goto cs_failed;
 
   return;
   
  cs_failed:
-  printk("DEBUG: sl811_cs_config failed\n");
-  sl811_cs_error(link->handle, last_fn, last_ret);
+  printk("sl811_cs_config failed\n");
+  cs_error(link->handle, last_fn, last_ret);
   sl811_cs_release(link);
   link->state &= ~DEV_CONFIG_PENDING;
 
@@ -416,7 +407,10 @@ static void sl811_cs_release(dev_link_t * link)
     link->state |= DEV_STALE_CONFIG;
     return;
   }
-  
+
+  /* request IO, because PCMCIA thinks it has claimed it */
+  request_region(link->io.BasePort1, link->io.NumPorts1, "sl811_cs");
+
   /* Unlink the device chain */
   link->dev = NULL;
   
@@ -430,10 +424,8 @@ static void sl811_cs_release(dev_link_t * link)
   if (link->state & DEV_STALE_LINK)
     sl811_cs_detach(link);
 
-  sl811h_remove(&platform_dev.dev);
-
-  /* FIXME: resources already claimed by pcmcia, so we cannot register
-     the device with the irq and io ports */
+  /* FIXME: if the unregister call frees up the resources, it oopses
+   so we pretend to have 0 resources */
   platform_dev.num_resources = 0;
   platform_dev.resource      = NULL;
 
@@ -475,9 +467,7 @@ static int sl811_cs_event(event_t event, int priority, event_callback_args_t *ar
     if (link->state & DEV_CONFIG)
       pcmcia_request_configuration(link->handle, &link->conf);
 
-    /* Reset routine will be added in the next version */
-    DBG("FIXME: card reset\n");
-    /*   hc_found_hci(irq, base_addr, base_addr+1); */
+    INFO("FIXME: card reset\n");
 
     break;
   }
@@ -526,4 +516,3 @@ static void __exit exit_sl811_cs(void)
 
 module_init(init_sl811_cs);
 module_exit(exit_sl811_cs);
-

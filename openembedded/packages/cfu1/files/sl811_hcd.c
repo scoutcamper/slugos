@@ -33,12 +33,11 @@
 
 #include <linux/config.h>
 
-//FIXME
-//#ifdef CONFIG_USB_DEBUG
+#ifdef CONFIG_USB_DEBUG
 #	define DEBUG
-//#else
-//#	undef DEBUG
-//#endif
+#else
+#	undef DEBUG
+#endif
 
 #include <linux/module.h>
 #include <linux/moduleparam.h>
@@ -91,7 +90,6 @@ static const char hcd_name[] = "sl811-hcd";
 
 /*-------------------------------------------------------------------------*/
 
-static irqreturn_t sl811h_irq(int irq, void *_hcd, struct pt_regs *regs);
 
 static void port_power(struct sl811 *sl811, int is_on)
 {
@@ -104,12 +102,12 @@ static void port_power(struct sl811 *sl811, int is_on)
 
 		sl811->port1 = (1 << USB_PORT_FEAT_POWER);
 		sl811->irq_enable = SL11H_INTMASK_INSRMV;
-		hcd->self.controller->power.power_state = PM_SUSPEND_ON;
+		hcd->self.controller->power.power_state = PMSG_ON;
 	} else {
 		sl811->port1 = 0;
 		sl811->irq_enable = 0;
-		hcd->state = USB_STATE_HALT;
-		hcd->self.controller->power.power_state = PM_SUSPEND_DISK;
+		hcd->state = HC_STATE_HALT;
+		hcd->self.controller->power.power_state = PMSG_SUSPEND;
 	}
 	sl811->ctrl1 = 0;
 	sl811_write(sl811, SL11H_IRQ_ENABLE, 0);
@@ -646,9 +644,8 @@ static inline u8 checkdone(struct sl811 *sl811)
 	return irqstat;
 }
 
-static irqreturn_t sl811h_irq(int irq, void *_hcd, struct pt_regs *regs)
+static irqreturn_t sl811h_irq(struct usb_hcd *hcd, struct pt_regs *regs)
 {
-	struct usb_hcd	*hcd = _hcd;
 	struct sl811	*sl811 = hcd_to_sl811(hcd);
 	u8		irqstat;
 	irqreturn_t	ret = IRQ_NONE;
@@ -833,6 +830,7 @@ static int sl811h_urb_enqueue(
 	/* avoid all allocations within spinlocks */
 	if (!hep->hcpriv) {
 		ep = kcalloc(1, sizeof *ep, mem_flags);
+		/* set hep, otherwise sl811h_ep	*start(struct sl811 *sl811, u8 bank) crashes */
 		ep->hep = hep;
 	}
 
@@ -840,7 +838,7 @@ static int sl811h_urb_enqueue(
 
 	/* don't submit to a dead or disabled port */
 	if (!(sl811->port1 & (1 << USB_PORT_FEAT_ENABLE))
-			|| !HCD_IS_RUNNING(hcd->state)) {
+			|| !HC_IS_RUNNING(hcd->state)) {
 		retval = -ENODEV;
 		goto fail;
 	}
@@ -954,7 +952,11 @@ static int sl811h_urb_enqueue(
 		retval = 0;
 		goto fail;
 	}
-	urb->hcpriv = hep;
+	
+	/* when uncommented, causes this error on mouse open: 
+		drivers/usb/input/usbmouse.c: can't resubmit intr, sl811-hcd-1/input0, status -22
+		urb->hcpriv = hep;  */
+	
 	spin_unlock(&urb->lock);
 
 	start_transfer(sl811);
@@ -1075,7 +1077,7 @@ sl811h_hub_status_data(struct usb_hcd *hcd, char *buf)
 	 */
 	local_irq_save(flags);
 	if (!timer_pending(&sl811->timer)) {
-		if (sl811h_irq(~0, sl811, NULL) != IRQ_NONE)
+		if (sl811h_irq( /* ~0, */ hcd, NULL) != IRQ_NONE)
 			sl811->stat_lost++;
 	}
 	local_irq_restore(flags);
@@ -1559,28 +1561,17 @@ static int
 sl811h_start(struct usb_hcd *hcd)
 {
 	struct sl811		*sl811 = hcd_to_sl811(hcd);
-	struct usb_device	*udev;
 
 	/* chip has been reset, VBUS power is off */
+	hcd->state = HC_STATE_RUNNING;
 
-	udev = usb_alloc_dev(NULL, &hcd->self, 0);
-	if (!udev)
-		return -ENOMEM;
-
-	udev->speed = USB_SPEED_FULL;
-	hcd->state = USB_STATE_RUNNING;
-
-	if (sl811->board)
+	if (sl811->board) {
 		hcd->can_wakeup = sl811->board->can_wakeup;
-
-	if (hcd_register_root(udev, hcd) != 0) {
-		usb_put_dev(udev);
-		sl811h_stop(hcd);
-		return -ENODEV;
+		hcd->power_budget = sl811->board->power * 2;
 	}
 
-	if (sl811->board && sl811->board->power)
-		hub_set_power_budget(udev, sl811->board->power * 2);
+	// enable power and interupts	
+	port_power(sl811, 1);
 
 	return 0;
 }
@@ -1594,7 +1585,7 @@ static struct hc_driver sl811h_hc_driver = {
 	/*
 	 * generic hardware linkage
 	 */
-	//.irq =			sl811h_irq,
+	.irq =			sl811h_irq,
 	.flags =		HCD_USB11 | HCD_MEMORY,
 
 	/* Basic lifecycle operations */
@@ -1624,43 +1615,41 @@ static struct hc_driver sl811h_hc_driver = {
 
 /*-------------------------------------------------------------------------*/
 
-int sl811h_remove(struct device *dev)
+static int __init_or_module
+sl811h_remove(struct device *dev)
 {
-	struct sl811		*sl811 = dev_get_drvdata(dev);
-	struct usb_hcd		*hcd = sl811_to_hcd(sl811);
+	struct usb_hcd		*hcd = dev_get_drvdata(dev);
+	struct sl811		*sl811 = hcd_to_sl811(hcd);
 	struct platform_device	*pdev;
 	struct resource		*res;
 
+	DBG("sl811h_remove\n");
 	pdev = container_of(dev, struct platform_device, dev);
 
-	if (HCD_IS_RUNNING(hcd->state))
-		hcd->state = USB_STATE_QUIESCING;
-
-	usb_disconnect(&hcd->self.root_hub);
 	remove_debug_file(sl811);
-	sl811h_stop(hcd);
+	usb_remove_hcd(hcd);
 
-	usb_deregister_bus(&hcd->self);
-
-	free_irq(hcd->irq, hcd);
-
-	/*iounmap(sl811->data_reg);*/
+#ifndef CONFIG_USB_SL811_CS
+	iounmap(sl811->data_reg);
+#endif
 	res = platform_get_resource(pdev, IORESOURCE_MEM, 1);
-	release_mem_region(res->start, 1);
-
-	/*iounmap(sl811->addr_reg);*/
+	if (res != NULL) release_mem_region(res->start, 1);
+	else DBG("res: %d\n", res);
+#ifndef CONFIG_USB_SL811_CS
+	iounmap(sl811->addr_reg);
+#endif
 	res = platform_get_resource(pdev, IORESOURCE_MEM, 0);
-	release_mem_region(res->start, 1);
+	if (res != NULL) release_mem_region(res->start, 1);
+	else DBG("res: %d\n", res);
 
 	usb_put_hcd(hcd);
 	return 0;
 }
-EXPORT_SYMBOL(sl811h_remove);
 
 #define resource_len(r) (((r)->end - (r)->start) + 1)
 
 /***************************************************************************
- * This routine tesst the Read/Write functionality of SL811HS registers
+ * This routine tests the Read/Write functionality of SL811HS registers
  *
  * 1) Store original register value into a buffer
  * 2) Write to registers with a RAMP pattern. (10, 11, 12, ..., 255)
@@ -1673,7 +1662,7 @@ EXPORT_SYMBOL(sl811h_remove);
  *
  * Return: 1 = passed; 0 = failed
  **************************************************************************/
-int test_registers(struct sl811 * sl811)
+static int test_registers(struct sl811 * sl811)
 {
         int i, result = 1;
         u8 buf[256], data;
@@ -1715,7 +1704,7 @@ int sl811h_probe(struct device *dev)
 	int			irq;
 	void __iomem		*addr_reg;
 	void __iomem		*data_reg;
-	int			retval = 0;
+	int			retval;
 	u8			tmp;
 
 	/* basic sanity checks first.  board-specific init logic should
@@ -1743,8 +1732,11 @@ int sl811h_probe(struct device *dev)
 		retval = -EBUSY;
 		goto err1;
 	}
-	/*addr_reg = ioremap(addr->start, resource_len(addr)); FIXME*/
+#ifdef CONFIG_USB_SL811_CS
 	addr_reg = (void *) addr->start;
+#else
+	addr_reg = ioremap(addr->start, resource_len(addr));
+#endif
 	if (addr_reg == NULL) {
 		retval = -ENOMEM;
 		goto err2;
@@ -1754,31 +1746,29 @@ int sl811h_probe(struct device *dev)
 		retval = -EBUSY;
 		goto err3;
 	}
-	/*data_reg = ioremap(data->start, resource_len(data)); FIXME*/
+
+#ifdef CONFIG_USB_SL811_CS
 	data_reg = (void *) data->start;
+#else
+	data_reg = ioremap(data->start, resource_len(data));
+#endif
 	if (data_reg == NULL) {
 		retval = -ENOMEM;
 		goto err4;
 	}
 
-	/* FIXME */
-	printk(KERN_INFO "SL811_HCD: addr_reg: 0x%04x, data_reg: 0x%04x\n",
-	       (int) addr_reg, (int) data_reg);
+	DBG("SL811_HCD: addr_reg: 0x%04x, data_reg: 0x%04x\n",
+	    (int) addr_reg, (int) data_reg);
 
 	/* allocate and initialize hcd */
-	hcd = usb_create_hcd(&sl811h_hc_driver);
+	hcd = usb_create_hcd(&sl811h_hc_driver, dev, dev->bus_id);
 	if (!hcd) {
 		retval = -ENOMEM;
 		goto err5;
 	}
+	hcd->rsrc_start = addr->start;
 
 	sl811 = hcd_to_sl811(hcd);
-	dev_set_drvdata(dev, sl811); /* dev->driver_data = sl811 */
-
-	hcd->self.controller = dev;
-	hcd->self.bus_name = dev->bus_id;
-	hcd->irq = irq;
-	hcd->regs = addr_reg;
 
 	spin_lock_init(&sl811->lock);
 	INIT_LIST_HEAD(&sl811->async);
@@ -1797,7 +1787,7 @@ int sl811h_probe(struct device *dev)
 
 
 	spin_lock_irq(&sl811->lock);
-	port_power(sl811, 1); //FIXME: was port_power(sl811, 0); 
+	port_power(sl811, 0);
 	spin_unlock_irq(&sl811->lock);
 	msleep(200);
 
@@ -1815,48 +1805,40 @@ int sl811h_probe(struct device *dev)
 		retval = -ENXIO;
 		goto err6;
 	}
-
 	/* sl811s would need a different handler for this irq */
-#ifdef	CONFIG_ARM
+
+#if !defined(CONFIG_USB_SL811_CS) && defined(CONFIG_ARM)
 	/* Cypress docs say the IRQ is IRQT_HIGH ... */
-	/* FIXME PCMCIA
 	set_irq_type(irq, IRQT_RISING);
-	*/
 	
 #endif
-	retval = request_irq(irq, sl811h_irq, SA_INTERRUPT,
-			     hcd->driver->description, hcd);
+	retval = usb_add_hcd(hcd, irq, SA_INTERRUPT);
 	if (retval != 0)
 		goto err6;
 
 	INFO("%s, irq %d\n", hcd->product_desc, irq);
 
-	retval = usb_register_bus(&hcd->self);
-	if (retval < 0)
-		goto err7;
-
-	retval = sl811h_start(hcd);
-	if (retval < 0)
-		goto err8;
-
 	create_debug_file(sl811);
-	return 0;
+	DBG("sl811_hcd initialized\n");
+	return retval;
 
- err8:
-	usb_deregister_bus(&hcd->self);
- err7:
-	free_irq(hcd->irq, hcd);
  err6:
 	usb_put_hcd(hcd);
  err5:
-	/*iounmap(data_reg); FIXME*/
+
+#ifndef CONFIG_USB_SL811_CS
+	iounmap(data_reg);
+#endif
  err4:
 	release_mem_region(data->start, 1);
  err3:
-	/*iounmap(addr_reg); FIXME*/
+#ifndef CONFIG_USB_SL811_CS
+	iounmap(addr_reg);
+#endif
  err2:
 	release_mem_region(addr->start, 1);
  err1:
+
 	DBG("init error, %d\n", retval);
 	return retval;
 }
@@ -1870,16 +1852,17 @@ EXPORT_SYMBOL (sl811h_probe);
  */
 
 static int
-sl811h_suspend(struct device *dev, u32 state, u32 phase)
+sl811h_suspend(struct device *dev, pm_message_t state, u32 phase)
 {
-	struct sl811	*sl811 = dev_get_drvdata(dev);
+	struct usb_hcd	*hcd = dev_get_drvdata(dev);
+	struct sl811	*sl811 = hcd_to_sl811(hcd);
 	int		retval = 0;
 
 	if (phase != SUSPEND_POWER_DOWN)
 		return retval;
 
 	if (state <= PM_SUSPEND_MEM)
-		retval = sl811h_hub_suspend(sl811_to_hcd(sl811));
+		retval = sl811h_hub_suspend(hcd);
 	else
 		port_power(sl811, 0);
 	if (retval == 0)
@@ -1890,7 +1873,8 @@ sl811h_suspend(struct device *dev, u32 state, u32 phase)
 static int
 sl811h_resume(struct device *dev, u32 phase)
 {
-	struct sl811	*sl811 = dev_get_drvdata(dev);
+	struct usb_hcd	*hcd = dev_get_drvdata(dev);
+	struct sl811	*sl811 = hcd_to_sl811(hcd);
 
 	if (phase != RESUME_POWER_ON)
 		return 0;
@@ -1899,14 +1883,14 @@ sl811h_resume(struct device *dev, u32 phase)
 	 * let's assume it'd only be powered to enable remote wakeup.
 	 */
 	if (dev->power.power_state > PM_SUSPEND_MEM
-			|| !sl811_to_hcd(sl811)->can_wakeup) {
+			|| !hcd->can_wakeup) {
 		sl811->port1 = 0;
 		port_power(sl811, 1);
 		return 0;
 	}
 
-	dev->power.power_state = PM_SUSPEND_ON;
-	return sl811h_hub_resume(sl811_to_hcd(sl811));
+	dev->power.power_state = PMSG_ON;
+	return sl811h_hub_resume(hcd);
 }
 
 #else

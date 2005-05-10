@@ -1,10 +1,11 @@
-DESCRIPTION = "Ratoc cfu1 CF USB 1.1 host card driver"
-MAINTAINER = "Simon Pickering <S.G.Pickering@bath.ac.uk>"
+DESCRIPTION = "PCMCIA driver for the RATOC REX-CFU1 USB host controller CF card."
+MAINTAINER = "Botond Botyanszki <openembedded@siliconium.net>"
 SECTION = "kernel/modules"
-LICENSE = "GPL"
 PRIORITY = "optional"
-RDEPENDS = "kernel-module-usbcore kernel-module-sl811-hcd"
-PR = "r1"
+DEPENDS = "virtual/kernel"
+LICENSE = "GPL"
+RDEPENDS = "kernel-module-usbcore"
+PR = "r2"
 
 SRC_URI = "file://rex-cfu1.conf \
            file://Makefile \
@@ -18,20 +19,13 @@ S = "${WORKDIR}"
 
 inherit module
 
-#EXTRA_OEMAKE = "CFLAGS=-DDEBUG -C ${STAGING_KERNEL_DIR} SUBDIRS=${WORKDIR}"
-EXTRA_OEMAKE = "-C ${STAGING_KERNEL_DIR} SUBDIRS=${WORKDIR}"
-
-do_compile() {
-	unset CFLAGS CPPFLAGS CXXFLAGS LDFLAGS
-	oe_runmake modules
-}
-		
+EXTRA_OEMAKE = 'EXTRA_CFLAGS="-DCONFIG_USB_SL811_CS -DCONFIG_USB_DEBUG" -C ${STAGING_KERNEL_DIR} SUBDIRS=${WORKDIR}'
 
 do_install() {
 	install -d ${D}/lib/modules/${KERNEL_VERSION}/pcmcia/
 	install -m 0644 sl811_cs.ko ${D}/lib/modules/${KERNEL_VERSION}/pcmcia/
+	install -m 0644 sl811_hcd.ko ${D}/lib/modules/${KERNEL_VERSION}/pcmcia/
 
 	install -d ${D}/${sysconfdir}/pcmcia/
 	install -m 0644 ${WORKDIR}/rex-cfu1.conf ${D}/${sysconfdir}/pcmcia/
 }
-

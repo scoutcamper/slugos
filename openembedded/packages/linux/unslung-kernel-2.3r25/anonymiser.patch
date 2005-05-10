@@ -13,12 +13,12 @@
 +#	@echo \#define LINUX_COMPILE_BY \"`whoami`\" >> .ver
 +	@echo \#define LINUX_COMPILE_BY \"unslung\" >> .ver
 +#	@echo \#define LINUX_COMPILE_HOST \"`hostname | $(uts_truncate)`\" >> .ver
-+	@echo \#define LINUX_COMPILE_HOST \"www\" >> .ver
++	@echo \#define LINUX_COMPILE_HOST \"unslung.org\" >> .ver
 +#	@([ -x /bin/dnsdomainname ] && /bin/dnsdomainname > .ver1) || \
 +#	 ([ -x /bin/domainname ] && /bin/domainname > .ver1) || \
 +#	 echo > .ver1
 +#	@echo \#define LINUX_COMPILE_DOMAIN \"`cat .ver1 | $(uts_truncate)`\" >> .ver
-+	@echo \#define LINUX_COMPILE_DOMAIN \"nslu2-linux.org\" >> .ver
++	@echo \#define LINUX_COMPILE_DOMAIN \"unslung.org\" >> .ver
  	@echo \#define LINUX_COMPILER \"`$(CC) $(CFLAGS) -v 2>&1 | tail -n 1`\" >> .ver
  	@mv -f .ver $@
  	@rm -f .ver1

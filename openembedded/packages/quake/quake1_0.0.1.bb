@@ -4,12 +4,13 @@ PRIORITY = "optional"
 DEPENDS = "libsdl-x11 libsdl-mixer libsdl-net zlib"
 MAINTAINER = "Simon Pickering <S.G.Pickering@bath.ac.uk>"
 LICENSE = "GPL"
-PR = "r1"
+PR = "r2"
 
 SRC_URI = "http://mirror1.pdaXrom.org/rc9/src/quake1src.tar.bz2 \
            http://mirror1.pdaxrom.org/source/src/pak0.tar.gz \
            file://Makefile.patch;patch=1 \
            file://cl_parse.c.patch;patch=1 \
+           file://vid_sdl.c.patch;patch=1 \
            file://host.c.patch;patch=1"
 
 S = "${WORKDIR}/quake1src"
