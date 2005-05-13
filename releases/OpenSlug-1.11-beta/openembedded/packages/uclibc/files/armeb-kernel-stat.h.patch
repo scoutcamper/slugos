@@ -1,0 +1,45 @@
+# The asm/stat.h for ARM has some rather unusual transmogrifications for
+# big-endian running.  This patch makes the built in UClibC version of the
+# kernel binary interface match.  The #if's are technically unnecessary,
+# apart from the last one for st_blocks - the ARMEB branch will work for
+# both big and little endian.  The 2.6.11.2 Linux kernel only has the
+# last #if, but this seems safer as some little endian code may be
+# relying on the truncation of the values.
+--- uClibc-0.9.27/libc/sysdeps/linux/arm/bits/kernel_stat.h.orig	2005-04-13 21:08:39.877969768 -0700
++++ uClibc-0.9.27/libc/sysdeps/linux/arm/bits/kernel_stat.h	2005-04-13 21:15:35.109844928 -0700
+@@ -29,20 +29,35 @@
+ };
+ 
+ struct kernel_stat64 {
++#if __ARMEB__
++	unsigned long long st_dev;
++	unsigned char __pad0[4];
++#else
+ 	unsigned short	st_dev;
+ 	unsigned char	__pad0[10];
++#endif
+ #define _HAVE_STAT64___ST_INO
+ 	unsigned long	__st_ino;
+ 	unsigned int	st_mode;
+ 	unsigned int	st_nlink;
+ 	unsigned long	st_uid;
+ 	unsigned long	st_gid;
++#if __ARMEB__
++	unsigned long long	st_rdev;
++	unsigned char	__pad3[4];
++#else
+ 	unsigned short	st_rdev;
+ 	unsigned char	__pad3[10];
++#endif
+ 	long long	st_size;
+ 	unsigned long	st_blksize;
++#if __ARMEB__
++	unsigned long	__pad4;
++	unsigned long	st_blocks;
++#else
+ 	unsigned long	st_blocks;	/* Number 512-byte blocks allocated. */
+ 	unsigned long	__pad4;		/* future possible st_blocks high bits */
++#endif
+ 	unsigned long	st_atime;
+ 	unsigned long	__pad5;
+ 	unsigned long	st_mtime;

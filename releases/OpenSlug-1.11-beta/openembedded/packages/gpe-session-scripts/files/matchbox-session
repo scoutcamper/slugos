@@ -1,0 +1,13 @@
+#!/bin/sh
+
+XRES=`xdpyinfo | awk '/dimensions/ { print $2 }' | cut -dx -f1`
+
+if [ $XRES -ge 640 ]; then
+  gpe-appmgr -r -d &
+else
+  matchbox-desktop &
+fi
+
+matchbox-panel  --orientation south &
+exec matchbox-window-manager $@
+

@@ -1,0 +1,11 @@
+#!/bin/sh
+
+# Format disk / stick if need be
+# echo "Formatting /dev/sda1"
+# mke2fs -j /dev/sda1
+
+mount -t ext3 /dev/sda1 /media/hdd
+cd / ; find . -print0 -mount | cpio -p -0 -d -m -u /media/hdd
+rm -rf /media/hdd/dev
+find /dev -print0 | cpio -p -0 -d -m -u /media/hdd
+touch /.sda1root
