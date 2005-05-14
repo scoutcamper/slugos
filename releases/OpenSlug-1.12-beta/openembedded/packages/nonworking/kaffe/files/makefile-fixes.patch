@@ -1,0 +1,27 @@
+The conditional seems to upset recent automake versions
+
+
+#
+# Patch managed by http://www.holgerschurig.de/patcher.html
+#
+
+--- kaffe/kaffe/kaffevm/boehm-gc/boehm/Makefile.am~makefile-fixes
++++ kaffe/kaffe/kaffevm/boehm-gc/boehm/Makefile.am
+@@ -25,17 +25,9 @@
+ EXTRA_DIST = 
+     ## more items will be succesively added below
+ 
+-if CPLUSPLUS
+ extra = libgccpp.la
+-else
+-extra = 
+-endif
+ 
+-if GC_CONVENIENCE
+-noinst_LTLIBRARIES = libgc.la $(extra) 
+-else
+ lib_LTLIBRARIES = libgc.la $(extra) 
+-endif
+ 
+ include_HEADERS = include/gc.h include/gc_local_alloc.h \
+ include/gc_pthread_redirects.h include/gc_config_macros.h \
