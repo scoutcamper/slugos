@@ -34,7 +34,7 @@ update-ignore:
 	svn propset svn:ignore -F .svnignore .
 
 openslug-source:
-	tar zcvf openslug-source.tar.gz --exclude=.svn Makefile conf openembedded nslu2-linux
+	tar zcvf openslug-source.tar.gz --exclude=.svn Makefile bitbake conf openembedded nslu2-linux
 
 distclean: clobber
 	rm -rf setup-env conf/local.conf downloads
