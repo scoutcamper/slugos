@@ -3,8 +3,7 @@
 #
 
 #work around some breakages
-CVSDATE_xserver-kdrive=20050207
-CVSDATE_xext=20050222
+#CVSDATE_xext=20050222
 
 #set some preferred providers:
 PREFERRED_PROVIDER_gconf=gconf-dbus
@@ -31,7 +30,7 @@ PREFERRED_VERSION_xproto ?= "6.6.2"
 PREFERRED_VERSION_rxvt-unicode ?= "5.3"
 #PREFERRED_VERSION_gtk2-theme-angelistic ?= "0.3"
 #PREFERRED_VERSION_xst ?= "0.14"
-#PREFERRED_VERSION_xextensions ?= "0.0cvs${CVSDATE}"
+PREFERRED_VERSION_xextensions ?= "0.0cvs20050610"
 PREFERRED_VERSION_xprop ?= "0.0cvs${CVSDATE}" 
 PREFERRED_VERSION_xhost ?= "0.0cvs20040413"
 PREFERRED_VERSION_xrdb ?= "0.0cvs${CVSDATE}"
@@ -44,7 +43,7 @@ PREFERRED_VERSION_xrdb ?= "0.0cvs${CVSDATE}"
 #PREFERRED_VERSION_gpe-contacts ?= "0.36"
 #PREFERRED_VERSION_gpe-today ?= "0.08"
 #PREFERRED_VERSION_matchbox-panel-manager ?= "0.1"
-PREFERRED_VERSION_dbus ?= "0.23"
+PREFERRED_VERSION_dbus ?= "0.23.4"
 #PREFERRED_VERSION_gpe-bluetooth ?= "0.38"
 #PREFERRED_VERSION_gpe-su ?= "0.18"
 #PREFERRED_VERSION_gpe-conf ?= "0.1.23"

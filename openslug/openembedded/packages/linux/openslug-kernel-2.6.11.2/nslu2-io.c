@@ -353,8 +353,6 @@ static int n2lm_ioctl(struct inode *inode, struct file *file, unsigned int cmd, 
 			n2lm_ledon(led);
 			if (led == LED_RS_RED)
 				n2lm_rsr_timer.data = RS_RED_TGL;
-			if (led == LED_RS_GRN)
-				n2lm_rsr_timer.data = RS_GRN_TGL;
 			n2lm_timer_start(led);
 			break;
 

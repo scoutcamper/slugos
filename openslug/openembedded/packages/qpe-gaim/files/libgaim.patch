@@ -1,7 +1,7 @@
-Index: gaim-1.1.4/src/status.c
+Index: gaim-1.3.0/src/status.c
 ===================================================================
---- gaim-1.1.4.orig/src/status.c	2005-02-10 01:07:25.000000000 +0100
-+++ gaim-1.1.4/src/status.c	2005-02-28 22:56:48.000000000 +0100
+--- gaim-1.3.0.orig/src/status.c	2005-02-10 01:07:25.000000000 +0100
++++ gaim-1.3.0/src/status.c	2005-06-05 02:21:59.000000000 +0200
 @@ -24,10 +24,13 @@
  #include "internal.h"
  #include "debug.h"
@@ -16,31 +16,31 @@ Index: gaim-1.1.4/src/status.c
  
  
  /* for people like myself who are too lazy to add an away msg :) */
-Index: gaim-1.1.4/plugins/Makefile.am
+Index: gaim-1.3.0/plugins/Makefile.am
 ===================================================================
---- gaim-1.1.4.orig/plugins/Makefile.am	2004-06-06 18:41:01.000000000 +0200
-+++ gaim-1.1.4/plugins/Makefile.am	2005-02-28 22:36:44.000000000 +0100
-@@ -13,46 +13,28 @@
+--- gaim-1.3.0.orig/plugins/Makefile.am	2005-04-29 19:01:57.000000000 +0200
++++ gaim-1.3.0/plugins/Makefile.am	2005-06-05 02:24:20.000000000 +0200
+@@ -13,46 +13,29 @@
  endif
  
  SUBDIRS = \
 -	docklet gaim-remote $(GEVOLUTION_DIR) gestures \
 -	$(PERL_DIR) $(TCL_DIR) ssl ticker
 +	$(GEVOLUTION_DIR) \
-+	$(PERL_DIR) $(TCL_DIR) ssl 
++	$(PERL_DIR) $(TCL_DIR) ssl
  
  plugindir = $(libdir)/gaim
  
- autorecon_la_LDFLAGS    = -module -avoid-version
--extplacement_la_LDFLAGS = -module -avoid-version
--history_la_LDFLAGS      = -module -avoid-version
--iconaway_la_LDFLAGS     = -module -avoid-version
- idle_la_LDFLAGS         = -module -avoid-version
--notify_la_LDFLAGS       = -module -avoid-version
- relnot_la_LDFLAGS       = -module -avoid-version
--spellchk_la_LDFLAGS     = -module -avoid-version
- statenotify_la_LDFLAGS  = -module -avoid-version
--timestamp_la_LDFLAGS    = -module -avoid-version
+ autorecon_la_LDFLAGS    = -module -avoid-version $(GLIB_LIBS)
+ extplacement_la_LDFLAGS = -module -avoid-version $(GLIB_LIBS)
+-history_la_LDFLAGS      = -module -avoid-version $(GTK_LIBS)
+-iconaway_la_LDFLAGS     = -module -avoid-version $(GTK_LIBS)
+ idle_la_LDFLAGS         = -module -avoid-version $(GLIB_LIBS)
+-notify_la_LDFLAGS       = -module -avoid-version $(GTK_LIBS)
+ relnot_la_LDFLAGS       = -module -avoid-version $(GLIB_LIBS)
+-spellchk_la_LDFLAGS     = -module -avoid-version $(GTK_LIBS)
+ statenotify_la_LDFLAGS  = -module -avoid-version $(GLIB_LIBS)
+-timestamp_la_LDFLAGS    = -module -avoid-version $(GTK_LIBS)
  
  if PLUGINS
  
@@ -70,7 +70,7 @@ Index: gaim-1.1.4/plugins/Makefile.am
  
  endif # PLUGINS
  
-@@ -74,7 +56,7 @@
+@@ -74,7 +57,7 @@
  	-DVERSION=\"$(VERSION)\" \
  	-I$(top_srcdir)/src \
  	$(DEBUG_CFLAGS) \
@@ -79,10 +79,10 @@ Index: gaim-1.1.4/plugins/Makefile.am
  	$(PLUGIN_CFLAGS)
  
  #
-Index: gaim-1.1.4/src/gaim.h
+Index: gaim-1.3.0/src/gaim.h
 ===================================================================
---- gaim-1.1.4.orig/src/gaim.h	2004-08-08 07:37:58.000000000 +0200
-+++ gaim-1.1.4/src/gaim.h	2005-03-01 00:08:44.000000000 +0100
+--- gaim-1.3.0.orig/src/gaim.h	2004-08-08 07:37:58.000000000 +0200
++++ gaim-1.3.0/src/gaim.h	2005-06-05 02:21:59.000000000 +0200
 @@ -27,6 +27,10 @@
  
  #include "connection.h"
@@ -123,11 +123,11 @@ Index: gaim-1.1.4/src/gaim.h
 +#endif
 +
  #endif /* _GAIM_H_ */
-Index: gaim-1.1.4/src/Makefile.am
+Index: gaim-1.3.0/src/Makefile.am
 ===================================================================
---- gaim-1.1.4.orig/src/Makefile.am	2004-12-03 05:18:25.000000000 +0100
-+++ gaim-1.1.4/src/Makefile.am	2005-02-28 23:11:27.000000000 +0100
-@@ -60,6 +60,8 @@
+--- gaim-1.3.0.orig/src/Makefile.am	2005-04-11 22:59:21.000000000 +0200
++++ gaim-1.3.0/src/Makefile.am	2005-06-05 02:21:59.000000000 +0200
+@@ -61,6 +61,8 @@
  
  SUBDIRS = protocols
  
@@ -136,7 +136,7 @@ Index: gaim-1.1.4/src/Makefile.am
  gaim_coresources = \
  	account.c \
  	accountopt.c \
-@@ -111,6 +113,7 @@
+@@ -112,6 +114,7 @@
  	debug.h \
  	eventloop.h \
  	ft.h \
@@ -144,7 +144,7 @@ Index: gaim-1.1.4/src/Makefile.am
  	imgstore.h \
  	log.h \
  	md5.h \
-@@ -138,101 +141,21 @@
+@@ -139,101 +142,21 @@
  	version.h \
  	xmlnode.h
  
@@ -256,7 +256,7 @@ Index: gaim-1.1.4/src/Makefile.am
  
  AM_CPPFLAGS = \
  	-DBR_PTHREADS=0 \
-@@ -241,9 +164,5 @@
+@@ -242,9 +165,5 @@
  	-DLOCALEDIR=\"$(datadir)/locale\" \
  	-DSYSCONFDIR=\"$(sysconfdir)\" \
  	-I$(top_srcdir)/plugins \
@@ -267,10 +267,10 @@ Index: gaim-1.1.4/src/Makefile.am
 -	$(GTKSPELL_CFLAGS) \
 -	$(STARTUP_NOTIFICATION_CFLAGS)
 +	$(GLIB_CFLAGS)
-Index: gaim-1.1.4/plugins/extplacement.c
+Index: gaim-1.3.0/plugins/extplacement.c
 ===================================================================
---- gaim-1.1.4.orig/plugins/extplacement.c	2004-09-03 23:34:03.000000000 +0200
-+++ gaim-1.1.4/plugins/extplacement.c	2005-02-28 22:30:43.000000000 +0100
+--- gaim-1.3.0.orig/plugins/extplacement.c	2004-09-03 23:34:03.000000000 +0200
++++ gaim-1.3.0/plugins/extplacement.c	2005-06-05 02:21:59.000000000 +0200
 @@ -21,10 +21,12 @@
   */
  
@@ -285,10 +285,10 @@ Index: gaim-1.1.4/plugins/extplacement.c
  
  static void
  conv_placement_by_number(GaimConversation *conv)
-Index: gaim-1.1.4/src/away.h
+Index: gaim-1.3.0/src/away.h
 ===================================================================
---- gaim-1.1.4.orig/src/away.h	2004-08-20 07:11:29.000000000 +0200
-+++ gaim-1.1.4/src/away.h	2005-02-28 22:46:03.000000000 +0100
+--- gaim-1.3.0.orig/src/away.h	2004-08-20 07:11:29.000000000 +0200
++++ gaim-1.3.0/src/away.h	2005-06-05 02:21:59.000000000 +0200
 @@ -25,7 +25,7 @@
  #ifndef _GAIM_AWAY_H_
  #define _GAIM_AWAY_H_
@@ -329,10 +329,10 @@ Index: gaim-1.1.4/src/away.h
 +#endif
  
  #endif /* _GAIM_AWAY_H_ */
-Index: gaim-1.1.4/src/server.c
+Index: gaim-1.3.0/src/server.c
 ===================================================================
---- gaim-1.1.4.orig/src/server.c	2005-02-03 16:34:35.000000000 +0100
-+++ gaim-1.1.4/src/server.c	2005-03-01 00:12:55.000000000 +0100
+--- gaim-1.3.0.orig/src/server.c	2005-04-14 21:17:50.000000000 +0200
++++ gaim-1.3.0/src/server.c	2005-06-05 02:21:59.000000000 +0200
 @@ -32,13 +32,17 @@
  #include "server.h"
  #include "sound.h"
@@ -351,7 +351,7 @@ Index: gaim-1.1.4/src/server.c
  
  #define SECS_BEFORE_RESENDING_AUTORESPONSE 600
  #define SEX_BEFORE_RESENDING_AUTORESPONSE "Only after you're married"
-@@ -793,6 +797,8 @@
+@@ -805,6 +809,8 @@
  	gchar *temp;
  	gint i = 0;
  	gboolean valid;
@@ -360,7 +360,7 @@ Index: gaim-1.1.4/src/server.c
  	GtkTreeIter iter;
  
  	valid = gtk_tree_model_get_iter_first(GTK_TREE_MODEL(awayqueuestore), &iter);
-@@ -805,6 +811,7 @@
+@@ -817,6 +823,7 @@
  		i++;
  		valid = gtk_tree_model_iter_next(GTK_TREE_MODEL(awayqueuestore), &iter);
  	}
@@ -368,7 +368,7 @@ Index: gaim-1.1.4/src/server.c
  
  	return -1;
  }
-@@ -816,7 +823,7 @@
+@@ -828,7 +835,7 @@
  
  	templist = message_queue;
  
@@ -377,7 +377,7 @@ Index: gaim-1.1.4/src/server.c
  		struct queued_message *qm = (struct queued_message *)templist->data;
  		if ((qm->flags & GAIM_MESSAGE_RECV) && !strcmp(name, qm->name))
  			i++;
-@@ -952,6 +959,7 @@
+@@ -964,6 +971,7 @@
  			qm->flags = msgflags;
  
  			if (queue_to_away) {
@@ -385,7 +385,7 @@ Index: gaim-1.1.4/src/server.c
  				GtkTreeIter iter;
  				gchar path[10];
  
-@@ -980,6 +988,7 @@
+@@ -992,6 +1000,7 @@
  									2, _("(1 message)"),
  									-1);
  				}
@@ -393,7 +393,7 @@ Index: gaim-1.1.4/src/server.c
  			} else /* queue_to_docklet */
  				unread_message_queue = g_slist_append(unread_message_queue, qm);
  		} else {
-@@ -1037,7 +1046,12 @@
+@@ -1049,7 +1058,12 @@
  		lar->sent = t;
  
  		/* apply default fonts and colors */

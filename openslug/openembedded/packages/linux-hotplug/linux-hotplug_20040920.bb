@@ -7,12 +7,13 @@ RPROVIDES = "hotplug"
 RCONFLICTS = "hotplug"
 RREPLACES = "hotplug"
 SECTION = "base"
-PR = "r2"
+PR = "r4"
 RSUGGESTS = "pciutils usbutils"
 
 SRC_URI = "ftp://ftp.kernel.org/pub/linux/utils/kernel/hotplug/hotplug-2004_09_20.tar.gz \
 	   file://userspecified_hcd.patch;patch=1 \
 	   file://hotplug-net-agent-usb.patch;patch=1 \
+           file://usbrc-busybox.patch;patch=1 \
            file://fix-net.agent \
            file://update-usb.usermap \
            file://logcheck-ignore \
@@ -42,8 +43,8 @@ oldmandir := "${mandir}"
 oldsbindir := "${sbindir}"
 prefix = ""
 exec_prefix = ""
-FILES_hotplug_append = " ${oldsbindir}"
-FILES_hotplug-doc_append = " ${oldmandir}"
+FILES_${PN} += "${oldsbindir}"
+FILES_${PN}-doc += "${oldmandir}"
 
 export DEBFIX = "sed -e 's:sysconfig/usb:default/hotplug.usb:'"
 do_install () {

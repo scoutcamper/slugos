@@ -4,6 +4,7 @@ LICENSE = "LGPL"
 SECTION = "libs"
 PRIORITY = "required"
 MAINTAINER = "Phil Blundell <pb@handhelds.org>"
+DEFAULT_PREFERENCE_i586 = "0"
 
 FILESDIR = "${@os.path.dirname(bb.data.getVar('FILE',d,1))}/glibc-cvs"
 PR = "r0"

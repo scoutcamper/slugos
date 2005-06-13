@@ -2,8 +2,7 @@ include conf/licenses.conf
 
 SRC_DISTRIBUTECOMMAND[func] = "1"
 python do_distribute_sources () {
-	import copy
-	l = copy.deepcopy(d)
+	l = bb.data.createCopy(d)
 	bb.data.update_data(l)
 	licenses = (bb.data.getVar('LICENSE', d, 1) or "").split()
 	if not licenses:

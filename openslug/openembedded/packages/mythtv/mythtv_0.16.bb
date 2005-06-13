@@ -49,7 +49,7 @@ do_configure_prepend() {
 			--disable-sunmlib	\
 						\
 			--cpu=${MYTHTV_ARCH}	\
-			--enablee-mmx		\
+			--enable-mmx		\
 			--disable-altivec	\
 			--enable-v4l		\
 			--enable-audio-oss	\

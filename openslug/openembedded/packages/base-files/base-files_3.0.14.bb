@@ -1,7 +1,7 @@
 DESCRIPTION = "Miscellaneous files for the base system."
 SECTION = "base"
 PRIORITY = "required"
-PR = "r31"
+PR = "r34"
 LICENSE = "GPL"
 
 SRC_URI = " \
@@ -148,6 +148,7 @@ do_install_append_nylon() {
 	rm ${D}${sysconfdir}/resolv.conf
 	touch ${D}${sysconfdir}/resolv.conf
 	rm -r ${D}/mnt/*
+	rm -r ${D}/media
 }
 
 do_install_append_openslug() {

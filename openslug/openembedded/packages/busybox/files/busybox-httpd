@@ -12,10 +12,6 @@ set -e
 case "$1" in
     start)
         echo -n "starting $DESC: $NAME... "
-	if [ ! -f /etc/httpd.conf ]; then
-		echo "/etc/httpd.conf is missing."
-		exit 1
-	fi 
 	if [ ! -d $HTTPROOT ]; then
 		echo "$HTTPROOT is missing."
 		exit 1

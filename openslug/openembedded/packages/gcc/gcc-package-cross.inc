@@ -1,18 +1,28 @@
 # Packages emitted by our gcc-cross builds.
 #
 INHIBIT_PACKAGE_STRIP ?= ""
+HAS_G2C ?= "yes"
+HAS_GFORTRAN ?= "no"
 OLD_INHIBIT_PACKAGE_STRIP := "${INHIBIT_PACKAGE_STRIP}"
 INHIBIT_PACKAGE_STRIP = "1"
 
-PACKAGES = "libgcc libstdc++ libg2c"
+PACKAGES = "libgcc libstdc++ libg2c libg2c-dev libgfortran libgfortran-dev"
 
 PACKAGE_ARCH_libg2c = "${TARGET_ARCH}"
 PACKAGE_ARCH_libg2c-dev = "${TARGET_ARCH}"
+PACKAGE_ARCH_libgfortran = "${TARGET_ARCH}"
+PACKAGE_ARCH_libgfortran-dev = "${TARGET_ARCH}"
+
 # Called from within gcc-cross, so libdir is set wrong
 FILES_libg2c = "${target_libdir}/libg2c.so.*"
 FILES_libg2c-dev = "${target_libdir}/libg2c.so \
 		    ${target_libdir}/libg2c.a \
 		    ${target_libdir}/libfrtbegin.a"
+
+FILES_libgfortran = "${target_libdir}/libgfortran.so.*"
+FILES_libgfortran-dev = "${target_libdir}/libgfortran.a \
+			 ${target_libdir}/libgfortran.so \
+			 ${target_libdir}/libgfortranbegin.a"
 
 PACKAGE_ARCH_libgcc = "${TARGET_ARCH}"
 FILES_libgcc = "${target_base_libdir}/libgcc_s.so.1"
@@ -50,7 +60,12 @@ do_install () {
 	# Move libstdc++ and libg2c into libdir (resetting our prefix to /usr
 	mkdir -p ${D}${target_libdir}
 	mv -f ${D}${prefix}/*/lib/libstdc++.so.* ${D}${target_libdir}
-	mv -f ${D}${prefix}/*/lib/libg2c.so.* ${D}${target_libdir}
+	if [ "${HAS_G2C}" = "yes" ]; then
+	  mv -f ${D}${prefix}/*/lib/libg2c.so.* ${D}${target_libdir}
+	fi
+	if [ "${HAS_GFORTRAN}" = "yes" ]; then
+	  mv -f ${D}${prefix}/*/lib/libgfortran*.so.* ${D}${target_libdir}
+	fi
 
        # Manually run the target stripper since we won't get it run by
        # the packaging.

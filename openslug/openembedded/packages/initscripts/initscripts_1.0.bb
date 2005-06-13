@@ -6,7 +6,7 @@ DEPENDS = "makedevs"
 DEPENDS_openzaurus = "makedevs virtual/kernel"
 RDEPENDS = "makedevs"
 LICENSE = "GPL"
-PR = "r42"
+PR = "r45"
 
 SRC_URI = "file://halt \
            file://ramdisk \
@@ -30,11 +30,13 @@ SRC_URI = "file://halt \
            file://umountnfs.sh \
            file://sysfs.sh \
            file://device_table.txt \
-	   file://corgikeymap-2.6.map"
+	   file://corgikeymap-2.6.map \
+	   file://tosakeymap-2.6.map"
 
 SRC_URI_append_arm = " file://alignment.sh"
 SRC_URI_append_openzaurus = " file://checkversion"
 SRC_URI_append_c7x0 =    " file://keymap"
+SRC_URI_append_tosa =    " file://keymap"
 
 def read_kernel_version(d):
 	import bb
@@ -99,6 +101,11 @@ do_install () {
 		ln -sf          ../init.d/keymap  				${D}${sysconfdir}/rcS.d/S00keymap
 	fi
 
+	if [ "${MACHINE}" == "tosa" ]; then
+		install -m 0755    ${WORKDIR}/tosakeymap-2.6.map		${D}${sysconfdir}
+		install -m 0755    ${WORKDIR}/keymap				${D}${sysconfdir}/init.d
+		ln -sf          ../init.d/keymap  				${D}${sysconfdir}/rcS.d/S00keymap
+	fi
 
 	install -m 0755 ${WORKDIR}/banner	${D}${sysconfdir}/init.d/banner
 	install -m 0755 ${WORKDIR}/devices	${D}${sysconfdir}/init.d/devices
@@ -125,7 +132,7 @@ do_install () {
 	ln -sf		../init.d/checkroot.sh	${D}${sysconfdir}/rcS.d/S10checkroot.sh
 #	ln -sf		../init.d/checkfs.sh	${D}${sysconfdir}/rcS.d/S30checkfs.sh
 	ln -sf		../init.d/mountall.sh	${D}${sysconfdir}/rcS.d/S35mountall.sh
-	ln -sf		../init.d/hostname.sh	${D}${sysconfdir}/rcS.d/S40hostname.sh
+	ln -sf		../init.d/hostname.sh	${D}${sysconfdir}/rcS.d/S39hostname.sh
 	ln -sf		../init.d/mountnfs.sh	${D}${sysconfdir}/rcS.d/S45mountnfs.sh
 	ln -sf		../init.d/bootmisc.sh	${D}${sysconfdir}/rcS.d/S55bootmisc.sh
 #	ln -sf		../init.d/urandom	${D}${sysconfdir}/rcS.d/S55urandom

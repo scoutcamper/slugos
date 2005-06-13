@@ -10,7 +10,7 @@ HOMEPAGE = "http://www.busybox.net"
 LICENSE = "GPL"
 SECTION = "base"
 PRIORITY = "required"
-PR = "r19"
+PR = "r25"
 
 SRC_URI = "http://www.busybox.net/downloads/busybox-${PV}.tar.gz \
            file://add-getkey-applet.patch;patch=1 \
@@ -25,6 +25,10 @@ SRC_URI = "http://www.busybox.net/downloads/busybox-${PV}.tar.gz \
 	   file://below.patch;patch=1 \
 	   file://fbset.patch;patch=1 \
 	   file://mount-all-type.patch;patch=1 \
+           file://celf-ash-builtins.patch;patch=1 \
+	   file://dhcp-hostname.patch;patch=1 \
+	   file://gzip-spurious-const.patch;patch=1 \
+	   file://ifupdown-spurious-environ.patch;patch=1 \
            file://defconfig \
            file://busybox-cron \
 	   file://busybox-httpd \
@@ -40,12 +44,22 @@ S = "${WORKDIR}/busybox-${PV}"
 
 export EXTRA_CFLAGS = "${CFLAGS}"
 EXTRA_OEMAKE_append = " CROSS=${HOST_PREFIX}"
+PACKAGES =+ "${PN}-httpd ${PN}-udhcpd"
+
+FILES_${PN}-httpd = "${sysconfdir}/init.d/busybox-httpd /srv/www"
+FILES_${PN}-udhcpd = "${sysconfdir}/init.d/busybox-udhcpd"
+
 FILES_${PN} += " ${datadir}/udhcpc"
 
-inherit cml1 update-rc.d
+INITSCRIPT_PACKAGES = "${PN} ${PN}-httpd ${PN}-udhcpd"
+INITSCRIPT_NAME_${PN}-httpd = "busybox-httpd"
+INITSCRIPT_NAME_${PN}-udhcpd = "busybox-udhcpd" 
+INITSCRIPT_NAME_${PN} = "syslog"
 
-INITSCRIPT_NAME = "syslog"
-INITSCRIPT_PARAMS = "defaults"
+# This disables the syslog startup links in openslug (see openslug-init)
+INITSCRIPT_PARAMS_${PN}_openslug = "start 20 ."
+
+inherit cml1 update-rc.d
 
 do_configure () {
 	install -m 0644 ${WORKDIR}/defconfig ${S}/.config
@@ -67,6 +81,7 @@ do_install () {
 	fi
 	if grep "CONFIG_HTTPD=y" ${WORKDIR}/defconfig; then 
 		install -m 0755 ${WORKDIR}/busybox-httpd ${D}${sysconfdir}/init.d/
+		install -d ${D}/srv/www
 	fi
 	if grep "CONFIG_UDHCPD=y" ${WORKDIR}/defconfig; then 
 		install -m 0755 ${WORKDIR}/busybox-udhcpd ${D}${sysconfdir}/init.d/
@@ -86,12 +101,12 @@ do_install () {
 	install -m 0755 ${WORKDIR}/umount.busybox ${D}${base_bindir}/
 }
 
-pkg_postinst () {
+pkg_postinst_${PN} () {
 	update-alternatives --install /bin/mount mount /bin/mount.busybox 50
 	update-alternatives --install /bin/umount umount /bin/umount.busybox 50
 }
 
-pkg_prerm () {
+pkg_prerm_${PN} () {
 	update-alternatives --remove mount /bin/mount.busybox
 	update-alternatives --remove umount /bin/umount.busybox
 }

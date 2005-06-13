@@ -12,5 +12,5 @@ SRC_URI = "http://www.nano-editor.org/dist/v1.3/nano-${PV}.tar.gz \
 inherit autotools
 
 do_configure_prepend () {
-	cp ${WORKDIR}/glib.m4 m4/
+	install -m 0644 ${WORKDIR}/glib.m4 m4/
 }

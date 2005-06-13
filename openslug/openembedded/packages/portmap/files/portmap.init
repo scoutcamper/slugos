@@ -22,7 +22,7 @@ case "$1" in
 	;;
     stop)
         echo -n "Stopping portmap daemon:"
-        echo -n " portmap" ; start-stop-daemon --stop --quiet --oknodo --exec /sbin/portmap
+        echo -n " portmap" ; start-stop-daemon --stop --quiet --exec /sbin/portmap
         echo "."
 	;;
     reload)

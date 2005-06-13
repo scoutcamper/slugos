@@ -1,11 +1,12 @@
 LICENSE = GPL
 SRC_URI = "ftp://ftp.gnupg.org/gcrypt/gpgme/gpgme-${PV}.tar.gz"
+PR = "r1"
 
 DEPENDS = "libgpg-error pth libassuan"
 
 EXTRA_OECONF = "--with-pth=${STAGING_DIR}/${HOST_SYS} --without-pth-test --with-gpg=${bindir}/gpg --without-gpgsm"
 
-inherit autotools
+inherit autotools binconfig
 
 do_stage() {
 	autotools_stage_includes

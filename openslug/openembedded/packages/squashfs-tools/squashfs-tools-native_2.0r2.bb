@@ -8,4 +8,5 @@ PACKAGES = ""
 
 do_stage () {
 	install -m 0755 mksquashfs ${STAGING_BINDIR}/
+	install -m 0755 mksquashfs-lzma ${STAGING_BINDIR}/
 }

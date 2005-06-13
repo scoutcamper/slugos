@@ -5,9 +5,9 @@ SRC_URI = "http://hauppauge.lightpath.net/de/nova-pci216.exe"
 FILES_${PN} = '*'
 
 python do_unpack() {
-	import re, copy
+	import re
 
-	localdata = copy.deepcopy(d)
+	localdata = bb.data.createCopy(d)
 	overrides = bb.data.getVar('OVERRIDES', localdata, 1)
 	if not overrides:
 		raise bb.build.FuncFailed('OVERRIDES not defined')

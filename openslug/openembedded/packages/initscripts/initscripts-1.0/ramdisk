@@ -25,7 +25,7 @@ fi
 RAM_MNTPT=/mnt/ram
 RAM_MTD_SIZE_HEX=`cat /proc/mtd | grep mtdram | tail -n 1 | cut -d" " -f 2`
 RAM_MTD_SIZE=`dc 0x$RAM_MTD_SIZE_HEX 1024 / p`
-OLD_MTD_SIZE=`cat /etc/ramdisk.conf`
+test -e /etc/ramdisk.conf && OLD_MTD_SIZE=`cat /etc/ramdisk.conf`
 echo $RAM_MTD_SIZE > /etc/ramdisk.conf
 
 if test ! -d "$RAM_MNTPT"; then echo >&2 "Mountpoint $RAM_MNTPT does not exist!"; exit 0; fi

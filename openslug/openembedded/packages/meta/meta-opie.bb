@@ -87,7 +87,6 @@ opie-gutenbrowser \
 opie-helpbrowser \
 opie-irc \
 opie-keypebble \
-opie-mobilemsg \
 opie-odict \
 opie-oxygen \
 opie-rdesktop \
@@ -267,11 +266,13 @@ opie-mediaplayer1-libmadplugin \
 opie-mediaplayer1-libmodplugin \
 opie-mediaplayer1-libtremorplugin \
 opie-mediaplayer1-libwavplugin \
+opie-mediaplayer1-ogg-mp3 \
 opie-mediaplayer2 \
 opie-mediaplayer2-skin-default \
 opie-mediaplayer2-skin-default-landscape \
 opie-mediaplayer2-skin-pod \
 opie-mediaplayer2-skin-techno \
+opie-mediaplayer2-divx \
 opie-powerchord \
 opie-recorder \
 opie-tonleiter \
@@ -327,7 +328,6 @@ opie-security \
 opie-sshkeys \
 opie-sysinfo \
 opie-systemtime \
-opie-tabmanager \
 opie-usermanager \
 opie-icon-reload \
 opie-vmemo-settings "
@@ -378,7 +378,7 @@ DEPENDS += " ${task-opie-wlan}"
 task-qpe-emulators = "\
 frodo \
 snes9x-sdl-qpe \
-uae \
+e-uae \
 "
 RDEPENDS_task-qpe-emulators = "${task-qpe-emulators}"
 DEPENDS += " ${task-qpe-emulators}"
