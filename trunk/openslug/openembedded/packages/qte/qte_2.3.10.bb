@@ -6,9 +6,9 @@ LICENSE = "GPL QPL"
 DEPENDS = "zlib libpng jpeg tslib uicmoc-native"
 DEPENDS_ramses = "zlib libpng jpeg uicmoc-native"
 PROVIDES = "virtual/qte virtual/libqte2"
-PR = "r15"
+PR = "r16"
 
-SRC_URI = "ftp://ftp.trolltech.com/pub/qt/source/qt-embedded-${PV}-free.tar.gz \
+SRC_URI = "ftp://ftp.trolltech.com/pub/qt/source/qt-embedded-${PV}-free.tar.gz;md5=1f7ad30113afc500cab7f5b2f4dec0d7 \
    	   file://qpe.patch;patch=1 \
 	   file://vt-switch.patch;patch=1 \
 	   file://daemonize.patch;patch=1 \
@@ -27,7 +27,8 @@ SRC_URI = "ftp://ftp.trolltech.com/pub/qt/source/qt-embedded-${PV}-free.tar.gz \
 	   file://qte-fix-iconsize.patch;patch=1 \
 	   file://sharp_char.h \
 	   file://key.patch;patch=1 \
-	   file://switches.h "
+	   file://switches.h \
+           file://bidimetrics.patch;patch=5 "
 
 SRC_URI_append_simpad   	= "file://devfs.patch;patch=1 "
 SRC_URI_append_c7x0		= "file://kernel-keymap.patch;patch=1 file://kernel-keymap-corgi.patch;patch=1 "
@@ -35,7 +36,7 @@ SRC_URI_append_spitz		= "file://kernel-keymap.patch;patch=1 file://kernel-keymap
 SRC_URI_append_akita            = "file://kernel-keymap.patch;patch=1 file://kernel-keymap-corgi.patch;patch=1 file://kernel-keymap-CXK.patch;patch=1 "
 SRC_URI_append_tosa		= "file://kernel-keymap.patch;patch=1 file://kernel-keymap-tosa.patch;patch=1 "
 SRC_URI_append_beagle   	= "file://beagle.patch;patch=1 "
-SRC_URI_append_jornada720       = "file://kernel-keymap.patch;patch=1 file://ipaq_sound_fix.patch;patch=1 "
+SRC_URI_append_jornada7xx       = "file://kernel-keymap.patch;patch=1 file://ipaq_sound_fix.patch;patch=1 "
 SRC_URI_append_jornada56x       = "file://kernel-keymap.patch;patch=1 file://ipaq_sound_fix.patch;patch=1 "
 SRC_URI_append_ramses           = "file://devfs.patch;patch=1 \
                                    file://ramses.patch;patch=1 \
@@ -78,7 +79,8 @@ EXTRA_DEFINES_tosa		= "-DQT_QWS_TSLIB                 -DQT_QWS_SL5XXX -DQT_QWS_S
 EXTRA_DEFINES_h3600     	= "-DQT_QWS_TSLIB -DQT_QWS_CUSTOM -DQT_QWS_IPAQ" 
 EXTRA_DEFINES_h3900 		= "-DQT_QWS_TSLIB -DQT_QWS_CUSTOM -DQT_QWS_IPAQ"
 EXTRA_DEFINES_jornada56x	= "-DQT_QWS_TSLIB -DQT_QWS_CUSTOM -DQT_QWS_IPAQ"
-EXTRA_DEFINES_jornada720	= "-DQT_QWS_TSLIB -DQT_QWS_CUSTOM -DQT_QWS_IPAQ"
+EXTRA_DEFINES_jornada6xx	= "-DQT_QWS_TSLIB -DQT_QWS_CUSTOM -DQT_QWS_IPAQ"
+EXTRA_DEFINES_jornada7xx	= "-DQT_QWS_TSLIB -DQT_QWS_CUSTOM -DQT_QWS_IPAQ"
 EXTRA_DEFINES_simpad		= "-DQT_QWS_TSLIB -DQT_QWS_CUSTOM -DQT_QWS_IPAQ   -DQT_QWS_SIMPAD -DQT_QWS_DEVFS"
 EXTRA_DEFINES_c7x0		= "-DQT_QWS_TSLIB -DQT_QWS_CUSTOM -DQT_QWS_SLC700 -DQT_QWS_SL5XXX"
 EXTRA_DEFINES_spitz		= "-DQT_QWS_TSLIB -DQT_QWS_CUSTOM -DQT_QWS_SLC700 -DQT_QWS_SL5XXX -DQT_QWS_SLCXK"
@@ -92,8 +94,8 @@ export SYSCONF_LINK = "${CCLD}"
 export SYSCONF_SHLIB = "${CCLD}"
 export SYSCONF_CFLAGS = "${CFLAGS}"
 export SYSCONF_LINK_SHLIB = "${CCLD}"
-export SYSCONF_CXXFLAGS = "${CXXFLAGS} -pipe -DQWS -fno-exceptions -fno-rtti -DNO_DEBUG ${EXTRA_DEFINES}"
-#export SYSCONF_CXXFLAGS = "${CXXFLAGS} -pipe -DQWS -fno-exceptions -fno-rtti -fvisibility=hidden -DGCC_SUPPORTS_VISIBILITY -DNO_DEBUG ${EXTRA_DEFINES}"
+export SYSCONF_CXXFLAGS = "${CXXFLAGS} -pipe -DQWS -fno-exceptions -fno-rtti -DNO_DEBUG ${EXTRA_DEFINES} -DUSE_BIDI"
+#export SYSCONF_CXXFLAGS = "${CXXFLAGS} -pipe -DQWS -fno-exceptions -fno-rtti -fvisibility=hidden -DGCC_SUPPORTS_VISIBILITY -DNO_DEBUG ${EXTRA_DEFINES} -DUSE_BIDI"
 export SYSCONF_LFLAGS = "${LDFLAGS} -lts"
 export SYSCONF_LFLAGS_ramses = "${LDFLAGS}"
 export SYSCONF_MOC = "${STAGING_BINDIR}/moc"

@@ -1,10 +1,10 @@
-SECTION = "devel"
 DESCRIPTION = "Java compiler adhering to language and VM specifications"
-HOMEPAGE = "http://www-124.ibm.com/developerworks/oss/jikes/"
+HOMEPAGE = "http://jikes.sourceforge.net/"
 PRIORITY = "optional"
 MAINTAINER = "Rene Wagner <reenoo@gmx.de>"
+SECTION = "devel"
+LICENSE = "IBM"
 
-SRC_URI="ftp://www-126.ibm.com/pub/jikes/${PV}/jikes-${PV}.tar.bz2"
-LICENSE="IBM"
+SRC_URI = "${SOURCEFORGE_MIRROR}/jikes/jikes-${PV}.tar.bz2"
 
 inherit autotools

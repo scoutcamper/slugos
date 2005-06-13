@@ -25,4 +25,4 @@ do_install () {
         install -m 755 ${WORKDIR}/init ${D}${sysconfdir}/init.d/dnsmasq
 }
 
-CONFFILES_${PN}_nylon = "${sysconfdir}/dnsmasq.conf"
+CONFFILES_${PN} = "${sysconfdir}/dnsmasq.conf"

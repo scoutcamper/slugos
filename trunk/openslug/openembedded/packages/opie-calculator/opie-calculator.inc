@@ -14,5 +14,7 @@ inherit opie
 do_install() {
         install -d ${D}${palmtopdir}/pics/calc/
         install -m 0644 ${WORKDIR}/pics/calc/*.png ${D}${palmtopdir}/pics/calc/
+        install -d ${D}${palmtopdir}/etc/
+        install -m 0644 ${WORKDIR}/etc/unit_conversion.dat ${D}${palmtopdir}/etc/
 }
 

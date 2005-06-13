@@ -28,7 +28,7 @@ case "$action" in
 
 start)
     echo -n "Start SD services:"
-	/sbin/modprobe $MODULE 2>/dev/null
+	/sbin/modprobe $MODULE >/dev/null
 	if [ -s /var/run/sdmgr.pid ]; then
 	    kill -0 `cat /var/run/sdmgr.pid` 2>/dev/null;
 	else

@@ -5,9 +5,9 @@ LICENSE = "GPL"
 #KV = "${@bb.data.getVar('PV',d,True).split('-')[0]}"
 KV = "${@bb.data.getVar('PV',d,True)}"
 
-PR = "r16"
+PR = "r20"
 
-DOSRC = "http://www.do13.in-berlin.de/openzaurus"
+DOSRC = "http://www.do13.in-berlin.de/openzaurus/patches"
 RPSRC = "http://www.rpsys.net/openzaurus/patches"
 JLSRC = "http://www.cs.wisc.edu/~lenz/zaurus/files/"
 
@@ -39,10 +39,11 @@ SRC_URI = "ftp://ftp.kernel.org/pub/linux/kernel/v2.6/linux-2.6.11.tar.gz \
            ${RPSRC}/corgi_irda-r2.patch;patch=1 \
            ${RPSRC}/corgi_base_extras1-r2.patch;patch=1 \
            ${RPSRC}/jffs2_longfilename-r0.patch;patch=1 \
-           ${RPSRC}/corgi_power-r17.patch;patch=1 \
+           ${RPSRC}/corgi_power-r22.patch;patch=1 \
            ${RPSRC}/corgi_power1-r1.patch;patch=1 \
            ${RPSRC}/ide_fixes-r1.patch;patch=1 \
            ${RPSRC}/mmc_sd-r4.patch;patch=1 \
+           ${RPSRC}/mmc_timeout-r0.patch;patch=1 \
            ${RPSRC}/corgi_snd-r6.patch;patch=1 \
            ${RPSRC}/w100_split-r5-r1.patch;patch=1 \
            ${DOSRC}/pxa2xx-ir-dma-r0.patch;patch=1 \
@@ -150,9 +151,20 @@ do_configure() {
 	yes '' | oe_runmake oldconfig
 }
 
+# Check the kernel is below the 1272*1024 byte limit for the c7x0
+do_compile_append() {
+	if [ "${MACHINE}" == "c7x0" ]; then
+		size=`ls arch/${ARCH}/boot/${KERNEL_IMAGETYPE} -s | cut -d ' ' -f 1`
+		if [ $size -ge 1271 ]; then
+			rm arch/${ARCH}/boot/${KERNEL_IMAGETYPE}
+			die "This kernel is too big for the c7x0 and will destroy your machine if you flash it!!!"
+		fi
+	fi
+}
+
 do_deploy() {
         install -d ${DEPLOY_DIR}/images
-        install -m 0644 arch/${ARCH}/boot/${KERNEL_IMAGETYPE} ${DEPLOY_DIR}/images/${KERNEL_IMAGETYPE}-${MACHINE}-${DATETIME}.bin
+        install -m 0644 arch/${ARCH}/boot/${KERNEL_IMAGETYPE} ${DEPLOY_DIR}/images/${KERNEL_IMAGETYPE}-${PV}-${MACHINE}-${DATETIME}.bin
 }
 
 do_deploy[dirs] = "${S}"

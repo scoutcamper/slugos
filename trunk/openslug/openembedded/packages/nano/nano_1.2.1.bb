@@ -1,9 +1,9 @@
-LICENSE = GPL
-SECTION = "console/utils"
-DEPENDS = "ncurses"
 DESCRIPTION = "GNU nano (Nano's ANOther editor, or \
 Not ANOther editor) is an enhanced clone of the \
 Pico text editor."
+LICENSE = GPL
+SECTION = "console/utils"
+DEPENDS = "ncurses"
 
 SRC_URI = "${GNU_MIRROR}/nano/nano-${PV}.tar.gz \
            file://configure.patch;patch=1 \
@@ -12,5 +12,5 @@ SRC_URI = "${GNU_MIRROR}/nano/nano-${PV}.tar.gz \
 inherit autotools
 
 do_configure_prepend () {
-	cp ${WORKDIR}/glib.m4 m4/
+	install -m 0644 ${WORKDIR}/glib.m4 m4/
 }

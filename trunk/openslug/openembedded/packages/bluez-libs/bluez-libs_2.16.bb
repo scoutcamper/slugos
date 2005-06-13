@@ -5,7 +5,7 @@ LICENSE = "GPL"
 
 SRC_URI = "http://bluez.sourceforge.net/download/bluez-libs-${PV}.tar.gz"
 
-inherit autotools 
+inherit autotools pkgconfig
 
 HEADERS = "bluetooth.h bnep.h cmtp.h hci.h hci_lib.h hci_uart.h hci_vhci.h hidp.h l2cap.h rfcomm.h sco.h sdp.h sdp_lib.h"
 

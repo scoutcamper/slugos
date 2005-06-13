@@ -3,7 +3,6 @@ BROKEN = "1"
 SECTION = "applications"
 PRIORITY = "optional"
 HOMEPAGE = "http://www.cirulla.net/kdenox-snapshots/"
-#DEPENDS = "openssl pcre"
 DEPENDS = "openssl pcre"
 LICENSE = "LGPL/GPL"
 PR = "r3"
@@ -11,7 +10,8 @@ PR = "r3"
 SRC_URI = "http://www.cirulla.net/kdenox-snapshots/snapshots/konqueror3-embedded-0.2-${PV}.tar.bz2 \
            file://qt-embedded.patch;patch=1"
 S = "${WORKDIR}/konqueror3-embedded-0.2-${PV}"
-     
+
+DEFAULT_PREFERENCE = "-1"
 
 inherit autotools
 

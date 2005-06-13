@@ -2,6 +2,7 @@ DESCRIPTION = "Packages that are compatible with the OpenSlug firmware"
 LICENSE = MIT
 PR = "r3"
 
+INHIBIT_DEFAULT_DEPS = "1"
 ALLOW_EMPTY = 1
 PACKAGES = "${PN}"
 
@@ -43,8 +44,10 @@ OPENSLUG_PACKAGES = "\
 	bash \
 	bluez-utils-nodbus bridge-utils \
 	coreutils cvs\
+	dnsmasq \
 	expat \
-	less \
+	ftpd-topfield \
+	less libusb \
 	miau microcom mt-daapd mysql \
 	nail \
 	openssh \
@@ -55,20 +58,27 @@ OPENSLUG_PACKAGES = "\
 	db4 \
 	openldap \
 	ntp \
+	reiserfsprogs reiser4progs \
+	python \
+	samba \
+	strace \
+	wget \
 	"
 
 # These packages only build on TARGET_OS=linux, not
 # TARGET_OS=linux-uclibc
 OPENSLUG_PACKAGES_append_linux = "\
 	php \
+	libpam \
 	yp-tools ypbind ypserv \
+	nfs-utils \
 	"
-
 BROKEN_PACKAGES = "\
+	cron \
 	mgetty \
-	strace  \
 	"
 
 DEPENDS = 'openslug-image \
 	${OPENSLUG_PACKAGES} \
-	${OPENSLUG_DEVELOPMENT}'
+	${OPENSLUG_DEVELOPMENT} \
+	package-index'
