@@ -1,0 +1,152 @@
+#!/bin/sh
+# TO USE THIS SCRIPT
+# ------------------
+#
+# clone the bk release to be moved to the trunk - use a local clone
+# as the source (one which has all the required changes - it can have
+# extra ones too) and use "bk clone -l -r<tag> <local-directory> bkclone
+#
+# For example:
+#
+#	bk clone -l -rOpenSlug-2.99-beta /home/openslug/openembedded bkclone
+#
+# 'bkclone' is a directory in the trunk/openslug SVN tree.  Use the <tag>
+# corresponding to the release - this will cause any extra stuff in your
+# tree to be removed.
+#
+# Having done this simply run:
+#
+#	copyclone bkclone openembedded
+#
+# Take note of any warnings.  If a file has been converted to a directory or
+# vice versa you are in untested territory - it should work, but the script
+# will ask for confirmation in each case.
+from="$1"
+to="$2"
+test -d "$from"/BitKeeper -a -d "$from"/packages || {
+	echo "copyclone: $from needs to be a bk clone containing the correct files!" >&2
+	exit 1
+}
+test -d "$to"/.svn -a -d "$to"/packages || {
+	echo "copyclone: $to needs to be the svn directory the current (SVN) files!" >&2
+	exit 1
+}
+echo -n "clone $from -> $to [N/y]: " >/dev/tty
+read ans </dev/tty
+test "$ans" = y -o "$ans" = Y || exit 0
+#
+#findbkf <from> <selectors>
+# find all the non-bitkeeper files in bk clone "$1"
+findbkf() {
+	where="$1"
+	shift
+	(	cd "$where"
+		find . \( -name BitKeeper -type d -prune \) -o \
+			\( -name SCCS -type d -prune \) -o \
+			\( "$@" -print \)
+	)
+}
+#
+#findsvnf <from> <selectors>
+# find all the non-svn files in svn tree "$1"
+findsvnf() {
+	where="$1"
+	shift
+	(	cd "$where"
+		find . \( -name .svn -type d -prune \) -o \
+			\( "$@" -print \)
+	)
+}
+#
+#svn_mkdir  file
+#svn_mkfile file
+# makes a directory in $to or copies a file from $from to $to
+svn_mkdir() {
+	if mkdir "$to/$1"
+	then
+		svn add "$to/$1"
+	else
+		echo "$to/$1: mkdir failed, not added" >&2
+	fi
+}
+svn_mkfile() {
+	if cp -p "$from/$1" "$to/$1"
+	then
+		svn add "$to/$1"
+	else
+		echo "$to/$1: copy failed, not added/updated" >&2
+	fi
+}
+#
+# Find all the differences
+{	echo "/FROM/"
+	findbkf "$from"
+	echo "/TO/"
+	findsvnf "$to"
+} |
+awk 'BEGIN{ op="n" }
+	$1=="/FROM/"{ op="f"; next }
+	$1=="/TO/"{ op="t"; next }
+	op=="f"{ from[$0] = 1 }
+	op=="t"{ to[$0] = 1 }
+	END{
+		for (f in from) {
+			if (to[f] == 1)
+				print "diff", f
+			else
+				print "add", f
+		}
+		for (f in to) {
+			if (from[f] != 1)
+				print "remove", f
+		}
+	}' |
+LCALL=C sort -r -k 2 | while read op file
+do
+	case "$op" in
+	add)	if test -d "$from/$file"
+		then
+			svn_mkdir "$file"
+		else
+			svn_mkfile "$file"
+		fi;;
+	remove)	if test -d "$to/$file"
+		then
+			svn delete "$to/$file"
+		else
+			svn delete "$to/$file"
+		fi;;
+	diff)	if test -d "$from/$file"
+		then
+			test -d "$to/$file" || {
+				echo -n "FILE $to/$file is now DIRECTORY $from/$file, OK[N/y]" >/dev/tty
+				read ans </dev/tty
+				test "$ans" = y -o "$ans" = Y && {
+					echo "NOTE: this may not work (untested!)" >/dev/tty
+					svn delete "$to/$file"
+					rm -f "$to/$file"
+					svn_mkdir "$file"
+				}
+			}
+		elif test -d "$to/$file"
+		then
+			echo -n "DIRECTORY $to/$file is now FILE $from/$file, OK[N/y]" >/dev/tty
+			read ans </dev/tty
+			test "$ans" = y -o "$ans" = Y && {
+				echo "NOTE: this may not work (untested!)" >/dev/tty
+				svn delete "$to/$file"
+				rm -rf "$to/$file"
+				svn_mkfile "$file"
+			}
+		elif cmp -s "$from/$file" "$to/$file"
+		then
+			: # echo "UNCHANGED: $file"
+		else
+			rm -f "$to/$file"
+			svn_mkfile "$file"
+		fi;;
+
+	*)	echo "INTERNAL ERROR $op" >&2
+		exit 1;;
+	esac
+done
