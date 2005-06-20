@@ -69,6 +69,11 @@ OPENSLUG_EXTRA_RDEPENDS += "${OPENSLUG_EXT2_PROGS}"
 OPENSLUG_EXTRA_DEPENDS += "reiserfsprogs"
 OPENSLUG_EXTRA_RDEPENDS += "reiserfsprogs"
 
+# These lines add a build of the 'upslug' program which may be
+# used to download the final image to an NSLU2.  The program can
+# be found within the tmp/work/upslug-native* directory.
+OPENSLUG_EXTRA_DEPENDS += "upslug-native"
+
 # These lines add support for an X/Y/ZModem package called lrzsz
 # (this is of use for people with modified NSLU2 hardware which
 # supports a serial port.)
