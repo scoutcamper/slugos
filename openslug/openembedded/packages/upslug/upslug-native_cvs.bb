@@ -6,8 +6,10 @@ HOMEPAGE = "http://www.nslu2-linux.org/wiki/Main/UpSlug"
 MAINTAINER = "NSLU2 Linux <nslu2-linux@yahoogroups.com>"
 SECTION = "console/network"
 PRIORITY = "optional"
-# Either BSD or GPL-2, unclear from the SourceForge project.
-LICENSE = "BSD, GPL-2"
+LICENSE = "GPL-2"
+
+# Use releases in preference
+DEFAULT_PREFERENCE = -1
 
 SRC_URI = "cvs://anonymous@cvs.sourceforge.net/cvsroot/nslu;method=pserver;module=upslug"
 

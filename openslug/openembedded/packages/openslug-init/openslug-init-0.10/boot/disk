@@ -29,6 +29,8 @@ then
 		# .recovery plus either mnt or initrd
 		if checkmount /mnt && :>/mnt/.recovery
 		then
+			# sync to ensure .recovery is written
+			sync
 			# pivot to /initrd if available, else /mnt
 			cd /
 			if test -d /mnt/initrd

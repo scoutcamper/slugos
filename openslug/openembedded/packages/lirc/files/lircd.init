@@ -6,7 +6,7 @@
 #
 
 
-test -f /usr/bin/lircd || exit 0
+test -f /usr/sbin/lircd || exit 0
 
 case "$1" in
   start)

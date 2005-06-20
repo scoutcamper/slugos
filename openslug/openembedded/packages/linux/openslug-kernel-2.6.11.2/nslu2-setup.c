@@ -116,9 +116,19 @@ static struct platform_device *nslu2_devices[] __initdata = {
 	&nslu2_flash
 };
 
+static void n2_power_off(void)
+{
+	/* This causes the box to drop the power and go dead. */
+#define GPIO_PO_BM		0x0100  //b0000 0001 0000 0000
+	*IXP4XX_GPIO_GPOER &= ~GPIO_PO_BM;	// enable the pwr cntl gpio
+	*IXP4XX_GPIO_GPOUTR |= GPIO_PO_BM;	// do the deed
+}
+
 static void __init nslu2_init(void)
 {
-	platform_add_devices(&nslu2_devices, ARRAY_SIZE(nslu2_devices));
+	/* Need power off to work. */
+	pm_power_off = n2_power_off;
+	platform_add_devices(nslu2_devices, ARRAY_SIZE(nslu2_devices));
 }
 
 MACHINE_START(NSLU2, "Linksys NSLU2")

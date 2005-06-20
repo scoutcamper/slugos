@@ -1,12 +1,12 @@
 LICENSE = GPL
 SECTION = "x11/gnome"
-PR = "r0"
+PR = "r1"
 PROVIDES = "gnome-vfs"
 RPROVIDES = "gnome-vfs"
 
 inherit gnome pkgconfig
 
-DEPENDS = "libxml2 gconf-dbus dbus bzip2 gnome-mime-data zlib samba osso-gwconnect"
+DEPENDS = "libxml2 gconf-osso dbus bzip2 gnome-mime-data zlib samba osso-gwconnect"
 
 SRC_URI = "http://repository.maemo.org/pool/maemo/ossw/source/o/${PN}/${PN}_${PV}.tar.gz \
            file://gconftool-lossage.patch;patch=1;pnum=1"

@@ -6,6 +6,8 @@ LICENSE = "flite"
 MAINTAINER = "Michael 'Mickey' Lauer <mickey@Vanille.de>"
 PR = "r1"
 
+PARALLEL_MAKE = ""
+
 SRC_URI = "http://www.speech.cs.cmu.edu/flite/packed/flite-${PV}/flite-${PV}-release.tar.bz2 \
            file://fix-read-only-assignments.patch;patch=1"
 S = "${WORKDIR}/flite-${PV}-release"
@@ -31,4 +33,15 @@ LEAD_SONAME = "libflite.so"
 
 do_install() {
         oe_runmake INSTALLBINDIR="${D}${bindir}" INSTALLLIBDIR="${D}${libdir}" INSTALLINCDIR="${D}${includedir}" install
+}
+
+
+do_stage () {
+        install -m 0644 ${S}/include/*.h ${STAGING_INCDIR}/
+        oe_libinstall -C lib -a -so libflite ${STAGING_LIBDIR}
+        oe_libinstall -C lib -a -so libflite_cmu_time_awb ${STAGING_LIBDIR}
+        oe_libinstall -C lib -a -so libflite_cmulex ${STAGING_LIBDIR}
+        oe_libinstall -C lib -a -so libflite_usenglish ${STAGING_LIBDIR}
+        oe_libinstall -C lib -a -so libflite_cmu_us_kal ${STAGING_LIBDIR}
+        oe_libinstall -C lib -a -so libflite_cmu_us_kal16 ${STAGING_LIBDIR}
 }

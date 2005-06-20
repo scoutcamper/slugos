@@ -7,7 +7,7 @@ PR = "r3"
 SRC_URI = "${SOURCEFORGE_MIRROR}/gphoto/libgphoto2-${PV}.tar.gz"
 
 EXTRA_OECONF = " --with-drivers=all"
-EXTRA_OECONF_ramses = "--with-drivers=canon --without-serial"
+EXTRA_OECONF_mnci = "--with-drivers=canon --without-serial"
 LICENSE = "GPL"
 inherit autotools pkgconfig
 

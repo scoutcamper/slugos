@@ -2,7 +2,7 @@ SECTION = "x11/base"
 RPROVIDES = "virtual/xserver"
 PROVIDES = "virtual/xserver"
 LICENSE = "Xorg"
-PR = "r0"
+PR = "r2"
 
 DEPENDS = "fontconfig freetype libxi xmu flex-native zlib"
 
@@ -16,22 +16,25 @@ PACKAGES =+ "xserver-xorg-xprint xserver-xorg-xvfb xserver-xorg-utils"
 
 S = "${WORKDIR}/xc"
 
-FILES_xserver-xorg-xprint = "${bindir}/Xprt /etc/init.d/xprint /etc/rc.d/rc*.d/*xprint /etc/X11/Xsession.d/92xprint-xpserverlist.sh /etc/X11/xinit/xinitrc.d/92xprint-xpserverlist.sh /etc/X11/xserver/*/print"
+FILES_xserver-xorg-xprint = "${bindir}/Xprt /etc/init.d/xprint /etc/rc.d/rc*.d/*xprint /etc/X11/Xsession.d/92xprint-xpserverlist.sh /etc/X11/xinit/xinitrc.d/92xprint-xpserverlist.sh /etc/X11/xserver/*/print ${sysconfdir}/profile.d/xprint.*"
 FILES_xserver-xorg-xvfb = "${bindir}/Xvfb"
 FILES_xserver-xorg-utils = "${bindir}/scanpci ${bindir}/pcitweak ${bindir}/ioport ${bindir}/in[bwl] ${bindir}/out[bwl] ${bindir}/mmap[rw] ${bindir}/gtf ${bindir}/getconfig ${bindir}/getconfig.pl"
 FILES_${PN} += "${libdir}/modules/*.o "${libdir}/modules/*/*.o ${libdir}/X11/Options ${libdir}/X11/getconfig ${libdir}/X11/etc ${libdir}/modules"
 FILES_${PN}-doc += "${libdir}/X11/doc"
 
 do_configure() {
-	echo "#define BuildServersOnly YES" > config/cf/host.def
-	echo "#define ProjectRoot /usr" >> config/cf/host.def
-	echo "#define XnestServer NO"  >> config/cf/host.def
-	echo "#define XdmxServer NO"  >> config/cf/host.def
-	echo "#define CcCmd gcc" >> config/cf/host.def
-	echo "#define LdCmd ld" >> config/cf/host.def
-	echo "#define HasFreetype2 YES" >> config/cf/host.def
-	echo "#define HasFontconfig YES" >> config/cf/host.def
-	echo "#define BuildDevelDRIDrivers YES" >>config/cf/host.def
+	cat <<EOF > config/cf/host.def
+#define BuildServersOnly YES
+#define ProjectRoot ${prefix}
+#define XnestServer NO
+#define XdmxServer NO
+#define CcCmd gcc
+#define LdCmd ld
+#define HasFreetype2 YES
+#define HasFontconfig YES
+#define BuildDevelDRIDrivers YES
+#define BuildXF86DRI YES
+EOF
 	echo "" > config/cf/date.def
 	rm -f include/extensions/panoramiX.h
 	make -C config/imake -f Makefile.ini CC="${BUILD_CC}" BOOTSTRAPCFLAGS="${BUILD_CFLAGS}" CROSSCOMPILEDIR="${CROSS_DIR}/${TARGET_SYS}/bin" PREPROCESS_CMD="gcc -E" clean imake

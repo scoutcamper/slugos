@@ -1,7 +1,7 @@
 DESCRIPTION = "Miscellaneous files for the base system."
 SECTION = "base"
 PRIORITY = "required"
-PR = "r34"
+PR = "r35"
 LICENSE = "GPL"
 
 SRC_URI = " \
@@ -38,15 +38,19 @@ dirs755 = "/bin /boot /dev ${sysconfdir} ${sysconfdir}/default \
 	   ${localstatedir}/lock/subsys ${localstatedir}/log \
 	   ${localstatedir}/run ${localstatedir}/spool \
 	   /mnt /media /media/card /media/cf /media/net /media/ram \
-	   /media/union /media/realroot /media/hdd"
+	   /media/union /media/realroot /media/hdd \ 
+           /media/mmc1"
 conffiles = "${sysconfdir}/debian_version ${sysconfdir}/host.conf \
 	     ${sysconfdir}/inputrc ${sysconfdir}/issue /${sysconfdir}/issue.net \
 	     ${sysconfdir}/nsswitch.conf ${sysconfdir}/profile \
 	     ${sysconfdir}/default"
 
 hostname = "openembedded"
-hostname_ramses = "MNCI"
 hostname_openslug = "openslug"
+hostname_mnci = "MNCI"
+PACKAGE_ARCH_mnci = "mnci"
+hostname_rt3000 = "MNRT"
+PACKAGE_ARCH_rt3000 = "rt3000"
 
 do_install () {
 	for d in ${dirs755}; do
@@ -138,7 +142,7 @@ do_install () {
 }
 
 
-do_install_append_ramses () {
+do_install_append_mnci () {
 	rmdir ${D}/tmp
 	mkdir -p ${D}${localstatedir}/tmp
 	ln -s var/tmp ${D}/tmp
@@ -149,6 +153,8 @@ do_install_append_nylon() {
 	touch ${D}${sysconfdir}/resolv.conf
 	rm -r ${D}/mnt/*
 	rm -r ${D}/media
+	rm -rf ${D}/tmp
+	ln -sf /var/tmp ${D}/tmp
 }
 
 do_install_append_openslug() {

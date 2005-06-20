@@ -11,7 +11,8 @@ SRC_URI = "file://rcS file://inittab"
 
 do_install() {
 	install -d ${D}${sysconfdir} \
-		   ${D}${sysconfdir}/rc.d \
+		   ${D}${sysconfdir}/rcS.d \
+		   ${D}${sysconfdir}/rc2.d \
 		   ${D}${sysconfdir}/init.d
 	
 	install -m 0644 ${WORKDIR}/inittab ${D}${sysconfdir}/inittab

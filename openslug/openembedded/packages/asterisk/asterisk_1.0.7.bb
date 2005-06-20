@@ -4,7 +4,7 @@ LICENSE="GPL"
 SRC_URI="http://www.asterisk.org/html/downloads/asterisk-${PV}.tar.gz \
          file://makefile.patch;patch=1"
 
-DEPENDS="ncurses"
+DEPENDS="ncurses zlib openssl"
 
 # Doh - they use 'L'inux intead of linux
 # FIXME:  Do the sed here

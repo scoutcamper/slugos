@@ -28,7 +28,7 @@ system(echo $QMAKESPEC | grep -s mipsel) {
 	DEFINES += FPM_MIPS
 }
 
-system(echo $QMAKESPEC | grep -s ramses) {
+system(echo $QMAKESPEC | grep -s mnci) {
 	DEFINES -= FPM_INTEL
 	DEFINES += FPM_ARM
 }
