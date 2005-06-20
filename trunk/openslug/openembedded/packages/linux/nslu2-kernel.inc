@@ -24,6 +24,7 @@
 #   file://usbnet.patch;patch=1
 #   file://ixp4xx_copy_from.patch;patch=1
 #   file://anonymiser.patch;patch=1
+#   file://xscale-reset.patch;patch=1
 #   ${N2K_EXTRA_PATCHES}
 #
 # N2K_SUFFIX - the suffix to add after 'zImage-' in the
@@ -105,7 +106,8 @@ python () {
     major = '.'.join(name[0].split('.')[0:2])
     patch_uri = [ None ]
     filedir = "${FILE_DIRNAME}/nslu2-kernel/%s"
-    filepath = [ filedir % major ]
+    # This entry will become the last one (everything is insertd before it)
+    filepath = [ filedir % "files" ]
     pref = 10
     mmac = 0
     for patch in pv[1:]:
@@ -116,6 +118,7 @@ python () {
 	    kernel[-1] = str(int(kernel[-1]) - 1)
 	    if patch[0:2] == "rc" and pref == 10:
 	    	pref = 6
+		filepath[0:0] = [ filedir % name[0] ]
 		filepath[0:0] = [ filedir % (name[0] + "-rc") ]
 	    else:
 	    	pref = 2
@@ -138,7 +141,7 @@ python () {
     base = '.'.join(kernel)
     patch_uri[0] = "ftp://ftp.kernel.org/pub/linux/kernel/v%s/linux-%s.tar.bz2" % (major, base)
     filepath[-1:-1] = [ filedir % base ]
-    filepath[-1:-1] = [ filedir % "files" ]
+    filepath[-1:-1] = [ filedir % major ]
 
     bb.data.setVar("N2K_SRCMAJ", major, d)
     # bb.note("N2K_SRCMAJ := %s" % major)
@@ -187,6 +190,7 @@ N2K_PATCHES ?= "\
     file://usbnet.patch;patch=1 \
     file://ixp4xx_copy_from.patch;patch=1 \
     file://anonymiser.patch;patch=1 \
+    file://xscale-reset.patch;patch=1 \
     ${N2K_EXTRA_PATCHES}"
 
 N2K_SUFFIX ?= "openslug"
@@ -202,9 +206,9 @@ inherit kernel
 
 ARCH = "arm"
 KERNEL_IMAGETYPE = "zImage"
-CMDLINE_CONSOLE ?= "ttyS0,115200n8"
-CMDLINE_ROOT ?= "root=/dev/mtdblock4 rw rootfstype=jffs2 mem=32M@0x00000000 init=/linuxrc"
-#CMDLINE_ROOT ?= "root=/dev/ram0 rw rootfstype=ext2,jffs2 initrd=0x01000000,10M init=/linuxrc mem=32M@0x00000000"
+# To specify the console set KERNEL_CONSOLE in the .bb
+# file.  The default is currently set in machine/nslu2.conf
+CMDLINE_ROOT ?= "root=/dev/mtdblock4 rw rootfstype=jffs2 mem=32M@0x00000000 init=/linuxrc reboot=s"
 CMDLINE = "${CMDLINE_ROOT} ${CMDLINE_CONSOLE}"
 
 # Add the architecture compiler flags to KERNEL_CC and KERNEL_LD as

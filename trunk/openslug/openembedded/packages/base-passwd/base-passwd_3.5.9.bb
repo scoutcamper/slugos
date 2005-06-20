@@ -39,7 +39,7 @@ do_install () {
 }
 
 
-do_install_append_ramses() {
+do_install_append_openmn() {
 	echo "0:Jn6tcg/qjqvUE:0:0:root:/root:/bin/sh" >>${D}${datadir}/base-passwd/passwd.master
 }
 

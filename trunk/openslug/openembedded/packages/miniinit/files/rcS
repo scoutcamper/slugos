@@ -1,6 +1,4 @@
 #!/bin/sh
-syslogd -C 16
-klogd
-for i in /etc/rc.d/S*; do
-  $i start 2>&1
+for i in /etc/rcS.d/S* /etc/rc2.d/S*; do
+	$i start 2>&1
 done | logger -s -p 6 -t ''

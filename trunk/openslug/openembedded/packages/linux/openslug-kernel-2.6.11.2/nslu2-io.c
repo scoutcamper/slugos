@@ -47,6 +47,7 @@
 #include <linux/interrupt.h>
 #include <linux/moduleparam.h>
 #include <linux/timer.h>
+#include <linux/reboot.h>
 
 #include <asm/system.h>
 #include <asm/uaccess.h>
@@ -55,6 +56,12 @@
 #include <asm-arm/delay.h>
 #include <asm-arm/signal.h>
 
+/* Set this to 1 to output lots of debug messages. */
+#if NSLU2_IO_DEBUG
+#define nslu2_io_debug(args) printk args
+#else
+#define nslu2_io_debug(args) ((void)0)
+#endif
 
 #define VERSION			"0.1.7"
 
@@ -215,7 +222,7 @@ static void n2lm_d2_handler(unsigned long data)
 static void n2lm_timer_start(unsigned long led)
 {
 
-	printk(KERN_DEBUG "timer: %ld\n",led);
+	nslu2_io_debug((KERN_DEBUG "timer: %ld\n",led));
 
 	switch(led) {
 		case LED_RS_RED:
@@ -282,7 +289,7 @@ static void n2lm_timer_stop_all(void)
 static void n2lm_ledon(unsigned long led)
 {
 
-	printk(KERN_DEBUG "ledon: %ld\n", led);
+	nslu2_io_debug((KERN_DEBUG "ledon: %ld\n", led));
 
 	switch (led) {
 		case LED_RS_RED:	
@@ -292,10 +299,10 @@ static void n2lm_ledon(unsigned long led)
 			*IXP4XX_GPIO_GPOUTR |= RS_GRN_ON;	//2
 			return;
 		case LED_DISK1:
-			*IXP4XX_GPIO_GPOUTR &= DISK1_ON;	//0xfffffffb
+			*IXP4XX_GPIO_GPOUTR &= DISK1_ON;	//0xfffffff7
 			return;
 		case LED_DISK2:	
-			*IXP4XX_GPIO_GPOUTR &= DISK2_ON;	//0xfffffff7
+			*IXP4XX_GPIO_GPOUTR &= DISK2_ON;	//0xfffffffb
 			return;
 		case LED_ALL:					//all green
 			*IXP4XX_GPIO_GPOUTR |= RS_GRN_ON;
@@ -317,10 +324,10 @@ static void n2lm_ledoff(unsigned long led)
 			*IXP4XX_GPIO_GPOUTR &= RS_GRN_OFF;	//0xfffffffd
 			return;
 		case LED_DISK1:
-			*IXP4XX_GPIO_GPOUTR |= DISK1_OFF;	//0x00000004
+			*IXP4XX_GPIO_GPOUTR |= DISK1_OFF;	//0x00000008
 			return;
 		case LED_DISK2:	
-			*IXP4XX_GPIO_GPOUTR |= DISK2_OFF;	//0x00000008
+			*IXP4XX_GPIO_GPOUTR |= DISK2_OFF;	//0x00000004
 			return;
 		case LED_ALL:
 			*IXP4XX_GPIO_GPOUTR &= (RS_GRN_OFF & RS_RED_OFF);
@@ -333,7 +340,7 @@ static void n2lm_ledoff(unsigned long led)
 static int n2lm_ioctl(struct inode *inode, struct file *file, unsigned int cmd, unsigned long led)
 {
 
-	printk(KERN_DEBUG "cmd=%d, led=%ld\n", cmd, led);
+	nslu2_io_debug((KERN_DEBUG "cmd=%d, led=%ld\n", cmd, led));
 	
 	if (led < 0 || led >= PHYS_LEDS)
 		return -EINVAL;
@@ -421,7 +428,7 @@ static void n2bz_handler(unsigned long data)
 		add_timer(&n2bz_timer);					//reinit timer
 	}
 	n2_buzz(tone/2, ontime);
-	printk(KERN_DEBUG "Count = %d\tOntime = %d\n", bz_repeatcnt, ontime);
+	nslu2_io_debug((KERN_DEBUG "Count = %d\tOntime = %d\n", bz_repeatcnt, ontime));
 	return;
 }
 
@@ -498,7 +505,7 @@ static irqreturn_t n2pb_handler (int irq, void *dev_id, struct pt_regs *regs)
 	remove_proc_entry(PWR_OFF_STR, NULL);		//no parent	
 	n2_buzz(N2_BEEP_PITCH_MED, N2_BEEP_DUR_MED);
 	ret = create_proc_entry(PWR_OFF_STR, 0, NULL);
-	printk(KERN_DEBUG "cpe ret = %p\n", ret);
+	nslu2_io_debug((KERN_DEBUG "cpe ret = %p\n", ret));
 
 // WARNING: This is RUDE...it unconditionally pulls the power plug.
 // Your data will be at risk...since this is just a test system
@@ -506,8 +513,7 @@ static irqreturn_t n2pb_handler (int irq, void *dev_id, struct pt_regs *regs)
 // message, do an orderly shutdown and use an ioctl or something in
 // /proc/powerdowm to actually have us pull the plug.
 
-	*IXP4XX_GPIO_GPOER &= ~GPIO_PO_BM;	// enable the pwr cntl gpio
-	*IXP4XX_GPIO_GPOUTR |= GPIO_PO_BM;	// do the deed
+	machine_power_off();
 
 	return IRQ_HANDLED;
 }
@@ -537,30 +543,30 @@ static irqreturn_t n2rb_handler (int irq, void *dev_id, struct pt_regs *regs)
 {
 
 	static struct testr test[] = {
-				 N2LM_ALL_OFF,0,
-				 N2LM_ON,0,
-				 N2LM_OFF,0,
-				 N2LM_ON,1,
-				 N2LM_ALL_OFF,1, 
-				 N2LM_ON,2,
-				 N2LM_OFF,2,
-				 N2LM_ON,3,
-				 N2LM_OFF,3,
-				 N2LM_BLINK,0,
-				 N2LM_OFF,0,
-				 N2LM_BLINK,1,
-				 N2LM_OFF,1,
-				 N2LM_BLINK,2,
-				 N2LM_OFF,2,
-				 N2LM_BLINK,3,
-				 N2LM_OFF,3,
-				 N2LM_ALL_OFF,0,
-				 N2LM_ALT,1,
-				 N2LM_OFF,1,
-				 N2LM_ALL_ON,0
+				 { N2LM_ALL_OFF,0 },
+				 { N2LM_ON,0 },
+				 { N2LM_OFF,0 },
+				 { N2LM_ON,1 },
+				 { N2LM_ALL_OFF,1 },
+				 { N2LM_ON,2 },
+				 { N2LM_OFF,2 },
+				 { N2LM_ON,3 },
+				 { N2LM_OFF,3 },
+				 { N2LM_BLINK,0 },
+				 { N2LM_OFF,0 },
+				 { N2LM_BLINK,1 },
+				 { N2LM_OFF,1 },
+				 { N2LM_BLINK,2 },
+				 { N2LM_OFF,2 },
+				 { N2LM_BLINK,3 },
+				 { N2LM_OFF,3 },
+				 { N2LM_ALL_OFF,0 },
+				 { N2LM_ALT,1 },
+				 { N2LM_OFF,1 },
+				 { N2LM_ALL_ON,0 }
 	};
 
-	printk("Reset Entry IRQ =%d Presses = %d Jiffies = %08lx\tIO = %x\tIOW = %x\n", irq, rb_presses, jiffies, (int)_IO('M',rb_presses), (int)_IOW('M',rb_presses,long));
+	nslu2_io_debug(("Reset Entry IRQ =%d Presses = %d Jiffies = %08lx\tIO = %x\tIOW = %x\n", irq, rb_presses, jiffies, (int)_IO('M',rb_presses), (int)_IOW('M',rb_presses,long)));
 
 	wake_up(&n2rb_waitq);	
   	while ((*IXP4XX_GPIO_GPINR & GPIO_RB_BM) == 0)
@@ -571,7 +577,7 @@ static irqreturn_t n2rb_handler (int irq, void *dev_id, struct pt_regs *regs)
 	tone = (rb_presses * 50) + 200;
 	ontime = (rb_presses*10) + 100;
 	offtime = 500 - (rb_presses*20);
-	printk("Ontime = %d\tOfftime = %d\tTone = %d\n",ontime,offtime,tone);
+	nslu2_io_debug(("Ontime = %d\tOfftime = %d\tTone = %d\n",ontime,offtime,tone));
  	rb_presses++;
 
 	n2bz_ioctl(NULL,NULL, N2BZ_BEEPS, rb_presses);	
@@ -598,7 +604,7 @@ static irqreturn_t n2rb_handler (int irq, void *dev_id, struct pt_regs *regs)
 //		n2lm_timer_start(rb_presses);
 //	};
 
-	printk(KERN_DEBUG "Reset Exit IRQ=%d Presses= %d Jiffies= %08lx\n", irq, rb_presses, jiffies);
+	nslu2_io_debug((KERN_DEBUG "Reset Exit IRQ=%d Presses= %d Jiffies= %08lx\n", irq, rb_presses, jiffies));
 	return IRQ_HANDLED;
 
 }

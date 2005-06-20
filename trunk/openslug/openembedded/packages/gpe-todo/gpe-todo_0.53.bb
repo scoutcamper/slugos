@@ -1,5 +1,5 @@
 LICENSE = "GPL"
-inherit gpe autotools
+inherit gpe autotools pkgconfig
 
 DESCRIPTION = "GPE to-do list"
 DEPENDS = "gtk+ libgpewidget libgpepimc libtododb"

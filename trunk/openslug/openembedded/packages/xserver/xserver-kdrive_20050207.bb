@@ -1,8 +1,9 @@
 PV = "0.0cvs${FIXEDCVSDATE}"
 FIXEDCVSDATE = "${@bb.data.getVar('FILE', d, 1).split('_')[-1].split('.')[0]}"
+DEFAULT_PREFERENCE = "1"
 
 LICENSE = "MIT"
-DEPENDS = "tslib xproto xdmcp xextensions xtrans xau x11 xext libxrandr fixesext damageext xfont resourceext compositeext xcalibrateext recordext"
+DEPENDS = "tslib xproto xdmcp xextensions-1.0.1 xtrans xau x11 xext libxrandr fixesext damageext xfont resourceext compositeext xcalibrateext recordext"
 PROVIDES = "virtual/xserver"
 RPROVIDES = "virtual/xserver"
 PACKAGES = "xserver-kdrive-mach64 xserver-kdrive-fbdev xserver-kdrive-vesa xserver-kdrive-mga xserver-kdrive-via xserver-kdrive-ati xserver-kdrive-fake xserver-kdrive-i810 xserver-kdrive-xephyr xserver-kdrive-epson ${PN}-doc ${PN}-dev ${PN}-locale"
@@ -36,7 +37,7 @@ SRC_URI = "cvs://anoncvs:anoncvs@pdx.freedesktop.org/cvs/xserver;module=xserver;
 	file://kmode.patch;patch=1 \
 	file://fbdev-not-fix.patch;patch=1"
 
-SRC_URI_append_ramses = " file://onlyfb.patch;patch=1 \
+SRC_URI_append_mnci   = " file://onlyfb.patch;patch=1 \
                           file://devfs.patch;patch=1 \
                           file://disable-apm.patch;patch=1"
 SRC_URI_append_poodle = " file://xserver-kdrive-poodle.patch;patch=1"

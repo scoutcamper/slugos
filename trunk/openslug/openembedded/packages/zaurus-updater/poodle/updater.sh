@@ -48,15 +48,18 @@ trap '' 2 3
 ### Check model ###
 /sbin/writerominfo
 MODEL=`cat /proc/deviceinfo/product`
-if [ "$MODEL" != "SL-5600" ] > /dev/null 2>&1
-then
-	echo 'MODEL:'$MODEL
+echo 'MODEL:'$MODEL
+case "$MODEL" in
+    SL-B500) ;;
+    SL-5600) ;;
+    *)
 	echo 'ERROR:Invalid model!'
 	echo 'Please reset'
 	while true
 	do
 	done
-fi
+	;;
+esac
 
 mkdir -p $TMPPATH > /dev/null 2>&1
 

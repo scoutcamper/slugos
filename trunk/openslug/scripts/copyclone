@@ -21,6 +21,15 @@
 # Take note of any warnings.  If a file has been converted to a directory or
 # vice versa you are in untested territory - it should work, but the script
 # will ask for confirmation in each case.
+#
+# Use "-c" as the first argument to check the result (-c will just output the
+# svn etc commands to be used)
+c=
+test "$1" = -c && {
+	c=echo
+	shift
+}
+#
 from="$1"
 to="$2"
 test -d "$from"/BitKeeper -a -d "$from"/packages || {
@@ -62,19 +71,43 @@ findsvnf() {
 #svn_mkfile file
 # makes a directory in $to or copies a file from $from to $to
 svn_mkdir() {
-	if mkdir "$to/$1"
+	if test -n "$c"
 	then
-		svn add "$to/$1"
+		echo mkdir "$to/$1"
 	else
-		echo "$to/$1: mkdir failed, not added" >&2
+		if mkdir "$to/$1"
+		then
+			svn add "$to/$1"
+		else
+			echo "$to/$1: mkdir failed, not added" >&2
+		fi
 	fi
 }
 svn_mkfile() {
-	if cp -p "$from/$1" "$to/$1"
+	if test -n "$c"
 	then
-		svn add "$to/$1"
+		echo add "$to/$1"
 	else
-		echo "$to/$1: copy failed, not added/updated" >&2
+		if cp -p "$from/$1" "$to/$1"
+		then
+			svn add "$to/$1"
+		else
+			echo "$to/$1: copy failed, not added" >&2
+		fi
+	fi
+}
+svn_cpfile() {
+	if test -n "$c"
+	then
+		echo update "$to/$1"
+	else
+		rm -rf "$to/$1"
+		if cp -p "$from/$1" "$to/$1"
+		then
+			:
+		else
+			echo "$to/$1: copy failed, not updated (or damaged!)" >&2
+		fi
 	fi
 }
 #
@@ -94,14 +127,14 @@ awk 'BEGIN{ op="n" }
 			if (to[f] == 1)
 				print "diff", f
 			else
-				print "add", f
+				print "add", f | "LCALL=C sort -k 2"
 		}
 		for (f in to) {
 			if (from[f] != 1)
-				print "remove", f
+				print "remove", f | "LCALL=C sort -r -k 2"
 		}
 	}' |
-LCALL=C sort -r -k 2 | while read op file
+while read op file
 do
 	case "$op" in
 	add)	if test -d "$from/$file"
@@ -110,9 +143,20 @@ do
 		else
 			svn_mkfile "$file"
 		fi;;
-	remove)	if test -d "$to/$file"
+	remove)	if test -n "$c"
 		then
-			svn delete "$to/$file"
+			# the directory deletes are just scheduled,
+			# so they remain in the tree until commited
+			if test -d "$to/$file"
+			then
+				files="$(findsvnf "$to/$file" ! -type d)"
+				if test -n "$files"
+				then
+					echo "WARNING: $to/$file: directory not empty!" >&2
+				fi
+			else
+				echo delete "$to/$file"
+			fi
 		else
 			svn delete "$to/$file"
 		fi;;
@@ -123,9 +167,14 @@ do
 				read ans </dev/tty
 				test "$ans" = y -o "$ans" = Y && {
 					echo "NOTE: this may not work (untested!)" >/dev/tty
-					svn delete "$to/$file"
-					rm -f "$to/$file"
-					svn_mkdir "$file"
+					if test -n "$c"
+					then
+						echo "FILE->DIR $to/$file"
+					else
+						svn delete "$to/$file"
+						rm -f "$to/$file"
+						svn_mkdir "$file"
+					fi
 				}
 			}
 		elif test -d "$to/$file"
@@ -134,16 +183,19 @@ do
 			read ans </dev/tty
 			test "$ans" = y -o "$ans" = Y && {
 				echo "NOTE: this may not work (untested!)" >/dev/tty
-				svn delete "$to/$file"
-				rm -rf "$to/$file"
-				svn_mkfile "$file"
+				if test -n "$c"
+				then
+					echo "DIR->FILE $to/$file"
+				else
+					svn delete "$to/$file"
+					svn_cpfile "$file"
+				fi
 			}
 		elif cmp -s "$from/$file" "$to/$file"
 		then
 			: # echo "UNCHANGED: $file"
 		else
-			rm -f "$to/$file"
-			svn_mkfile "$file"
+			svn_cpfile "$file"
 		fi;;
 
 	*)	echo "INTERNAL ERROR $op" >&2

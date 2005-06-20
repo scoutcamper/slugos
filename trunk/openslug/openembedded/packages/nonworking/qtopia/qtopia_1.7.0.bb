@@ -31,7 +31,7 @@ export QTDIR = ${STAGING_DIR}/target
 EXTRA_OECONF_CONFIG =
 EXTRA_OECONF_ARCH = -xplatform ${TARGET_OS}-${TARGET_ARCH}-g++
 EXTRA_OECONF_ARCH_collie = -xplatform ${TARGET_OS}-sharp-g++
-EXTRA_OECONF_ARCH_ramses = -xplatform ${TARGET_OS}-ramses-g++
+EXTRA_OECONF_ARCH_mnci = -xplatform ${TARGET_OS}-mnci-g++
 EXTRA_OECONF = ${EXTRA_OECONF_ARCH} ${EXTRA_OECONF_CONFIG}
 EXTRA_OEMAKE = -e
 

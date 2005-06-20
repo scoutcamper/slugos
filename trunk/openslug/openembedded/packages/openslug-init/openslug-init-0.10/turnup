@@ -121,17 +121,23 @@ copy_rootfs() {
 #  In flash file systems /dev is in ramfs, in disk systems /dev
 #  can be populated permanently.  This is done by creating a
 #  single entry '.noram' in /dev - the devices init script will
-#  then populate the directory.  The passed in device_table is
-#  not currently used.
+#  then populate the directory without overmounting it.  The
+#  devices in the passed in device table are also created, but
+#  note that this is insufficient, /etc/init.d/devices must
+#  also run.
 setup_dev() {
 	test -n "$1" -a -d "$1"/dev -a -r "$2" || {
 		echo "turnup: setup_dev($1,$2): expected a directory and a file" >&2
 		return 1
 	}
-	# at present the device_table is not used because it is incomplete,
-	# /etc/init.d/devices adds extra stuff, it seems fine to leave
-	# things this way
 	echo "turnup: initialising dev file system" >&2
+	# init tries to open the following devices:
+	#	/dev/console
+	#	/dev/tty0
+	#	/dev/null
+	# syslog, and maybe other things, only work if fd 1 is valid, therefore
+	# we must create these devices here...
+	makedevs --root="$1" --devtable="$2"
 	:>"$1"/dev/.noram
 	return 0
 }
@@ -176,9 +182,9 @@ setup_var() {
 	#rm "$1"/etc/rc?.d/[KS]??populate-var.sh
 	# remove the /var tmpfs entry from the new /etc/fstab
 	case "$2" in
-	disk)	sed -i '\@\s/var\s\s*tmpfs\s@d' "$1"/etc/fstab
+	disk)	sed -i '\@[ 	]/var[ 	][ 	]*tmpfs[ 	]@d' "$1"/etc/fstab
 		echo "turnup: tmpfs will no longer be mounted on /var" >&2;;
-	nfs)	sed -i '\@\s/var\s\s*tmpfs\s@s@\s/var@&/tmp@' "$1"/etc/fstab
+	nfs)	sed -i '\@[ 	]/var[ 	][ 	]*tmpfs[ 	]@s@[ 	]/var@&/tmp@' "$1"/etc/fstab
 		echo "turnup: tmpfs /var mount moved to /var/tmp" >&2;;
 	esac
 	#
@@ -274,7 +280,7 @@ setup_rootfs() {
 #  / with the correct options.
 #  bad, since sed won't fail even if it changes nothing.
 setup_fstab() {
-	sed -i '\@^[^ 	]*\s\s*/\s@s@^.*$@'"$2	/	$3	$4	1  1"'@' "$1"/etc/fstab
+	sed -i '\@^[^ 	]*[ 	][ 	]*/[ 	]@s@^.*$@'"$2	/	$3	$4	1  1"'@' "$1"/etc/fstab
 	egrep -q "^$2	/	$3	$4	1  1\$" "$1"/etc/fstab || {
 		echo "turnup: /etc/fstab: root(/) entry not changed" >&2
 		echo "  you probably need to check the options in /etc/fstab" >&2

@@ -4,7 +4,7 @@ PRIORITY = "optional"
 MAINTAINER = "Michael 'Mickey' Lauer <mickey@Vanille.de>"
 LICENSE = "GPL"
 DEPENDS = "virtual/kernel"
-PR = "r0"
+PR = "r2"
 
 SRC_URI = "${SOURCEFORGE_MIRROR}/lirc/lirc-${PV}.tar.gz \
       file://lircd.init file://lircmd.init"
@@ -12,7 +12,7 @@ S = "${WORKDIR}/lirc-${PV}"
 
 inherit autotools module-base update-rc.d
 
-INITSCRIPT_NAME = "lirc"
+INITSCRIPT_NAME = "lircd"
 INITSCRIPT_PARAMS = "defaults 20"
 
 include lirc-config.inc

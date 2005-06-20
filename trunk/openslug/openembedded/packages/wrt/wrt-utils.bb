@@ -20,7 +20,7 @@ do_compile() {
 	${CC} ${CFLAGS} -o jffs2root jffs2root.c
 	${CC} ${CFLAGS} -o mtd mtd.c
 	
-	make -C ../linksys-wlconf TOP=${S} SRCBASE=${S}
+	make -C ../linksys-wlconf TOP=${S} SRCBASE=${S} LDFLAGS="-L${S}/libnvram -lnvram -L${S}/libshared -lshared"
 
 	${KERNEL_CC} -D__KERNEL__ -fno-strict-aliasing -fno-common -fomit-frame-pointer -G 0 \
 	-mno-abicalls -fno-pic -finline-limit=100000 -mabi=32 -march=mips32 -Wa,-32 \
@@ -41,11 +41,6 @@ do_install() {
 	
 	install -m 755 ../linksys-wlconf/wlconf ${D}/usr/sbin/
 	install -m 644 wlcompat.o ${D}/lib/modules/${KERNEL_VERSION}/
-}
-
-do_stage() {
-	oe_libinstall -so libnvram/libnvram ${STAGING_LIBDIR}
-	oe_libinstall -so libshared/libshared ${STAGING_LIBDIR}
 }
 
 PACKAGES = "wrt-libs wrt-utils kernel-module-wlcompat"

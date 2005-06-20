@@ -5,7 +5,8 @@ PRIORITY = "optional"
 LICENSE = "BSD"
 
 SRC_URI = "http://www.ibiblio.org/pub/Linux/system/hardware/hdparm-${PV}.tar.gz \
-	   file://bswap.patch;patch=1"
+	   file://bswap.patch;patch=1 \
+	   file://uclibc.patch;patch=1"
 
 do_install () {
 	install -d ${D}/${sbindir} ${D}/${mandir}/man8

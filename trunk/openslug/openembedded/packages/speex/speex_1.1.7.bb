@@ -16,7 +16,7 @@ inherit autotools
 #	--enable-fixed-point
 #
 
-EXTRA_OECONF_append_ramses = " --enable-arm5e-asm --enable-fixed-point"
+EXTRA_OECONF_append_openmn = " --enable-arm5e-asm --enable-fixed-point"
 
 do_configure_append() {
 	sed -i s/"^OGG_CFLAGS.*$"/"OGG_CFLAGS = "/g Makefile */Makefile */*/Makefile

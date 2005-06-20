@@ -4,7 +4,7 @@ LICENSE = "GPL"
 DEPENDS = "x11 xext xcomposite libxfixes xdamage libxrender xinerama xpm xrandr xft"
 PR = "r1" 
 
-SRC_URI = "http://belnet.dl.sourceforge.net/sourceforge/icewm/icewm-${PV}.tar.gz \
+SRC_URI = "${SOURCEFORGE_MIRROR}/icewm/icewm-${PV}.tar.gz \
 	   file://makefile.patch;patch=1"
 
 S = "${WORKDIR}/icewm-${PV}"

@@ -4,9 +4,10 @@ PRIORITY = "optional"
 MAINTAINER = "Michael 'Mickey' Lauer <mickey@Vanille.de>"
 LICENSE = "GPL QPL"
 DEPENDS = "zlib libpng jpeg tslib uicmoc-native"
-DEPENDS_ramses = "zlib libpng jpeg uicmoc-native"
+DEPENDS_mnci = "zlib libpng jpeg uicmoc-native"
+DEPENDS_append_c7x0 = " sharp-aticore-oss"
 PROVIDES = "virtual/qte virtual/libqte2"
-PR = "r16"
+PR = "r18"
 
 SRC_URI = "ftp://ftp.trolltech.com/pub/qt/source/qt-embedded-${PV}-free.tar.gz;md5=1f7ad30113afc500cab7f5b2f4dec0d7 \
    	   file://qpe.patch;patch=1 \
@@ -31,16 +32,16 @@ SRC_URI = "ftp://ftp.trolltech.com/pub/qt/source/qt-embedded-${PV}-free.tar.gz;m
            file://bidimetrics.patch;patch=5 "
 
 SRC_URI_append_simpad   	= "file://devfs.patch;patch=1 "
-SRC_URI_append_c7x0		= "file://kernel-keymap.patch;patch=1 file://kernel-keymap-corgi.patch;patch=1 "
+SRC_URI_append_c7x0		= "file://kernel-keymap.patch;patch=1 file://kernel-keymap-corgi.patch;patch=1 file://c7x0-w100-accel.patch;patch=1 "
 SRC_URI_append_spitz		= "file://kernel-keymap.patch;patch=1 file://kernel-keymap-corgi.patch;patch=1 file://kernel-keymap-CXK.patch;patch=1 "
 SRC_URI_append_akita            = "file://kernel-keymap.patch;patch=1 file://kernel-keymap-corgi.patch;patch=1 file://kernel-keymap-CXK.patch;patch=1 "
 SRC_URI_append_tosa		= "file://kernel-keymap.patch;patch=1 file://kernel-keymap-tosa.patch;patch=1 "
 SRC_URI_append_beagle   	= "file://beagle.patch;patch=1 "
 SRC_URI_append_jornada7xx       = "file://kernel-keymap.patch;patch=1 file://ipaq_sound_fix.patch;patch=1 "
 SRC_URI_append_jornada56x       = "file://kernel-keymap.patch;patch=1 file://ipaq_sound_fix.patch;patch=1 "
-SRC_URI_append_ramses           = "file://devfs.patch;patch=1 \
-                                   file://ramses.patch;patch=1 \
-                                   file://ramses-touchscreen.patch;patch=1 \
+SRC_URI_append_mnci             = "file://devfs.patch;patch=1 \
+                                   file://mnci.patch;patch=1 \
+                                   file://mnci-touchscreen.patch;patch=1 \
 				   file://qkeyboard_qws.h \
 				   file://qkeyboard_qws.cpp "
 SRC_URI_append_h3600            = "file://ipaq-keyboard.patch;patch=1 file://ipaq_sound_fix.patch;patch=1 "
@@ -65,6 +66,7 @@ def qte_arch(d):
 QTE_ARCH := "${@qte_arch(d)}"
 
 EXTRA_OECONF_CONFIG = "-qconfig qpe"
+EXTRA_OECONF_CONFIG_c7x0 = "-qconfig qpe -accel-w100"
 EXTRA_OECONF = "-system-jpeg -system-libpng -system-zlib -no-qvfb -no-xft -no-vnc -gif \
 		-xplatform ${TARGET_OS}-${QTE_ARCH}-g++ ${EXTRA_OECONF_CONFIG} -depths 8,16,32"
 EXTRA_OEMAKE = "-e"
@@ -86,7 +88,7 @@ EXTRA_DEFINES_c7x0		= "-DQT_QWS_TSLIB -DQT_QWS_CUSTOM -DQT_QWS_SLC700 -DQT_QWS_S
 EXTRA_DEFINES_spitz		= "-DQT_QWS_TSLIB -DQT_QWS_CUSTOM -DQT_QWS_SLC700 -DQT_QWS_SL5XXX -DQT_QWS_SLCXK"
 EXTRA_DEFINES_akita             = "-DQT_QWS_TSLIB -DQT_QWS_CUSTOM -DQT_QWS_SLC700 -DQT_QWS_SL5XXX -DQT_QWS_SLCXK"
 EXTRA_DEFINES_beagle		= "-DQT_QWS_TSLIB -DQT_QWS_CUSTOM -DQT_QWS_IPAQ   -DQT_QWS_BEAGLE"
-EXTRA_DEFINES_ramses 		= "                               -DQT_QWS_RAMSES                 -DQT_QWS_DEVFS"
+EXTRA_DEFINES_mnci 		= "                               -DQT_QWS_RAMSES                 -DQT_QWS_DEVFS"
 
 export SYSCONF_CC = "${CC}"
 export SYSCONF_CXX = "${CXX}"
@@ -97,11 +99,11 @@ export SYSCONF_LINK_SHLIB = "${CCLD}"
 export SYSCONF_CXXFLAGS = "${CXXFLAGS} -pipe -DQWS -fno-exceptions -fno-rtti -DNO_DEBUG ${EXTRA_DEFINES} -DUSE_BIDI"
 #export SYSCONF_CXXFLAGS = "${CXXFLAGS} -pipe -DQWS -fno-exceptions -fno-rtti -fvisibility=hidden -DGCC_SUPPORTS_VISIBILITY -DNO_DEBUG ${EXTRA_DEFINES} -DUSE_BIDI"
 export SYSCONF_LFLAGS = "${LDFLAGS} -lts"
-export SYSCONF_LFLAGS_ramses = "${LDFLAGS}"
+export SYSCONF_LFLAGS_mnci = "${LDFLAGS}"
 export SYSCONF_MOC = "${STAGING_BINDIR}/moc"
 export SYSCONF_UIC = "${STAGING_BINDIR}/uic"
 
-do_configure_prepend_ramses() {
+do_configure_prepend_mnci() {
 	chmod -R a+w ${S}/src/kernel
 	cp ${WORKDIR}/qkeyboard_qws.h ${S}/src/kernel
 	cp ${WORKDIR}/qkeyboard_qws.cpp ${S}/src/kernel

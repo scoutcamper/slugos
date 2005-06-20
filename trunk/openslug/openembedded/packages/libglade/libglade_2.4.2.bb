@@ -13,6 +13,8 @@ SRC_URI += "file://glade-cruft.patch;patch=1 file://no-xml2.patch;patch=1"
 
 EXTRA_OECONF += "--without-libxml2"
 
+CFLAGS += "-lz"
+
 PACKAGES += " ${PN}-data"
 FILES_${PN} = "${libdir}/lib*.so.*"
 FILES_${PN}-data = "${datadir}/xml/libglade/glade-2.0.dtd"

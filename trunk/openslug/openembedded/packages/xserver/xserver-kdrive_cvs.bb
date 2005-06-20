@@ -1,4 +1,6 @@
 PV = "0.0cvs${CVSDATE}"
+DEFAULT_PREFERENCE = "-2"
+
 LICENSE = "MIT"
 DEPENDS = "tslib xproto xdmcp xextensions xtrans xau x11 xext libxrandr fixesext damageext xfont resourceext compositeext xcalibrateext recordext"
 PROVIDES = "virtual/xserver"
@@ -34,7 +36,7 @@ SRC_URI = "cvs://anoncvs:anoncvs@pdx.freedesktop.org/cvs/xserver;module=xserver 
 	file://kmode.patch;patch=1 \
 	file://fbdev-not-fix.patch;patch=1"
 
-SRC_URI_append_ramses = " file://onlyfb.patch;patch=1"
+SRC_URI_append_mnci   = " file://onlyfb.patch;patch=1"
 SRC_URI_append_poodle = " file://xserver-kdrive-poodle.patch;patch=1"
 PACKAGE_ARCH_poodle = "poodle"
 

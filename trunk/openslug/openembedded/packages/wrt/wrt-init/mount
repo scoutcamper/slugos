@@ -4,7 +4,3 @@ mount -o remount,rw /
 mount /proc
 mount /var
 mount /dev/pts
-
-# tmp should be a symlink to /var/tmp
-rm -rf /tmp
-ln -sf /var/tmp /tmp

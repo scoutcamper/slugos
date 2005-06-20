@@ -1,4 +1,5 @@
 #!/bin/sh
+
 echo "S" > /proc/jffs2_bbc
 
 [ "$(nvram get il0macaddr)" = "00:90:4c:5f:00:2a" ] && {
@@ -18,12 +19,6 @@ echo "S" > /proc/jffs2_bbc
   }
 }
 
+# well this is not really WRT specific
 HOSTNAME=`cat /etc/hostname`
 echo ${HOSTNAME}>/proc/sys/kernel/hostname
-
-vconfig set_name_type VLAN_PLUS_VID_NO_PAD
-
-# automagically run firstboot
-[ -z "$FAILSAFE" ] && {
-	{ mount|grep jffs2 1>&-; } || firstboot
-}

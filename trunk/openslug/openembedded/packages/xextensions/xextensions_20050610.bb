@@ -1,4 +1,4 @@
-PV = "0.0cvs${FIXEDCVSDATE}"
+PV = "1.0.3+cvs${FIXEDCVSDATE}"
 FIXEDCVSDATE = "${@bb.data.getVar('FILE', d, 1).split('_')[-1].split('.')[0]}"
 
 LICENSE= "BSD-X"
