@@ -10,6 +10,7 @@ OPENSLUG_DEVELOPMENT = "\
 	autoconf \
 	automake \
 	bash \
+	binutils \
 	bison \
 	bzip2 \
 	coreutils \
@@ -20,6 +21,7 @@ OPENSLUG_DEVELOPMENT = "\
 	gawk \
 	gcc \
 	gdb \
+	gnu-config \
 	grep \
 	lsof \
 	m4 \
