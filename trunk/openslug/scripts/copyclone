@@ -2,21 +2,23 @@
 # TO USE THIS SCRIPT
 # ------------------
 #
-# clone the bk release to be moved to the trunk - use a local clone
-# as the source (one which has all the required changes - it can have
-# extra ones too) and use "bk clone -l -r<tag> <local-directory> bkclone
+# check out the monotone release to be used to the trunk - check out a
+# tagged release, or, for testing, a specific revision, using co and
+# the --revision option, use a new direcctory name (i.e. don't attempt
+# to check out to an existing directory.)
 #
 # For example:
 #
-#	bk clone -l -rOpenSlug-2.99-beta /home/openslug/openembedded bkclone
+#	monotone --db=your.db --revision=t:OpenSlug-2.3-beta co monotone
 #
-# 'bkclone' is a directory in the trunk/openslug SVN tree.  Use the <tag>
-# corresponding to the release - this will cause any extra stuff in your
-# tree to be removed.
+# monotone will tell you which revision it checked out - make sure it
+# got it right!
+#
+# 'monotone' is a directory in the trunk/openslug SVN tree.
 #
 # Having done this simply run:
 #
-#	copyclone bkclone openembedded
+#	copyclone monotone openembedded
 #
 # Take note of any warnings.  If a file has been converted to a directory or
 # vice versa you are in untested territory - it should work, but the script
@@ -32,12 +34,12 @@ test "$1" = -c && {
 #
 from="$1"
 to="$2"
-test -d "$from"/BitKeeper -a -d "$from"/packages || {
-	echo "copyclone: $from needs to be a bk clone containing the correct files!" >&2
+test -d "$from"/MT -a -d "$from"/packages || {
+	echo "copyclone: $from needs to be a monotone  working directory containing the correct files!" >&2
 	exit 1
 }
 test -d "$to"/.svn -a -d "$to"/packages || {
-	echo "copyclone: $to needs to be the svn directory the current (SVN) files!" >&2
+	echo "copyclone: $to needs to be the svn directory with the current (SVN) files!" >&2
 	exit 1
 }
 echo -n "clone $from -> $to [N/y]: " >/dev/tty
@@ -50,7 +52,7 @@ findbkf() {
 	where="$1"
 	shift
 	(	cd "$where"
-		find . \( -name BitKeeper -type d -prune \) -o \
+		find . \( -name MT -type d -prune \) -o \
 			\( -name SCCS -type d -prune \) -o \
 			\( "$@" -print \)
 	)
