@@ -5,8 +5,8 @@ SECTION = "devel/python"
 PRIORITY = "optional"
 MAINTAINER = "Michael 'Mickey' Lauer <mickey@Vanille.de>"
 PROVIDES = "python python-core"
-DEPENDS = "python-native zlib gdbm openssl"
-PR = "ml3"
+DEPENDS = "python-native readline zlib gdbm openssl"
+PR = "ml7"
 
 PYTHON_MAJMIN = "2.4"
 
@@ -47,6 +47,7 @@ do_compile() {
 
 do_stage() {
 	install -m 0644 Include/*.h ${STAGING_INCDIR}/python${PYTHON_MAJMIN}/
+	oe_libinstall -a -so libpython2.4 ${STAGING_LIBDIR}
 }
 
 do_install() {

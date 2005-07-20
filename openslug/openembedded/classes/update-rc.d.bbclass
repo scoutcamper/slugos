@@ -20,6 +20,9 @@ if test "x$D" != "x"; then
 else
 	${INIT_D_DIR}/${INITSCRIPT_NAME} stop
 fi
+}
+
+updatercd_postrm() {
 update-rc.d $D ${INITSCRIPT_NAME} remove
 }
 
@@ -49,12 +52,17 @@ python populate_packages_prepend () {
 			prerm = '#!/bin/sh\n'
 		prerm += bb.data.getVar('updatercd_prerm', localdata, 1)
 		bb.data.setVar('pkg_prerm_%s' % pkg, prerm, d)
+	        postrm = bb.data.getVar('pkg_postrm', localdata, 1)
+	        if not postrm:
+	                postrm = '#!/bin/sh\n'
+                postrm += bb.data.getVar('updatercd_postrm', localdata, 1)
+		bb.data.setVar('pkg_postrm_%s' % pkg, postrm, d)
 
 	pkgs = bb.data.getVar('INITSCRIPT_PACKAGES', d, 1)
 	if pkgs == None:
 		pkgs = bb.data.getVar('PN', d, 1)
 		packages = (bb.data.getVar('PACKAGES', d, 1) or "").split()
-		if not pkgs in packages:
+		if not pkgs in packages and packages != []:
 			pkgs = packages[0]
 	for pkg in pkgs.split():
 		update_rcd_package(pkg)

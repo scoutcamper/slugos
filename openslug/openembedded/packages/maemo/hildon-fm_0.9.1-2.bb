@@ -1,3 +1,4 @@
+PR 	= 	"r1"
 LICENSE =	"GPL/LGPL"
 MAINTAINER = "Koen Kooi <koen@handhelds.org>"
 
@@ -12,8 +13,8 @@ inherit pkgconfig autotools
 EXTRA_OECONF =	"--disable-gtk-doc"
 
 do_stage() {
-	install -d ${STAGING_INCDIR}/hildon-widgets
+	install -d ${STAGING_INCDIR}/hildon-fm/hildon-widgets
 	install -d ${STAGING_LIBDIR}
-	install -m 644 hildon-fm/*.h ${STAGING_INCDIR}/hildon-widgets
+	install -m 644 hildon-fm/*.h ${STAGING_INCDIR}/hildon-fm/hildon-widgets
 	install -m 755 hildon-fm/.libs/*.so* ${STAGING_LIBDIR}
 }

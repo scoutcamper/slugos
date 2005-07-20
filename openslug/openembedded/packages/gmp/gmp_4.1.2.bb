@@ -4,7 +4,8 @@ HOMEPAGE = "http://www.swox.com/gmp/"
 LICENSE = "GPL LGPL"
 
 SRC_URI = "ftp://mirrors.kernel.org/gnu/gmp/gmp-${PV}.tar.gz \
-	   file://configure.patch;patch=1"
+	   file://configure.patch;patch=1 \
+	   file://amd64.patch;patch=1"
 
 inherit autotools 
 

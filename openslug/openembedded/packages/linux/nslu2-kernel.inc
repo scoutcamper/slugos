@@ -25,6 +25,7 @@
 #   file://ixp4xx_copy_from.patch;patch=1
 #   file://anonymiser.patch;patch=1
 #   file://xscale-reset.patch;patch=1
+#   file://mtd-shutdown.patch;patch=1
 #   ${N2K_EXTRA_PATCHES}
 #
 # N2K_SUFFIX - the suffix to add after 'zImage-' in the
@@ -104,9 +105,10 @@ python () {
     base = pv[0]
     name = [base]
     major = '.'.join(name[0].split('.')[0:2])
+    minor = '.'.join(name[0].split('.')[0:3])
     patch_uri = [ None ]
     filedir = "${FILE_DIRNAME}/nslu2-kernel/%s"
-    # This entry will become the last one (everything is insertd before it)
+    # This entry will become the last one (everything is inserted before it)
     filepath = [ filedir % "files" ]
     pref = 10
     mmac = 0
@@ -141,6 +143,8 @@ python () {
     base = '.'.join(kernel)
     patch_uri[0] = "ftp://ftp.kernel.org/pub/linux/kernel/v%s/linux-%s.tar.bz2" % (major, base)
     filepath[-1:-1] = [ filedir % base ]
+    if base != minor:
+	    filepath[-1:-1] = [ filedir % minor ]
     filepath[-1:-1] = [ filedir % major ]
 
     bb.data.setVar("N2K_SRCMAJ", major, d)
@@ -191,13 +195,14 @@ N2K_PATCHES ?= "\
     file://ixp4xx_copy_from.patch;patch=1 \
     file://anonymiser.patch;patch=1 \
     file://xscale-reset.patch;patch=1 \
+    file://mtd-shutdown.patch;patch=1 \
     ${N2K_EXTRA_PATCHES}"
 
 N2K_SUFFIX ?= "openslug"
 
-SRC_URI  = ${N2K_SRCURI}
-SRC_URI += ${N2K_SRCFILES}
-SRC_URI += ${N2K_PATCHES}
+SRC_URI  = "${N2K_SRCURI}"
+SRC_URI += "${N2K_SRCFILES}"
+SRC_URI += "${N2K_PATCHES}"
 SRC_URI += "file://defconfig"
 
 COMPATIBLE_HOST = 'arm.*-linux'
@@ -206,10 +211,12 @@ inherit kernel
 
 ARCH = "arm"
 KERNEL_IMAGETYPE = "zImage"
-# To specify the console set KERNEL_CONSOLE in the .bb
-# file.  The default is currently set in machine/nslu2.conf
+# To specify the console set KERNEL_CONSOLE in the .bb file.
+# CMDLINE_ROOT contains the boot options
 CMDLINE_ROOT ?= "root=/dev/mtdblock4 rw rootfstype=jffs2 mem=32M@0x00000000 init=/linuxrc reboot=s"
-CMDLINE = "${CMDLINE_ROOT} ${CMDLINE_CONSOLE}"
+# Add distro specific debug (or non-debug) options to this
+CMDLINE_DEBUG ?= ""
+CMDLINE = "${CMDLINE_ROOT} ${CMDLINE_DEBUG} ${CMDLINE_CONSOLE}"
 
 # Add the architecture compiler flags to KERNEL_CC and KERNEL_LD as
 # required.  Notice that this has to be done for each separately built

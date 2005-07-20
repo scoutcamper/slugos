@@ -3,9 +3,11 @@ DESCRIPTION = "The mgetty package contains an intelligent \
 getty for allowing logins over a serial line (such as \
 through a modem) and receiving incoming faxes."
 LICENSE = "GPL"
-PR="r2"
+PR="r3"
 
-SRC_URI = "${DEBIAN_MIRROR}/main/m/mgetty/mgetty_${PV}.orig.tar.gz \
+# The source can no longer be found at ${DEBIAN_MIRROR}/main/m/mgetty/mgetty_${PV}.orig.tar.gz
+# so the nslu2-linux project has mirrored it until someone updates this package to a newer version.
+SRC_URI = "http://nslu.sf.net/downloads/mgetty_1.1.30.orig.tar.gz \
            file://debian.patch;patch=1 \
            file://00-g3_Makefile;patch=1 \
            file://01-adjust-path;patch=1 \
@@ -40,6 +42,11 @@ SRC_URI = "${DEBIAN_MIRROR}/main/m/mgetty/mgetty_${PV}.orig.tar.gz \
            file://voice-defs.h"
 
 CFLAGS_prepend = "-DAUTO_PPP -DFIDO "
+
+# This is necessary because of the way the mgetty Makefile works,
+# it effectively recursively makes . - without passing MAKE the -e
+# flag.  Oops.
+export MAKE = "make -e"
 
 do_compile () {
         cp ${WORKDIR}/policy.h ${WORKDIR}/voice-defs.h .

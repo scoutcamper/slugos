@@ -1,7 +1,6 @@
 include ${PN}.inc
-    
- 
-PR = "r0"
+
+PR = "r1"
 
 SRC_URI = "${HANDHELDS_CVS};tag=${TAG};module=opie/noncore/tools/opie-sh \
            ${HANDHELDS_CVS};tag=${TAG};module=opie/pics \

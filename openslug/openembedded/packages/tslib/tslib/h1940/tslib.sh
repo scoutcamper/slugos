@@ -1,6 +1,6 @@
 #!/bin/sh
 
-TSLIB_TSDEVICE=/dev/input/event0
+TSLIB_TSDEVICE=`detect-stylus --device`
 TSLIB_CONFFILE=/usr/share/tslib/ts.conf-h3600
 QWS_MOUSE_PROTO=TPanel
 

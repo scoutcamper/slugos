@@ -3,6 +3,7 @@ SECTION = "opie/Shell"
 PRIORITY = "optional"
 MAINTAINER = "Team Opie <opie@handhelds.org>"
 LICENSE = "GPL"
+RDEPENDS = "opie-sh"
 APPNAME = "opie-sh"
 APPTYPE = "binary"
 

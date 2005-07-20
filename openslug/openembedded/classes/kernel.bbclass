@@ -1,7 +1,7 @@
 inherit module_strip
 
 PROVIDES += "virtual/kernel"
-DEPENDS += "virtual/${TARGET_PREFIX}depmod virtual/${TARGET_PREFIX}gcc${KERNEL_CCSUFFIX} update-modules"
+DEPENDS += "virtual/${TARGET_PREFIX}depmod-${@get_kernelmajorversion('${PV}')} virtual/${TARGET_PREFIX}gcc${KERNEL_CCSUFFIX} update-modules"
 
 inherit kernel-arch
 
@@ -87,6 +87,12 @@ kernel_do_stage() {
 
 	mkdir -p ${STAGING_KERNEL_DIR}/include/pcmcia
 	cp -fR include/pcmcia/* ${STAGING_KERNEL_DIR}/include/pcmcia/
+
+	if [ -d drivers/sound ]; then
+		# 2.4 alsa needs some headers from this directory
+		mkdir -p ${STAGING_KERNEL_DIR}/include/drivers/sound
+		cp -fR drivers/sound/*.h ${STAGING_KERNEL_DIR}/include/drivers/sound/
+	fi
 
 	install -m 0644 .config ${STAGING_KERNEL_DIR}/config-${PV}${KERNEL_LOCALVERSION}
 	ln -sf config-${PV}${KERNEL_LOCALVERSION} ${STAGING_KERNEL_DIR}/.config
@@ -178,18 +184,21 @@ if [ x"$D" = "x" ]; then
 fi
 }
 
-# defaults
+# autoload defaults (alphabetically sorted)
+module_autoload_hidp = "hidp"
 module_autoload_ipv6 = "ipv6"
 module_autoload_ipsec = "ipsec"
 module_autoload_ircomm-tty = "ircomm-tty"
+module_autoload_rfcomm = "rfcomm"
 module_autoload_sa1100-rtc = "sa1100-rtc"
 
+# alias defaults (alphabetically sorted)
 module_conf_bluez = "alias net-pf-31 bluez"
+module_conf_bnep = "alias bt-proto-4 bnep"
+module_conf_hci_uart = "alias tty-ldisc-15 hci_uart"
 module_conf_l2cap = "alias bt-proto-0 l2cap"
 module_conf_sco = "alias bt-proto-2 sco"
 module_conf_rfcomm = "alias bt-proto-3 rfcomm"
-module_conf_bnep = "alias bt-proto-4 bnep"
-module_conf_hci_uart = "alias tty-ldisc-15 hci_uart"
 
 python populate_packages_prepend () {
 	def extract_modinfo(file):
@@ -271,7 +280,12 @@ python populate_packages_prepend () {
 				if not m:
 					continue
 				on = legitimize_package_name(m.group(1))
-				dependencies.append(format % on)
+				dependency_pkg = format % on
+        			v = bb.data.getVar("PARALLEL_INSTALL_MODULES", d, 1) or "0"
+	        		if v == "1":
+		                	kv = bb.data.getVar("KERNEL_MAJOR_VERSION", d, 1)
+					dependency_pkg = "%s-%s" % (dependency_pkg, kv)
+				dependencies.append(dependency_pkg)
 			return dependencies
 		return []
 

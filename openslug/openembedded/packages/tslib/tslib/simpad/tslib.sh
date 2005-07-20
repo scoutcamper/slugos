@@ -1,5 +1,5 @@
 #!/bin/sh
 
-TSLIB_TSDEVICE=/dev/touchscreen/ucb1x00
+TSLIB_TSDEVICE=/dev/input/event0
 
 export TSLIB_TSDEVICE
