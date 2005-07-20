@@ -1,12 +1,8 @@
 DESCRIPTION = "A TCP/IP Daemon simplifying the communication with GPS devices"
 SECTION = "network"
 PRIORITY = "optional"
-MAINTAINER = "Jose Bernardo Silva <jbs@bandos.homelinux.com> \
-		Robert Anderson <rea@sr.unh.edu> \
-		Stephan Zalewski <stephan.zalewski@uni-dusseldorf.de>"
 LICENSE = "GPL"
 DEPENDS = "ncurses"
-PR = "r0"
 
 SRC_URI = "http://download.berlios.de/gpsd/gpsd-${PV}.tar.gz \
 	file://gpsd"
@@ -23,7 +19,6 @@ do_stage() {
         install -m 0655 ${S}/libgps.la ${STAGING_LIBDIR}
         install -m 0655 ${S}/gps.h ${STAGING_INCDIR}
         install -m 0655 ${S}/gpsd.h ${STAGING_INCDIR}
-	install -m 0655 ${S}/gpsutils.h ${STAGING_INCDIR}
 }
 
 do_install_append() {

@@ -1,15 +1,9 @@
-
-PR = "r7"
-
-# Ugly patch to hack configure.in to set the CPPFLAGS without actually checking for LFS support
-# For nslu2. Will probably work for forcing for other archs as well. 
-LFS_SRC_URI = ""
-LFS_SRC_URI_nslu2 = "file://configure.lfs.patch;patch=1"  
+PR = "r8"
 
 SRC_URI = "http://us2.samba.org/samba/ftp/stable/samba-${PV}.tar.gz \
 	   file://configure.patch;patch=1 \
 	   file://cifs.patch;patch=1 \
-	   ${LFS_SRC_URI} \
+	   file://config-lfs.patch;patch=1 \
 	   file://init \
            file://quota.patch;patch=1;pnum=0 \
 	   "
@@ -22,6 +16,7 @@ INITSCRIPT_NAME = "samba"
 # level, later levels put the shutdown later too - see the links
 # in rc6.d, the shutdown must precede network shutdown).
 INITSCRIPT_PARAMS = "defaults"
+#CONFFILES_${PN} = "${sysconfdir}/samba/smb.conf"
 
 # The file system settings --foodir=dirfoo and overridden unconditionally
 # in the samba config by --with-foodir=dirfoo - even if the --with is not
@@ -45,7 +40,7 @@ do_install_append() {
 	install -d "${D}${sysconfdir}/init.d"
 	install -c -m 755 ${WORKDIR}/init ${D}${sysconfdir}/init.d/samba
 	install -d "${D}${sysconfdir}/samba"
-	install -c -m 644 ../examples/smb.conf.default ${D}${sysconfdir}/samba/smb.conf.default
+	install -c -m 644 ../examples/smb.conf.default ${D}${sysconfdir}/samba/smb.conf
 }
 
 PACKAGES =+ "swat"

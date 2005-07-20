@@ -1,7 +1,7 @@
 DESCRIPTION = "Miscellaneous files for the base system."
 SECTION = "base"
 PRIORITY = "required"
-PR = "r35"
+PR = "r38"
 LICENSE = "GPL"
 
 SRC_URI = " \
@@ -21,7 +21,7 @@ SRC_URI = " \
            file://licenses/GPL-2 \
            file://licenses/LGPL-2 \
            file://licenses/LGPL-2.1 \
-           file://licenses/Artistic "	   
+           file://licenses/Artistic "
 S = "${WORKDIR}"
 
 docdir_append = "/${P}"
@@ -38,7 +38,7 @@ dirs755 = "/bin /boot /dev ${sysconfdir} ${sysconfdir}/default \
 	   ${localstatedir}/lock/subsys ${localstatedir}/log \
 	   ${localstatedir}/run ${localstatedir}/spool \
 	   /mnt /media /media/card /media/cf /media/net /media/ram \
-	   /media/union /media/realroot /media/hdd \ 
+	   /media/union /media/realroot /media/hdd \
            /media/mmc1"
 conffiles = "${sysconfdir}/debian_version ${sysconfdir}/host.conf \
 	     ${sysconfdir}/inputrc ${sysconfdir}/issue /${sysconfdir}/issue.net \
@@ -103,41 +103,6 @@ do_install () {
 		install -m 0644 ${WORKDIR}/licenses/$license ${D}${datadir}/common-licenses/
 	done
 
-	if (grep -q "^\(tmpfs\|ramfs\)\W\+/var" ${D}${sysconfdir}/fstab); then
-		# /var is in a ramdisk
-		install -d ${D}${sysconfdir}/init.d ${D}${sysconfdir}/rcS.d
-		for d in ${dirs755}; do
-			if (echo $d|grep -q "^${localstatedir}"); then
-				echo "mkdir -p $d" >> ${D}${sysconfdir}/init.d/populate-var.sh
-				echo "chmod 0775 $d" >> ${D}${sysconfdir}/init.d/populate-var.sh
-			fi
-		done
-		for d in ${dirs1777}; do
-			if (echo $d|grep -q "^${localstatedir}"); then
-				echo "mkdir -p $d" >> ${D}${sysconfdir}/init.d/populate-var.sh
-				echo "chmod 1777 $d" >> ${D}${sysconfdir}/init.d/populate-var.sh
-			fi
-		done
-		for d in ${dirs2775}; do
-			if (echo $d|grep -q "^${localstatedir}"); then
-				echo "mkdir -p $d" >> ${D}${sysconfdir}/init.d/populate-var.sh
-				echo "chmod 2775 $d" >> ${D}${sysconfdir}/init.d/populate-var.sh
-			fi
-		done
-
-
-		echo ">/var/run/utmp" >> ${D}${sysconfdir}/init.d/populate-var.sh
-		echo ">/var/log/wtmp" >> ${D}${sysconfdir}/init.d/populate-var.sh
-		echo ">/var/log/lastlog" >> ${D}${sysconfdir}/init.d/populate-var.sh
-		echo "chmod 0664 /var/run/utmp /var/log/wtmp /var/log/lastlog"	>> ${D}${sysconfdir}/init.d/populate-var.sh
-		echo "touch /var/run/resolv.conf"	>> ${D}${sysconfdir}/init.d/populate-var.sh
-
-#		rmdir ${D}${localstatedir}/*
-		chmod 0755 ${D}${sysconfdir}/init.d/populate-var.sh
-		ln -sf ../init.d/populate-var.sh ${D}${sysconfdir}/rcS.d/S37populate-var.sh
-		ln -sf ${localstatedir}/run/resolv.conf ${D}${sysconfdir}/resolv.conf
-		ln -sf ${localstatedir}/ld.so.cache ${D}${sysconfdir}/ld.so.cache
-	fi
 	ln -sf /proc/mounts ${D}${sysconfdir}/mtab
 }
 
@@ -149,8 +114,7 @@ do_install_append_mnci () {
 }
 
 do_install_append_nylon() {
-	rm ${D}${sysconfdir}/resolv.conf
-	touch ${D}${sysconfdir}/resolv.conf
+	printf "" "" >${D}${sysconfdir}/resolv.conf
 	rm -r ${D}/mnt/*
 	rm -r ${D}/media
 	rm -rf ${D}/tmp
@@ -158,9 +122,11 @@ do_install_append_nylon() {
 }
 
 do_install_append_openslug() {
-	rm ${D}${sysconfdir}/resolv.conf
-	touch ${D}${sysconfdir}/resolv.conf
+	printf "" "" >${D}${sysconfdir}/resolv.conf
 	rm -r ${D}/mnt/*
+	rmdir ${D}/home/root
+	install -m 0755 -d ${D}/root
+	ln -s ../root ${D}/home/root
 }
 
 PACKAGES = "${PN}-doc ${PN}"
@@ -170,7 +136,7 @@ FILES_${PN}-doc = "${docdir} ${datadir}/common-licenses"
 
 # Unslung distribution specific packages follow ...
 
-PACKAGES_unslung = ${PN}-unslung
+PACKAGES_unslung = "${PN}-unslung"
 PACKAGE_ARCH_${PN}-unslung = "nslu2"
 MAINTAINER_${PN}-unslung = "NSLU2 Linux <www.nslu2-linux.org>"
 RDEPENDS_${PN}-unslung = "nslu2-linksys-ramdisk"

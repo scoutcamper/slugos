@@ -1,16 +1,17 @@
 DESCRIPTION = "Open Source multimedia player."
 SECTION = "opie/multimedia"
 PRIORITY = "optional"
-HOMEPAGE = "http://www.mplayerhq.hu/"
+HOMEPAGE = "http://atty.jp/?Zaurus%2Fmplayer"
 DEPENDS = "virtual/libsdl libmad libogg libvorbis zlib libpng jpeg"
 LICENSE = "GPL"
 RCONFLICTS = "mplayer"
 MAINTAINER = "Graeme Gregory <dp@xora.org.uk>"
-PR = "r0"
+PR = "r1"
 
 SRC_URI = "http://www.xora.org.uk/oe/mplayer-${PV}.tar.gz \
 	   file://Makefile.patch;patch=1;pnum=0 \
 	   file://sdl.patch;patch=1 \
+           file://Makefile-libs.patch;patch=1 \
            file://libmpdemux-ogg-include.patch;patch=1 \
            file://libmpcodecs-ogg-include.patch;patch=1 "
 

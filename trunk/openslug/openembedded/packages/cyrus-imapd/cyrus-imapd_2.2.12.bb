@@ -1,7 +1,8 @@
 SECTION = "console/network"
-DEPENDS = "cyrus-sasl"
-PR = "r0"
+DEPENDS = "cyrus-sasl db"
 LICENSE = "BSD"
+PR = "r2"
+DEPENDS += "install-native"
 
 SRC_URI = "ftp://ftp.andrew.cmu.edu/pub/cyrus-mail/cyrus-imapd-${PV}.tar.gz \
            file://autotools.patch;patch=1 \
@@ -10,19 +11,15 @@ SRC_URI = "ftp://ftp.andrew.cmu.edu/pub/cyrus-mail/cyrus-imapd-${PV}.tar.gz \
 inherit autotools
 
 EXTRA_OECONF = "--with-auth=unix \
-		--without-perl"
+		--without-perl \
+		--without-snmp"
 
 FILES_${PN} += "${prefix}/cyrus/bin"
 
-BUILD_CFLAGS += " -I${S} -I${S}/et"
-#do_compile_prepend () {
-#	cd lib
-#	ccache arm-linux-gcc -L/home/kergoth/code/build-arm/tmp/staging/arm-linux/lib -Wl,-rpath-link,/home/kergoth/code/build-arm/tmp/staging/arm-linux/lib -o mkchartable mkchartable.o xmalloc.o assert.o
-#	${BUILD_CC} ${BUILD_CFLAGS} mkchartable.c -c -o mkchartable.o
-#	${BUILD_CC} ${BUILD_CFLAGS} xmalloc.c -c -o xmalloc.o
-#	${BUILD_CC} ${BUILD_CFLAGS} assert.c -c -o assert.o
-#	${BUILD_CC} ${BUILD_LDFLAGS} -o mkchartable mkchartable.o xmalloc.o assert.o
-#	rm -f xmalloc.o assert.o mkchartable.o
-#	cd ..
-#}
+# Target only, the db4 headers are in include/db4, so *prepend* this
+# directory to the search path
+TARGET_CPPFLAGS =+ "-I${STAGING_DIR}/${TARGET_SYS}/include/db4"
 
+# All, lib/foo.c includes <config.h> from the top level directory and
+# is natively compiled
+BUILD_CPPFLAGS += " -I${S} -I${S}/et"

@@ -9,9 +9,7 @@ HOMEPAGE = "http://ep09.pld-linux.org/~mmazur/linux-libc-headers/"
 LICENSE = "GPL"
 MAINTAINER = "Chris Larson <kergoth@handhelds.org>"
 INHIBIT_DEFAULT_DEPS = "1"
-
-# NOTE: no need to package these headers, since the c library includes them.
-PACKAGES = ""
+PR = "r1"
 
 SRC_URI = "http://ep09.pld-linux.org/~mmazur/linux-libc-headers/linux-libc-headers-${PV}.tar.bz2 \
 	file://keyboard.patch;patch=1"
@@ -57,3 +55,10 @@ do_stage () {
 	cp -pfLR include/linux ${CROSS_DIR}/${TARGET_SYS}/include/
 	cp -pfLR include/asm ${CROSS_DIR}/${TARGET_SYS}/include/
 }
+
+do_install() {
+	install -d ${D}${includedir}
+	cp -pfLR include/linux ${D}${includedir}/
+	cp -pfLR include/asm ${D}${includedir}/
+}
+

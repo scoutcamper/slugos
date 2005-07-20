@@ -5,6 +5,13 @@
 . /etc/default/functions
 
 #
+# configuration
+#  The following variables control which directories in /var end up on the rootfs
+#  and which end up in a temporary file system.
+INRAM_MEMSTICK="/var/cache /var/lock /var/log /var/run /var/tmp /var/lib/ipkg"
+INRAM_NFS="/var/cache /var/lock /var/run /var/tmp"
+INRAM_DISK=""
+#
 # force: override certain checks
 force=
 #
@@ -55,6 +62,23 @@ fsoptions() {
 	else
 		echo defaults
 	fi
+}
+#
+# get_flash <directory> {mount options}
+#  mount the flash device, writeable, on the given directory
+get_flash() {
+	local ffsdir ffsdev
+
+	ffsdir="$1"
+	shift
+	test -n "$ffsdir" -a -d "$ffsdir" || {
+		echo "$0: $ffsdir: internal error, flash mount point not a directory" >&2
+		return 1
+	}
+
+	ffsdev="$(mtblockdev Flashdisk)"
+	umountflash "$ffsdev" &&
+	mountflash "$ffsdev" "$ffsdir" "$@"
 }
 #
 # check_rootfs [-i] <root fs directory>
@@ -158,53 +182,49 @@ setup_bootdev() {
 
 #
 # setup_var new type
-#  Populates /var.  Should only be called for true disk systems and NFS -
-#  it's a waste on USB memory sticks!  Removes the /var tmpfs setting
-#  for disks, sets it to /var/tmp for NFS.
+#  Populates /var.
+#  Removes the /var tmpfs entry from /etc/fstab.
+#  Creates links from /var into /media/ram for NFS and Memstick.
+
 setup_var() {
 	test -n "$1" -a -d "$1"/var || {
 		echo "turnup: setup_var($1,$2): expected a directory" >&2
 		return 1
 	}
 	case "$2" in
-	disk|nfs);;
-	*)	echo "turnup: setup_var($1,$2): expected 'disk' or 'nfs'" >&2
+	disk|nfs|memstick);;
+	*)	echo "turnup: setup_var($1,$2): expected 'disk', 'nfs' or 'memstick'" >&2
 		return 1;;
 	esac
 	#
 	# populate /var, there is a shell script to do this, but it uses
 	# absolute path names
-	chroot "$1" /bin/busybox sh /etc/init.d/populate-var.sh || {
+	chroot "$1" /bin/busybox sh /etc/init.d/populate-volatile.sh || {
 		echo "turnup: /var: could not populate directory" >&2
 		return 1
 	}
+
+	case "$2" in
+	disk) RAMTARGETS=${INRAM_DISK};;
+	nfs) RAMTARGETS=${INRAM_NFS};;
+	memstick) RAMTARGETS=${INRAM_MEMSTICK};;
+	esac
+
+	for d in ${RAMTARGETS}; do
+	  RAMDIR="/media/ram${d}"
+	  REALDIR="${d}"
+	  rm -rf "${1}${REALDIR}"
+	  ln -s "${RAMDIR}" "${1}${REALDIR}"
+	  done
 	# the startup link is left for the moment, this seems safer
 	#rm "$1"/etc/rc?.d/[KS]??populate-var.sh
 	# remove the /var tmpfs entry from the new /etc/fstab
-	case "$2" in
-	disk)	sed -i '\@[ 	]/var[ 	][ 	]*tmpfs[ 	]@d' "$1"/etc/fstab
-		echo "turnup: tmpfs will no longer be mounted on /var" >&2;;
-	nfs)	sed -i '\@[ 	]/var[ 	][ 	]*tmpfs[ 	]@s@[ 	]/var@&/tmp@' "$1"/etc/fstab
-		echo "turnup: tmpfs /var mount moved to /var/tmp" >&2;;
-	esac
+	sed -i '\@[ 	]/var[ 	][ 	]*tmpfs[ 	]@d' "$1"/etc/fstab
+	echo "turnup: tmpfs will no longer be mounted on /var" >&2
 	#
 	# Previous versions of turnup removed populate-var.sh from the
 	# startup links, this one doesn't, so /var can be made back into
 	# a tmpfs just by a change to /etc/fstab.
-	return 0
-}
-
-#
-# setup_files new
-#  At present just puts the rmrecovery links in.
-setup_files() {
-	test -n "$1" -a -d "$1"/etc || {
-		echo "turnup: setup_files($1): expected a directory" >&2
-		return 1
-	}
-	#
-	# add the script to remove .recovery
-	update-rc.d -r "$1" rmrecovery start 99 1 2 3 4 5 .
 	return 0
 }
 
@@ -257,15 +277,13 @@ setup_rootfs() {
 	case "$type" in
 	flash)	return 0;;
 	disk)	setup_dev "$new" "$table" &&
-		setup_var "$new" disk &&
-		setup_files "$new" &&
+		setup_var "$new" "$type" &&
 		setup_syslog "$new";;
 	memstick)
 		setup_bootdev "$new" "$table" &&
-		setup_files "$new";;
+		setup_var "$new" "$type" ;;
 	nfs)	setup_dev "$new" "$table" &&
-		setup_var "$new" nfs &&
-		setup_files "$new" &&
+		setup_var "$new" "$type" &&
 		setup_syslog "$new";;
 	*)	echo "turnup: setup_rootfs: $type: unknown rootfs type" >&2
 		return 1;;
@@ -427,7 +445,7 @@ disk() {
 	}
 
 	# make sure we can get to the flash file system first
-	mountflash "$ffs" || {
+	get_flash "$ffs" || {
 		rmdir "$new" "$ffs"
 		return 1
 	}
@@ -511,7 +529,7 @@ boot_reset() {
 		return 1
 	}
 
-	mountflash "$ffs" || {
+	get_flash "$ffs" || {
 		rmdir "$ffs"
 		return 1
 	}
@@ -560,7 +578,7 @@ nfs() {
 	}
 
 	# make sure we can get to the flash file system first
-	mountflash "$ffs" || {
+	get_flash "$ffs" || {
 		rmdir "$new" "$ffs"
 		return 1
 	}
@@ -672,7 +690,7 @@ fix_hw_addr() {
 		# this isn't the flash device
 		ffs="/tmp/flashdisk.$$"
 		# make sure we can get to the flash file system first
-		mountflash "$ffs" || {
+		get_flash "$ffs" || {
 			rmdir "$ffs"
 			return 1
 		}
@@ -755,8 +773,10 @@ init_network() {
 		read_one "First DNS server" network dns_server1
 		read_one "Second DNS server" network dns_server2
 		read_one "Third DNS server" network dns_server3
+		echo "$ip_addr       $disk_server_name" >> /etc/hosts
 		;;
-	dhcp)	;;
+	dhcp)	sed -i -e "s/localhost\$/localhost $disk_server_name/" /etc/hosts
+		;;
 	*)	bootproto=dhcp;;
 	esac
 	#

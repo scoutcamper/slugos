@@ -1,7 +1,7 @@
 DESCRIPTION = "Meta-package for Opie and QPE"
 SECTION = "opie/base"
 ALLOW_EMPTY = 1
-PR = "r23"
+PR = "r24"
 PACKAGE_ARCH = "all"
 LICENSE = "MIT"
 
@@ -49,6 +49,7 @@ opie-memoryapplet \
 opie-multikeyapplet \
 opie-networkapplet \
 opie-notesapplet \
+opie-pcmciaapplet \
 opie-pyquicklaunchapplet \
 opie-restartapplet \
 opie-restartapplet2 \
@@ -387,6 +388,7 @@ task-qpe-fonts = "\
 qpf-bitstream-vera \
 qpf-bitstream-vera-sans-mono \
 qpf-dejavusans \
+qpf-dejavusanscondensed \
 qpf-dejavusansmono \
 qpf-dejavuserif \
 qpf-dejavuserifcondensed \
@@ -394,7 +396,6 @@ qpf-freemono \
 qpf-freeserif \
 qpf-gentium \
 qpf-gentiumalt \
-qpf-hunky \
 qpf-hunkysans \
 qpf-hunkyserif \
 qpf-qte \

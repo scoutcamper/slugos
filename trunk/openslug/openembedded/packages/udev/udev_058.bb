@@ -8,8 +8,3 @@ include udev.inc
 
 PR = "r3"
 # CFLAGS += -I${STAGING_INCDIR}/sysfs
-
-do_install_append() {
-    install -d ${D}${sysconfdir}/udev/rules.d/
-    install -m 0644 ${S}/etc/udev/debian/permissions.rules ${D}${sysconfdir}/udev/rules.d/
-}
