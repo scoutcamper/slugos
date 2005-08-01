@@ -84,6 +84,7 @@ OPENSLUG_PACKAGES = "\
 	python \
 	samba \
 	sane-backends \
+	strace \
 	thttpd \
 	vlan \
 	wget \
@@ -108,7 +109,7 @@ OPENSLUG_PACKAGES_append_linux = "\
 
 BROKEN_PACKAGES = "\
 	atftp \
-	strace \
+	postfix \
 	"
 
 DEPENDS = 'openslug-image \
