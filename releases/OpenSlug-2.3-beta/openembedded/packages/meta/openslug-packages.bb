@@ -102,7 +102,6 @@ OPENSLUG_PACKAGES_append_linux = "\
 	nfs-utils \
 	libpam \
 	php \
-	postfix \
 	xinetd \
 	yp-tools ypbind ypserv \
 	"
