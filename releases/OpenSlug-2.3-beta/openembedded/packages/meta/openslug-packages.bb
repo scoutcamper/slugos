@@ -61,7 +61,6 @@ OPENSLUG_PACKAGES = "\
 	libusb \
 	libxml2 \
 	miau \ 
-	microcom \
 	mt-daapd \
 	mutt \
 	mysql \
