@@ -26,7 +26,6 @@ do_install_prepend() {
 
 do_install_append() {
 	install -c -m 755 ${WORKDIR}/init ${D}${sysconfdir}/init.d/openntpd
-	install -d ${D}${localstatedir}/shared/empty
 }
 
 pkg_postrm () {
