@@ -89,6 +89,7 @@ OPENSLUG_PACKAGES = "\
 	openntpd \
 	ntp \
 	reiserfsprogs reiser4progs \
+	psmisc \
 	python \
 	samba \
 	sane-backends \
