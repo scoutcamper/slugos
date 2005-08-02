@@ -16,6 +16,7 @@ OPENSLUG_DEVELOPMENT = "\
 	coreutils \
 	cvs \
 	diffutils \
+	diffstat \
 	findutils \
 	flex \
 	gawk \
@@ -23,6 +24,7 @@ OPENSLUG_DEVELOPMENT = "\
 	gdb \
 	gnu-config \
 	grep \
+	ipkg-utils \
 	lsof \
 	m4 \
 	make \
@@ -31,6 +33,7 @@ OPENSLUG_DEVELOPMENT = "\
 	openssh \
 	patch \
 	pciutils \
+	pkgconfig \
 	quilt \
 	sed \
 	util-linux \
