@@ -76,6 +76,7 @@ OPENSLUG_PACKAGES = "\
 	sudo \
 	sysfsutils \
 	thttpd \
+	timezones \
 	db4 \
 	openldap \
 	openntpd \
