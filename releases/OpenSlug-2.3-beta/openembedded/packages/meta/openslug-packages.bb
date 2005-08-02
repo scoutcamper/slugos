@@ -57,6 +57,7 @@ OPENSLUG_PACKAGES = "\
 	glib-2.0 \
 	gphoto2 \
 	gtk-doc \
+	joe \
 	less \
 	libusb \
 	libxml2 \
