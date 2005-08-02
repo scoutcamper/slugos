@@ -77,6 +77,7 @@ OPENSLUG_PACKAGES = "\
 	pwc \
 	rsync \
 	sudo \
+	screen \ 
 	sysfsutils \
 	thttpd \
 	timezones \
