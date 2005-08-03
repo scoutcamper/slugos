@@ -51,8 +51,8 @@ do_install_append() {
 }
 
 PACKAGES =+ " openssh-scp openssh-ssh openssh-sshd openssh-sftp openssh-misc"
-FILES_openssh-scp = "${bindir}/scp"
-FILES_openssh-ssh = "${bindir}/ssh ${bindir}/slogin /${sysconfdir}/ssh/ssh_config"
+FILES_openssh-scp = "${bindir}/scp.${PN}"
+FILES_openssh-ssh = "${bindir}/ssh.${PN} ${bindir}/slogin /${sysconfdir}/ssh/ssh_config"
 FILES_openssh-sshd = "${sbindir}/sshd /${sysconfdir}/init.d/sshd ${bindir}/ssh-keygen"
 FILES_openssh-sshd += " /${sysconfdir}/ssh/moduli /${sysconfdir}/ssh/sshd_config /var/run/sshd"
 FILES_openssh-sftp = "${bindir}/sftp ${libdir}exec/sftp-server"
