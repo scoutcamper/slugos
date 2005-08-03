@@ -71,11 +71,11 @@ else
 fi
 }
 
-pkg_postinst_openssh_scp() {
+pkg_postinst_openssh-scp() {
 	update-alternatives --install ${bindir}/scp scp scp.${PN} 90
 }
 
-pkg_postinst_openssh_ssh() {
+pkg_postinst_openssh-ssh() {
 	update-alternatives --install ${bindir}/ssh ssh ssh.${PN} 90
 }
 
