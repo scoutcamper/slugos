@@ -11,7 +11,7 @@ used to provide applications with a secure communication channel."
 HOMEPAGE = "http://www.openssh.org/"
 LICENSE = "BSD"
 MAINTAINER = "Bruno Randolf <bruno.randolf@4g-systems.biz>"
-PR = "r1"
+PR = "r2"
 
 SRC_URI = "ftp://ftp.openbsd.org/pub/OpenBSD/OpenSSH/portable/openssh-${PV}.tar.gz \
            file://configure.patch;patch=1 \
@@ -46,6 +46,8 @@ do_compile_append () {
 do_install_append() {
 	install -d ${D}${sysconfdir}/init.d
 	install -m 0755 ${WORKDIR}/init ${D}${sysconfdir}/init.d/sshd
+	mv ${D}${bindir}/scp ${D}${bindir}/scp.openssh
+	mv ${D}${bindir}/ssh ${D}${bindir}/ssh.openssh
 }
 
 PACKAGES =+ " openssh-scp openssh-ssh openssh-sshd openssh-sftp openssh-misc"
@@ -67,6 +69,14 @@ else
 	adduser --system --home /var/run/sshd --no-create-home --disabled-password --ingroup sshd -s /bin/false sshd
 	update-rc.d sshd defaults
 fi
+}
+
+pkg_postinst_openssh_scp() {
+	update-alternatives --install ${bindir}/scp scp scp.${PN} 90
+}
+
+pkg_postinst_openssh_ssh() {
+	update-alternatives --install ${bindir}/ssh ssh ssh.${PN} 90
 }
 
 pkg_postrm_openssh-sshd() {

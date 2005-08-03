@@ -87,6 +87,7 @@ OPENSLUG_PACKAGES = "\
 	db4 \
 	openldap \
 	openntpd \
+	openssh \
 	ntp \
 	reiserfsprogs reiser4progs \
 	psmisc \
@@ -98,6 +99,7 @@ OPENSLUG_PACKAGES = "\
 	vlan \
 	wget \
 	unionfs-modules unionfs-utils \
+	zlib \
 	"
 
 # These packages only build on TARGET_OS=linux, not
