@@ -97,6 +97,7 @@ OPENSLUG_PACKAGES = "\
 	strace \
 	thttpd \
 	vlan \
+	wakelan \
 	wget \
 	unionfs-modules unionfs-utils \
 	zlib \
