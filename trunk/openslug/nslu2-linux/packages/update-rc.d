@@ -1,1 +1,0 @@
-../../openembedded/packages/update-rc.d
