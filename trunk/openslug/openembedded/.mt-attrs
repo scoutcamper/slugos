@@ -10,9 +10,6 @@ execute "true"
    file "packages/aspell/aspell-0.50.5/mk-dirs_h.py"
 execute "true"
 
-   file "packages/atftp/atftp_0.7.bb"
-execute "true"
-
    file "packages/busybox/files/busybox-cron"
 execute "true"
 
@@ -26,6 +23,9 @@ execute "true"
 execute "true"
 
    file "packages/busybox/files/umount.busybox"
+execute "true"
+
+   file "packages/cyrus-imapd/files/cyrus"
 execute "true"
 
    file "packages/dhcp/files/init-relay"
@@ -82,7 +82,7 @@ execute "true"
    file "packages/initscripts/initscripts-1.0/c7x0/devices"
 execute "true"
 
-   file "packages/initscripts/initscripts-1.0/c7x0/keymap"
+   file "packages/initscripts/initscripts-1.0/c7x0/keymap-2.6.map"
 execute "true"
 
    file "packages/initscripts/initscripts-1.0/checkfs.sh"
@@ -92,9 +92,6 @@ execute "true"
 execute "true"
 
    file "packages/initscripts/initscripts-1.0/collie/devices"
-execute "true"
-
-   file "packages/initscripts/initscripts-1.0/corgikeymap-2.6.map"
 execute "true"
 
    file "packages/initscripts/initscripts-1.0/devices"
@@ -122,6 +119,9 @@ execute "true"
 execute "true"
 
    file "packages/initscripts/initscripts-1.0/jornada7xx/devices"
+execute "true"
+
+   file "packages/initscripts/initscripts-1.0/keymap"
 execute "true"
 
    file "packages/initscripts/initscripts-1.0/mountall.sh"
@@ -184,9 +184,6 @@ execute "true"
    file "packages/irda-utils/files/init"
 execute "true"
 
-   file "packages/libmpeg2/libmpeg2_0.4.0b.bb"
-execute "true"
-
    file "packages/linux-hotplug/files/mmc.agent"
 execute "true"
 
@@ -223,9 +220,6 @@ execute "true"
    file "packages/matchbox-panel-hacks/matchbox-panel-hacks-0.3-1/xrandr-panelapp.sh"
 execute "true"
 
-   file "packages/miau/miau_0.5.3.bb"
-execute "true"
-
    file "packages/mini-init"
 execute "true"
 
@@ -254,9 +248,6 @@ execute "true"
 execute "true"
 
    file "packages/nonworking/apache/apache/files/init"
-execute "true"
-
-   file "packages/nonworking/qtopia/qtopia-1.7.0-r0/qtopia-init.postinst"
 execute "true"
 
    file "packages/nslu2-binary-only/unslung-rootfs/linuxrc"
@@ -334,6 +325,9 @@ execute "true"
    file "packages/opie-icon-reload/opie-icon-reload/icon-reload.sh"
 execute "true"
 
+   file "packages/opie-taskbar/opie-taskbar/c7x0/opie"
+execute "true"
+
    file "packages/opie-taskbar/opie-taskbar/mnci/opie"
 execute "true"
 
@@ -349,6 +343,9 @@ execute "true"
    file "packages/portmap/files/portmap.init"
 execute "true"
 
+   file "packages/postfix/files/postfix"
+execute "true"
+
    file "packages/ppp-dsl/ppp_on_boot.dsl"
 execute "true"
 
@@ -362,12 +359,6 @@ execute "true"
 execute "true"
 
    file "packages/prboom/files/prboom.sh"
-execute "true"
-
-   file "packages/puppy/puppy_1.8.bb"
-execute "true"
-
-   file "packages/puppy/puppy_1.9.bb"
 execute "true"
 
    file "packages/qpf-fonts/files/update-qtfontdir"
@@ -407,9 +398,6 @@ execute "true"
 execute "true"
 
    file "packages/sysvinit/sysvinit/rcS"
-execute "true"
-
-   file "packages/thc/thcrut_1.2.5.bb"
 execute "true"
 
    file "packages/txdrug/txdrug-0.1/opt/QtPalmtop/etc/txdrug/drugs.db"

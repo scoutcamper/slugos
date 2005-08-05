@@ -1,6 +1,6 @@
 DESCRIPTION = "Packages that are compatible with the OpenSlug firmware"
 LICENSE = MIT
-PR = "r3"
+PR = "r4"
 
 INHIBIT_DEFAULT_DEPS = "1"
 ALLOW_EMPTY = 1
@@ -23,6 +23,9 @@ OPENSLUG_DEVELOPMENT = "\
 	gdb \
 	gnu-config \
 	grep \
+	gzip \
+	ipkg-utils \
+	libtool \
 	lsof \
 	m4 \
 	make \
@@ -31,87 +34,97 @@ OPENSLUG_DEVELOPMENT = "\
 	openssh \
 	patch \
 	pciutils \
+	perl \
+	pkgconfig \
 	quilt \
 	sed \
-	util-linux \
-	"
-
-# These packages only build on TARGET_OS=linux, not
-# TARGET_OS=linux-uclibc
-OPENSLUG_DEVELOPMENT_append_linux = "\
-	perl \
+	strace \
 	tar \
+	util-linux \
 	"
 
 
 OPENSLUG_PACKAGES = "\
+	atftp \
 	bash \
+	bind \
 	bluez-utils-nodbus \
 	bridge-utils \
+	bwmon \
+	ccxstream \
 	coreutils \
 	cron \
 	cvs\
+	cyrus-imapd \
+	db4 \
 	dnsmasq \
 	expat \
 	ftpd-topfield \
 	glib-2.0 \
 	gphoto2 \
 	gtk-doc \
+	iperf \
+	jpeg \
 	less \
+	libpam \
+	libpng \
 	libusb \
 	libxml2 \
+	man man-pages \
+	mgetty \
 	miau \ 
 	microcom \
+	mpd \
 	mt-daapd \
 	mutt \
 	mysql \
 	nail \
+	nano \
+	ncftp \
+	netpbm \
+	nfs-utils \
+	ntp \
+	obexftp openobex openobex-apps ircp \
+	openldap \
+	openntpd \
 	openssh \
 	openvpn \
 	pcre \
+	php \
 	ppp \
+	procps \
+	psmisc \
 	puppy \
 	pwc \
+	python \
+	reiserfsprogs reiser4progs \
 	rsync \
+	samba \
+	sane-backends \
+	screen \
+	setpwc \
+	strace \
+	streamripper \
 	sudo \
 	sysfsutils \
 	thttpd \
-	db4 \
-	openldap \
-	openntpd \
-	ntp \
-	reiserfsprogs reiser4progs \
-	python \
-	samba \
-	sane-backends \
 	thttpd \
-	vlan \
-	wget \
+	tiff \
+	timezones \
 	unionfs-modules unionfs-utils \
-	"
-
-# These packages only build on TARGET_OS=linux, not
-# TARGET_OS=linux-uclibc  (Note that for several this
-# is because of use of single precision FP interfaces
-# such as sinf.)
-OPENSLUG_PACKAGES_append_linux = "\
-	bind \
-	mgetty \
-	mpd \
-	nfs-utils \
-	libpam \
-	php \
-	postfix \
+	vlan \
+	wakelan \
+	wget \
 	xinetd \
 	yp-tools ypbind ypserv \
+	zlib \
 	"
 
 BROKEN_PACKAGES = "\
-	atftp \
-	strace \
 	"
 
 DEPENDS = 'openslug-image \
 	${OPENSLUG_PACKAGES} \
 	${OPENSLUG_DEVELOPMENT} \
+	openslug-native \
 	package-index'
