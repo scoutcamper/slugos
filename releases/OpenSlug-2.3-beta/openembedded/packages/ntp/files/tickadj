@@ -1,5 +1,5 @@
 #!/bin/sh
 # Set tick value to 10101, so that the NSLU2 clock doesn't drift extremely much.
-TICKADJ=`which tickadj`
+. /etc/default/rcS	# Read TICKADJ from rcS
 
-$TICKADJ 10101
+`which tickadj` $TICKADJ
