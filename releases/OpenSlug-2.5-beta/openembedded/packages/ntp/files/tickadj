@@ -1,0 +1,5 @@
+#!/bin/sh
+# Set tick value to 10101, so that the NSLU2 clock doesn't drift extremely much.
+TICKADJ=`which tickadj`
+
+$TICKADJ 10101
