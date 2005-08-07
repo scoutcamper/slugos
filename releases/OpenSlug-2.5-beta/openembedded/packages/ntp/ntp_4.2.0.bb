@@ -6,7 +6,7 @@ HOMEPAGE = "http://ntp.isc.org/bin/view/Main/WebHome"
 SECTION = "console/network"
 PRIORITY = "optional"
 LICENSE = "ntp"
-PR = "r3"
+PR = "r5"
 # OE core: this is here to prevent this version of ntp from
 # changing OE distros other than openslug.  This code has
 # only been tested on openslug.  Feel free to remove these lines!
@@ -17,12 +17,15 @@ SRC_URI = "http://www.eecis.udel.edu/~ntp/ntp_spool/ntp4/${P}.tar.gz \
 	file://ntpdc.Makefile.am.maybe-layout.patch;patch=1 \
 	file://ntpd \
 	file://ntp.conf \
-	file://ntpdate"
+	file://ntpdate \
+	file://tickadj"
 
 
 INITSCRIPT_NAME = "ntpd"
 # No dependencies, so just go in at the standard level (20)
 INITSCRIPT_PARAMS = "defaults"
+INITSCRIPT_NAME_${PN}-tickadj_nslu2 = "tickadj"
+INITSCRIPTS_PARAMS_${PN}-tickadj_nslu2 = "start 10 5"
 
 inherit autotools update-rc.d
 
@@ -31,7 +34,7 @@ inherit autotools update-rc.d
 EXTRA_OECONF = "--without-openssl --without-crypto ac_cv_header_readline_history_h=no"
 CFLAGS_append = " -DPTYS_ARE_GETPT -DPTYS_ARE_SEARCHED"
 
-PACKAGES = "ntpdate ntp-bin ntp"
+PACKAGES = "ntpdate ntp-bin ntp ntp-tickadj"
 # NOTE: you don't need ntpdate, use "ntpdc -q -g -x"
 PROVIDES = "ntpdate-${PV} ntpdate-${PV}-${PR} ntpdate"
 
@@ -41,8 +44,12 @@ FILES_ntpdate = "${bindir}/ntpdate ${sysconfdir}/init.d/ntpdate"
 #perl scripts, and installing perl is an enormous overhead for a user who only
 #needs ntpq
 #RDEPENDS_ntp-bin = perl
-FILES_ntp-bin = "${bindir}/ntp-wait ${bindir}/ntpdc ${bindir}/ntpq ${bindir}/ntptime ${bindir}/ntptrace"
-FILES_ntp = "${bindir}/ntpd ${bindir}/tickadj ${sysconfdir}/ntp.conf ${sysconfdir}/init.d/ntpd"
+# ntp originally includes tickadj. It's split off for inclusion in small firmware images on platforms 
+# with wonky clocks (e.g. OpenSlug)
+RDEPENDS_${PN} = ${PN}-tickadj
+FILES_${PN}-bin = "${bindir}/ntp-wait ${bindir}/ntpdc ${bindir}/ntpq ${bindir}/ntptime ${bindir}/ntptrace"
+FILES_${PN} = "${bindir}/ntpd ${sysconfdir}/ntp.conf ${sysconfdir}/init.d/ntpd"
+FILES_${PN}-tickadj = "${bindir}/tickadj ${sysconfdir}/init.d/tickadj"
 
 do_install_append() {
 	install -d ${D}/${sysconfdir}/init.d
@@ -50,6 +57,12 @@ do_install_append() {
 	install -m 755 ${WORKDIR}/ntpdate ${D}/${sysconfdir}/init.d
 	install -m 755 ${WORKDIR}/ntpd ${D}/${sysconfdir}/init.d
 }
+
+do_install_append_nslu2() {
+	install -d ${D}/${sysconfdir}/init.d
+	install -m 755 ${WORKDIR}/tickadj ${D}/${sysconfdir}/init.d
+}
+
 
 pkg_postinst_ntpdate_nylon() {
 if test "x$D" != "x"; then
