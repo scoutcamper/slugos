@@ -90,6 +90,7 @@ OPENSLUG_PACKAGES = "\
 	openssh \
 	ntp \
 	reiserfsprogs reiser4progs \
+	procps \
 	psmisc \
 	python \
 	samba \
