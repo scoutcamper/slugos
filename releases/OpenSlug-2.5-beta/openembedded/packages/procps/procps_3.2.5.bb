@@ -7,7 +7,7 @@ SECTION = "base"
 PRIORITY = "optional"
 MAINTAINER = "Inge Arnesen <inge.arnesen@gmail.com>"
 DEPENDS = "ncurses"
-PR = "r3"
+PR = "r4"
 
 SRC_URI = "http://procps.sourceforge.net/procps-${PV}.tar.gz \
            file://install.patch;patch=1 \
@@ -33,8 +33,8 @@ do_install_append () {
 	mv ${D}${bindir}/uptime ${D}${bindir}/uptime.${PN}
 	mv ${D}${bindir}/top ${D}${bindir}/top.${PN}
 	mv ${D}${base_bindir}/kill ${D}${base_bindir}/kill.${PN}
-	mv ${D}${base_bindir}/ps ${D}${base_bindir}/ps.{PN}
-	mv ${D}${bindir}/free ${D}${bindir}/free.{PN}
+	mv ${D}${base_bindir}/ps ${D}${base_bindir}/ps.${PN}
+	mv ${D}${bindir}/free ${D}${bindir}/free.${PN}
 }	
 
 pkg_postinst() {
