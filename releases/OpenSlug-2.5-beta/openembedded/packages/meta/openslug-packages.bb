@@ -71,6 +71,7 @@ OPENSLUG_PACKAGES = "\
 	libpng \
 	libusb \
 	libxml2 \
+	mailx \
 	man man-pages \
 	mgetty \
 	miau \ 
@@ -104,6 +105,7 @@ OPENSLUG_PACKAGES = "\
 	sane-backends \
 	screen \
 	setpwc \
+	ssmtp \
 	strace \
 	streamripper \
 	sudo \
