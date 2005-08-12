@@ -16,6 +16,7 @@ OPENSLUG_DEVELOPMENT = "\
 	coreutils \
 	cvs \
 	diffutils \
+	diffstat \
 	findutils \
 	flex \
 	gawk \
