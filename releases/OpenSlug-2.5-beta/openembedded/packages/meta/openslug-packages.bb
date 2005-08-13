@@ -66,6 +66,7 @@ OPENSLUG_PACKAGES = "\
 	gphoto2 \
 	gtk-doc \
 	iperf \
+	joe \
 	jpeg \
 	less \
 	libpam \
