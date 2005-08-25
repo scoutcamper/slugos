@@ -46,6 +46,7 @@ OPENSLUG_DEVELOPMENT = "\
 
 
 OPENSLUG_PACKAGES = "\
+	alsa-utils \
 	atftp \
 	bash \
 	bind \
@@ -112,12 +113,14 @@ OPENSLUG_PACKAGES = "\
 	streamripper \
 	sudo \
 	sysfsutils \
+	syslog-ng \
 	thttpd \
 	thttpd \
 	tiff \
 	timezones \
 	unionfs-modules unionfs-utils \
 	vlan \
+	vsftpd \
 	wakelan \
 	wget \
 	xinetd \
