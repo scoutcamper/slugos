@@ -3,9 +3,9 @@ LICENSE = MIT
 DEPENDS = "ipkg-native ipkg-utils-native fakeroot-native \
            binutils-cross-sdk gcc-cross-sdk gdb-cross \
            libidl libsvg-cairo sed-native \
-           meta-gpe \
+           meta-gpe gstreamer\
            opie-mail"
-PR = "r5"
+PR = "r8"
 
 PACKAGES = ""
 
@@ -51,24 +51,14 @@ libice-dev \
 libidl-2-dev \
 libipkg-dev \
 libjpeg-dev \
-libmailwrapper-dev \
 libmb-dev \
 libmimedir-dev \
 libopenobex-1.0-dev \
-libopiebluez2-dev \
-libopiedb2-dev \
-libopiecore2-dev \
-libopienet2-dev \
-libopiepim2-dev \
-libopieui2-dev \
 libpcap-dev \
 libpixman-dev \
 libpng-dev \
 libpng12-dev \
 libpopt-dev \
-libqpe1-dev \
-libqte2-dev \
-libqtaux2-dev \
 libreadline-dev \
 libschedule-dev \
 libsm-dev \
@@ -95,7 +85,6 @@ libxpm-dev \
 libxrandr-dev \
 libxrender-dev \
 libxsettings-client-dev \
-libxsettings-dev \
 libxss-dev \
 libxt-dev \
 libxtst-dev \
@@ -113,7 +102,20 @@ xextensions-dev \
 libxmu-dev \
 xproto-dev \
 xtrans-dev \
+gstreamer-dev \
 "
+
+#libopiebluez2-dev \
+#libopiedb2-dev \
+#libopiecore2-dev \
+#libopienet2-dev \
+#libopiepim2-dev \
+#libopieui2-dev \
+#libqpe1-dev \
+#libqte2-dev \
+#libqtaux2-dev \
+#libmailwrapper-dev \
+
 
 do_populate_sdk() {
 	touch ${DEPLOY_DIR_IPK}/Packages
@@ -146,16 +148,16 @@ EOF
 	${IPKG_TARGET} install ${TARGET_INSTALL}
 
 	mkdir -p ${SDK_OUTPUT}/${prefix}/${TARGET_SYS}
-	cp -a ${SDK_OUTPUT}/${prefix}/usr/* ${SDK_OUTPUT}/${prefix}/${TARGET_SYS}
+	cp -pPR ${SDK_OUTPUT}/${prefix}/usr/* ${SDK_OUTPUT}/${prefix}/${TARGET_SYS}
 	rm -rf ${SDK_OUTPUT}/${prefix}/usr/
 
-        cp -a ${SDK_OUTPUT}/${prefix}/lib/* ${SDK_OUTPUT}/${prefix}/${TARGET_SYS}/lib
+        cp -pPR ${SDK_OUTPUT}/${prefix}/lib/* ${SDK_OUTPUT}/${prefix}/${TARGET_SYS}/lib
         rm -rf ${SDK_OUTPUT}/${prefix}/lib/*
 
 	mv ${SDK_OUTPUT}/${prefix}/${TARGET_SYS}/lib/gcc* ${SDK_OUTPUT}/${prefix}/lib
 
-	cp -a ${TMPDIR}/cross/${TARGET_SYS}/include/linux/ ${SDK_OUTPUT}/${prefix}/${TARGET_SYS}/include/
-        cp -a ${TMPDIR}/cross/${TARGET_SYS}/include/asm/ ${SDK_OUTPUT}/${prefix}/${TARGET_SYS}/include/
+	cp -pPR ${TMPDIR}/cross/${TARGET_SYS}/include/linux/ ${SDK_OUTPUT}/${prefix}/${TARGET_SYS}/include/
+        cp -pPR ${TMPDIR}/cross/${TARGET_SYS}/include/asm/ ${SDK_OUTPUT}/${prefix}/${TARGET_SYS}/include/
 	chmod -R a+r ${SDK_OUTPUT}/${prefix}/${TARGET_SYS}/include/
 	find ${SDK_OUTPUT}/${prefix}/${TARGET_SYS}/include/ -type d | xargs chmod +x
 

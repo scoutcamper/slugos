@@ -11,27 +11,26 @@ LICENSE = "GPL MIT Artistic"
 SECTION = "console/utils" 
 DEPENDS = "jpeg zlib libpng tiff install-native flex-native" 
 RDEPENDS = "perl\
-	perl-module-${TARGET_SYS}-xsloader\
-	perl-module-carp\
-	perl-module-constant\
+	perl-module-cwd\
 	perl-module-english\
-	perl-module-exporter\
-	perl-module-exporter-heavy\
 	perl-module-fcntl\
+	perl-module-file-basename\
 	perl-module-file-spec\
-	perl-module-file-spec-unix\
 	perl-module-getopt-long\
 	perl-module-strict\
-	perl-module-vars\
-	perl-module-warnings\
-	perl-module-warnings-register\
 	"
+
+# these should not be required, they are here because the perl
+# module dependencies are currently incorrect:
+RDEPENDS += "perl-module-exporter-heavy"
+RDEPENDS += "perl-module-file-spec-unix"
+
 HOMEPAGE = "http://netpbm.sourceforge.net" 
 DESCRIPTION = "Netpbm is a toolkit for manipulation of graphic images, including\
 conversion of images between a variety of different formats.  There\
 are over 220 separate tools in the package including converters for\
 about 100 graphics formats."
-PR = "r1"
+PR = "r3"
 
 SRC_URI = "${SOURCEFORGE_MIRROR}/netpbm/netpbm-${PV}.tgz \
 	   file://ppmtojpeg.patch;patch=42 \
@@ -66,16 +65,16 @@ do_install() {
 		*/VERSION)	;;
 		*/pkginfo)	;;
 		*/bin)		install -d ${D}${bindir}
-				cp -a "$d"/* ${D}${bindir}
+				cp -pPR "$d"/* ${D}${bindir}
 				rm ${D}${bindir}/doc.url;;
 		*/include)	install -d ${D}${includedir}
-				cp -a "$d"/* ${D}${includedir};;
+				cp -pPR "$d"/* ${D}${includedir};;
 		*/link|*/lib)	install -d ${D}${libdir}
-				cp -a "$d"/* ${D}${libdir};;
+				cp -pPR "$d"/* ${D}${libdir};;
 		*/man)		install -d ${D}${mandir}
-				cp -a "$d"/* ${D}${mandir};;
+				cp -pPR "$d"/* ${D}${mandir};;
 		*/misc)		install -d ${D}${datadir}/netpbm
-				cp -a "$d"/* ${D}${datadir}/netpbm;;
+				cp -pPR "$d"/* ${D}${datadir}/netpbm;;
 		*/config_template)
 				install -d ${D}${bindir}
 				sed "/^@/d

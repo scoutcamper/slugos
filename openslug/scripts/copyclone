@@ -11,14 +11,14 @@
 #
 #	monotone --db=your.db --revision=t:OpenSlug-2.3-beta co monotone
 #
-# monotone will tell you which revision it checked out - make sure it
-# got it right!
+# make sure everything worked ok - there should be no errors or warnings.
+# Do *not* check out over an existing directory - make a new one!
 #
 # 'monotone' is a directory in the trunk/openslug SVN tree.
 #
 # Having done this simply run:
 #
-#	copyclone monotone openembedded
+#	scripts/copyclone monotone openembedded
 #
 # Take note of any warnings.  If a file has been converted to a directory or
 # vice versa you are in untested territory - it should work, but the script

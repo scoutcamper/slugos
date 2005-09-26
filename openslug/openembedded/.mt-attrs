@@ -4,6 +4,9 @@ execute "true"
    file "packages/acpid/acpid-1.0.3/init"
 execute "true"
 
+   file "packages/apache/files/init"
+execute "true"
+
    file "packages/apmd/apmd-3.2.2/init"
 execute "true"
 
@@ -70,13 +73,10 @@ execute "true"
    file "packages/initscripts/initscripts-1.0/akita/devices"
 execute "true"
 
-   file "packages/initscripts/initscripts-1.0/banner"
-execute "true"
-
-   file "packages/initscripts/initscripts-1.0/beagle/devices"
-execute "true"
-
    file "packages/initscripts/initscripts-1.0/bootmisc.sh"
+execute "true"
+
+   file "packages/initscripts/initscripts-1.0/borzoi/devices"
 execute "true"
 
    file "packages/initscripts/initscripts-1.0/c7x0/devices"
@@ -205,6 +205,9 @@ execute "true"
    file "packages/linux/linux-omap-2.6-2.6.9-omap1/omap5912osk/defconfig"
 execute "true"
 
+        file "packages/linux/triton-kernel-2.6.11/patch-2.6.11-mm2-karo9.bz2"
+manual_merge "true"
+
    file "packages/lirc/files/lircd.init"
 execute "true"
 
@@ -248,6 +251,12 @@ execute "true"
 execute "true"
 
    file "packages/nonworking/apache/apache/files/init"
+execute "true"
+
+   file "packages/nslu2-binary-only/unslung-rootfs-2.3r63/linuxrc"
+execute "true"
+
+   file "packages/nslu2-binary-only/unslung-rootfs-2.3r63/unsling"
 execute "true"
 
    file "packages/nslu2-binary-only/unslung-rootfs/linuxrc"
@@ -335,6 +344,12 @@ execute "true"
 execute "true"
 
    file "packages/opie-taskbar/opie-taskbar/opie-reorgfiles"
+execute "true"
+
+   file "packages/orinoco/spectrum-fw/get_symbol_fw"
+execute "true"
+
+   file "packages/orinoco/spectrum-fw/parse_symbol_fw"
 execute "true"
 
    file "packages/pad/pad/pad.c"
@@ -453,6 +468,9 @@ execute "true"
 
    file "packages/wrt/wrt-init/wrtboot"
 execute "true"
+
+        file "packages/zaurus-updater/files/gnu-tar.gz"
+manual_merge "true"
 
    file "packages/zaurus-updater/spitz/updater.sh"
 execute "true"
