@@ -139,23 +139,21 @@ pivot_image() {
 
 	mkdir -p /media/image || die "mkdir -p /media/image failed"
 
-
-	if test "$FSCK_IMAGES" = yes
-	then
-		echo "Checking file system on [$IMAGE_NAME]"
-		losetup /dev/loop0 $1/$IMAGE_PATH/$IMAGE_NAME || die "losetup /dev/loop0 $1/$IMAGE_PATH/$IMAGE_NAME failed!"
-		fsck.ext3 -p /dev/loop0 || sleep 2
-		losetup -d /dev/loop0
-	fi						
+	echo "Setting up loopback (/dev/loop0) for $IMAGE_NAME"
+	losetup /dev/loop0 $1/$IMAGE_PATH/$IMAGE_NAME || die "losetup /dev/loop0 $1/$IMAGE_PATH/$IMAGE_NAME failed!"
+	check_fs /dev/loop0 $IMAGE_TYPE
 
 	echo -e "\n* * * Booting rootfs image * * *\n"
 
 
 	# Busybox's "mount" doesn't seem to like "-o loop" for some reason
 	# It works on collie and b0rks on poodle.
-	losetup /dev/loop1 $1/$IMAGE_PATH/$IMAGE_NAME || die "losetup /dev/loop1 $1/$IMAGE_PATH/$IMAGE_NAME failed!"
-	mount /dev/loop1 /media/image || die "mount /dev/loop1 /media/image failed!"
-
+	if [ "$IMAGE_TYPE" = "" ]; then
+		IMAGE_TYPE="auto"
+	fi
+	# If mount fails it has the tendency to spew out a _lot_ of error messages.
+	# We direct the output to /dev/null so the user can see which step actually failed.
+	mount -t $IMAGE_TYPE /dev/loop0 /media/image >/dev/null 2>&1 || die "mount -t $IMAGE_TYPE  /dev/loop0 /media/image failed!"
 
 	mkdir -p /media/image/media/ROM || die "mkdir -p /media/image/media/ROM failed"
 
@@ -185,10 +183,11 @@ set_password() {
 	mount -o remount,rw /
 	if test -z "$MASTER_PASSWORD"
 	then
-		echo -e "\nAltboot is a boot-manager which allows to boot from SD, CF and NFS\n\n"
-		echo -e "\nFor security reasons altboot requires a password\nto boot into single-user mode or init=/bin/sh"
-		echo -e "\nThis is *not* your root password! It is used by altboot alone!"
-		echo -e "Please enter a new master password:\n"
+		echo -e "\nAltboot is a boot-manager which allows to boot from SD,\nCF and NFS"
+		echo -e "\nFor security reasons altboot requires a password\nto boot into init=/bin/sh."
+		echo -e "${C_RED}This is *not* your root password!\nIt is used by altboot alone!${C_RESET}"
+		echo -e "${C_BLUE}\nNote:\tThe password will be echoed to the screen\n\tand it will be asked twice for confirmation.${C_RESET}"
+		echo -e "\nPlease enter a new master password:\n"
 
 		while true
 		do
@@ -203,18 +202,14 @@ set_password() {
 				then
 					crypt_pw="`echo "$junk1" | md5sum | awk '{print $1}'`"
 					
-					if test -e /etc/hutils.conf
-					then
-						sed "/^MASTER_PASSWORD/s/\(.*\=\).*/\1\"$crypt_pw\"/" /etc/hutils.conf > /etc/hutils.conf_
-						mv /etc/hutils.conf_ /etc/hutils.conf
-						echo "Password changed."
-					fi
 					if test -e /etc/altboot.cfg
 					then
 						sed "/^MASTER_PASSWORD/s/\(.*\=\).*/\1\"$crypt_pw\"/" /etc/altboot.cfg > /etc/altboot.cfg_
 						mv /etc/altboot.cfg_ /etc/altboot.cfg
 						MASTER_PASSWORD="$crypt_pw"
 						echo "Password changed."
+					else
+						echo "/etc/altboot.cfg is missing, no password saved"
 					fi
 					
 					break
@@ -257,5 +252,43 @@ verify_master_pw() {
 #				fi
 			fi
 		done
+	fi
+}
+
+
+check_fs() {
+	if [ "$FSCK_IMAGES" = "yes" ]
+	then
+                FSCK=""
+		if [ "$2" = "" ]; then
+			FSTYPE="ext2"
+		else
+			FSTYPE="$2"
+		fi
+		case "$FSTYPE" in
+		ext2 | ext3)
+	        	if [ -e /sbin/fsck.ext3 ]; then
+		       		FSCK="/sbin/fsck.ext3"
+			elif [ -e /sbin/e3fsck ]; then
+		       		FSCK="/sbin/e3fsck"
+			elif [ -e /sbin/fsck.ext2 ]; then
+		       		FSCK="/sbin/fsck.ext2"
+			elif [ -e /sbin/e2fsck ]; then
+		       		FSCK="/sbin/e2fsck"
+			fi
+			FSCK="$FSCK -p"
+		;;
+		vfat)
+		    if [ -e /sbin/dosfsck ]; then
+			FSCK="/sbin/dosfsck -a"
+		    fi
+		;;
+		esac
+		if [ "$FSCK" = "" ]; then
+		        echo "Could not find fsck for $FSTYPE!"
+		else
+			echo "Checking file system on $1"
+			$FSCK $1 || sleep 2
+		fi
 	fi
 }

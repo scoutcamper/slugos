@@ -212,17 +212,19 @@ inherit kernel
 ARCH = "arm"
 KERNEL_IMAGETYPE = "zImage"
 # To specify the console set KERNEL_CONSOLE in the .bb file.
-# CMDLINE_ROOT contains the boot options
-CMDLINE_ROOT ?= "root=/dev/mtdblock4 rw rootfstype=jffs2 mem=32M@0x00000000 init=/linuxrc reboot=s"
+# CMDLINE_ROOT contains the boot options, CMDLINE_KERNEL_OPTIONS
+# contains the things for a specific kernel.
+CMDLINE_KERNEL_OPTIONS ?= "reboot=s"
+CMDLINE_ROOT ?= "root=/dev/mtdblock4 rw rootfstype=jffs2 mem=32M@0x00000000 init=/linuxrc"
 # Add distro specific debug (or non-debug) options to this
 CMDLINE_DEBUG ?= ""
-CMDLINE = "${CMDLINE_ROOT} ${CMDLINE_DEBUG} ${CMDLINE_CONSOLE}"
+CMDLINE = "${CMDLINE_ROOT} ${CMDLINE_KERNEL_OPTIONS} ${CMDLINE_DEBUG} ${CMDLINE_CONSOLE}"
 
 # Add the architecture compiler flags to KERNEL_CC and KERNEL_LD as
 # required.  Notice that this has to be done for each separately built
 # module as well!
-KERNEL_CC += "${TARGET_CC_ARCH} -mno-thumb-interwork"
-# KERNEL_LD +=
+KERNEL_CC += "${TARGET_CC_KERNEL_ARCH}"
+KERNEL_LD += "${TARGET_LD_KERNEL_ARCH}"
 
 # By putting the added files in place in a separate task before
 # do_patch it becomes possible to patch these files.
