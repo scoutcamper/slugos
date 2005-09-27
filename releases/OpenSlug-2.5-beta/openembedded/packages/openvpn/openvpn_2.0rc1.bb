@@ -6,6 +6,7 @@ LICENSE = "GPLv2"
 PRIORITY = "optional"
 DEPENDS = "lzo openssl"
 RRECOMMENDS = "kernel-module-tun"
+DEFAULT_PREFERENCE = "-1"
 PR = "r2"
 
 SRC_URI = "${SOURCEFORGE_MIRROR}/openvpn/openvpn-2.0_rc1.tar.gz \
