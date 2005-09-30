@@ -52,7 +52,7 @@ mount_tmpfs() {
 
   mkdir -p /dev/.static/dev
   chmod 700 /dev/.static/
-  mount -n -o move /etc/udev /dev/.static/dev
+  busybox mount -n -o move /etc/udev /dev/.static/dev
 }
 
 # I hate this hack.  -- Md
