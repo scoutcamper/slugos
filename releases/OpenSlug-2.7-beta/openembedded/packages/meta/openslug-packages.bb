@@ -19,6 +19,7 @@ OPENSLUG_PACKAGES = "\
 	bison \
 	bluez-utils-nodbus \
 	bridge-utils \
+	buzzer \
 	bwmon \
 	bzip2 \
 	ccxstream \
