@@ -64,6 +64,7 @@ OPENSLUG_PACKAGES = "\
 	libxml2 \
 	lsof \
 	m4 \
+	madplay \
 	mailx \
 	make \
 	man man-pages \
