@@ -3,7 +3,7 @@ MAINTAINER = "Lorn Potter <lpotter@trolltech.com>"
 SECTION = "console/utils"
 LICENSE = "GPL"
 DEPENDS = "alsa-lib ncurses"
-PR = "r3"
+PR = "r4"
 
 SRC_URI = "ftp://ftp.alsa-project.org/pub/utils/alsa-utils-${PV}.tar.bz2"
 SRC_URI += "file://alsa-utils-sys-siglist.patch;patch=108"
@@ -53,5 +53,5 @@ DESCRIPTION_alsa-utils-alsaconf     = "a bash script that creates ALSA configura
 
 RDEPENDS_alsa-utils-aplay  += "alsa-conf"
 RDEPENDS_alsa-utils-amixer += "alsa-conf"
-RDEPENDS_alsa-utils += "${ALSA_PACKAGES}"
+RDEPENDS_alsa-utils += "alsa-lib"
 ALLOW_EMPTY_alsa-utils = "1"
