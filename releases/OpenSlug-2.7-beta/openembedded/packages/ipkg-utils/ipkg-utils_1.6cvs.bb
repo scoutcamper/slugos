@@ -5,9 +5,9 @@ PRIORITY = "optional"
 MAINTAINER = "Chris Larson <kergoth@handhelds.org>"
 LICENSE = "GPL"
 CONFLICTS = "ipkg-link"
-RDEPENDS = "python"
+RDEPENDS = "python-core"
 PV_append = "${CVSDATE}"
-PR = "r9"
+PR = "r10"
 
 SRC_URI = "${HANDHELDS_CVS};module=ipkg-utils"
 	   
