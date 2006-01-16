@@ -68,6 +68,7 @@ OPENSLUG_PACKAGES = "\
 	mailx \
 	make \
 	man man-pages \
+	mdadm \
 	mgetty \
 	miau \ 
 	microcom \
