@@ -51,7 +51,6 @@ OPENSLUG_PACKAGES = "\
 	iperf \
 	ipkg-utils \
 	iptables \
-	irssi \
 	joe \
 	jpeg \
 	lcdproc \
@@ -140,6 +139,7 @@ OPENSLUG_PACKAGES = "\
 BROKEN_PACKAGES = "\
 	groff \
 	icecast \
+	irssi \
 	watchdog \
 	"
 
