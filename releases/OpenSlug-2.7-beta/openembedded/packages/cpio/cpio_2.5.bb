@@ -3,7 +3,8 @@ HOMEPAGE = "http://www.gnu.org/software/cpio/"
 SECTION = "console"
 LICENSE = "GPL"
 MAINTAINER = "Chris Larson <kergoth@handhelds.org>"
-PR = "r3"
+PR = "r4"
+DEPENDS = "tetex-native"
 
 SRC_URI = "${GNU_MIRROR}/cpio/cpio-${PV}.tar.gz \
 	   file://install.patch;patch=1"
