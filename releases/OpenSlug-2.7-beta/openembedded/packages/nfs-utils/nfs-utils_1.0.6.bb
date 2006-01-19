@@ -3,7 +3,7 @@ PRIORITY = "optional"
 SECTION = "console/networking"
 MAINTAINER = "dyoung <dyoung@thestuffguy.com>"
 LICENSE = "GPL"
-PR = "r3"
+PR = "r4"
 
 SRC_URI = "${SOURCEFORGE_MIRROR}/nfs/nfs-utils-${PV}.tar.gz \
 	file://acinclude-lossage.patch;patch=1 \
@@ -66,4 +66,10 @@ do_install() {
 	install -m 0644 ${S}/utils/rquotad/rquotad.man ${D}${mandir}/man8/rquotad.8
 	install -m 0644 ${S}/utils/showmount/showmount.man ${D}${mandir}/man8/showmount.8
 	install -m 0644 ${S}/utils/statd/statd.man ${D}${mandir}/man8/statd.8
+}
+
+pkg_postinst() {
+	mkdir -p /var/lib/nfs
+	touch -p /var/lib/rmtab
+	touch ${sysconfdir}/defaults/nfsd
 }
