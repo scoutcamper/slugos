@@ -36,6 +36,7 @@ do_install() {
 
 pkg_postinst () {
 	grep mysql /etc/passwd || adduser --disabled-password --home=/var/mysql --ingroup nogroup mysql
+	mysql_install_db
 }
 
 pkg_postrm () {
