@@ -1,7 +1,7 @@
 SECTION = "console/network"
 DEPENDS = "db3 pcre postfix-native"
 LICENSE = "IPL"
-PR = "r8"
+PR = "r9"
 
 SRC_URI = "ftp://ftp.porcupine.org/mirrors/postfix-release/official/postfix-${PV}.tar.gz \
 	   file://${FILESDIR}/makedefs.patch;patch=1 \
