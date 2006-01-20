@@ -3,7 +3,7 @@ PRIORITY = "optional"
 SECTION = "console/networking"
 MAINTAINER = "dyoung <dyoung@thestuffguy.com>"
 LICENSE = "GPL"
-PR = "r4"
+PR = "r5"
 
 SRC_URI = "${SOURCEFORGE_MIRROR}/nfs/nfs-utils-${PV}.tar.gz \
 	file://acinclude-lossage.patch;patch=1 \
@@ -22,6 +22,7 @@ INITSCRIPT_NAME = "nfsserver"
 # it in at the default levels.  It must be terminated before the network
 # in the shutdown levels, but that works fine.
 INITSCRIPT_PARAMS = "defaults"
+INHIBIT_AUTO_STAGE = "1"
 
 inherit autotools update-rc.d
 
