@@ -1,4 +1,4 @@
-PR = "r3"
+PR = "r4"
 
 SRC_URI = "http://us2.samba.org/samba/ftp/stable/samba-${PV}.tar.gz \
 	   file://configure.patch;patch=1 \
@@ -23,6 +23,7 @@ CONFFILES_${PN} = "${sysconfdir}/samba/smb.conf"
 # in the samba config by --with-foodir=dirfoo - even if the --with is not
 # specified!  Fix that here.  Set the privatedir to /etc/samba/private.
 EXTRA_OECONF += "\
+	samba_cv_struct_timespec=yes \
 	--with-configdir=${sysconfdir}/samba \
 	--with-privatedir=${sysconfdir}/samba/private \
 	--with-lockdir=${localstatedir}/lock \
