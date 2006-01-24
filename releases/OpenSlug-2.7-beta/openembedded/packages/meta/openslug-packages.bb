@@ -63,6 +63,7 @@ OPENSLUG_PACKAGES = "\
 	libusb \
 	libxml2 \
 	lsof \
+	lvm2 \
 	m4 \
 	madplay \
 	mailx \
