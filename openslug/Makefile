@@ -12,7 +12,7 @@
 # MACHINE - the OpenEmbedded build target machine
 #
 # All of these values are (should be, must be) quoted in double quotes
-include conf/auto.conf
+-include conf/auto.conf
 
 BUILD_DIRS = downloads
 REQUIRED_DIRS = bitbake openembedded
@@ -29,6 +29,7 @@ configuration:
 	else\
 		echo>&2;\
 		echo '*** SlugOS: use make DISTRO="<distro>" to initialise ***'>&2;\
+		echo '***  use make help to get more information           ***'>&2;\
 		echo>&2;\
 		exit 1; \
 	fi
@@ -37,18 +38,23 @@ configuration:
 		rm -f conf/auto.new;\
 		echo '*** SlugOS: DISTRO is "'$(DISTRO)'"';\
 	else\
+		test -e conf/auto.conf && {\
+			echo '*** SlugOS: WARNING: DISTRO changed from:'>&2;\
+			cat conf/auto.conf | sed 's/^/   /' >&2;\
+			echo '*** WARNING: parallel builds with a different DISTROs will NOT WORK'>&2;\
+		};\
 		mv conf/auto.new conf/auto.conf;\
 		echo '*** SlugOS: DISTRO set to "'$(DISTRO)'"';\
 	fi
 	@make $(TARGET)-safe
-
-conf/auto.conf: configuration
 
 # This rule clobbers the environment (note that ccache uses '$HOME' by
 # default, so the cache will end up there).
 .PHONY: distro image kernel prefetch
 distro image kernel prefetch: $$@-safe
 
+%-config:
+	@make TARGET=config DISTRO="$*" configuration
 %-distro:
 	@make TARGET=distro DISTRO="$*" configuration
 %-image:
@@ -57,6 +63,10 @@ distro image kernel prefetch: $$@-safe
 	@make TARGET=kernel DISTRO="$*" configuration
 %-prefetch:
 	@make TARGET=prefetch DISTRO="$*" configuration
+
+config-safe:
+	@echo '*** SlugOS: configuration created:'
+	@cat conf/auto.conf | sed 's/^/   /'
 
 %-safe:
 	@echo '*** SlugOS: building '$(DISTRO)' $* for '$(MACHINE)' in a safe environment'
