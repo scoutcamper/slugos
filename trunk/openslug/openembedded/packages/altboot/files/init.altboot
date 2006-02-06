@@ -8,7 +8,7 @@
 test -e /etc/altboot.func && . /etc/altboot.func || die "ERROR: /etc/altboot.func not found. Check your installation!"
 
 CURRENT_ENV="`set`"
-VERSION="0.0.2"
+VERSION="0.0.4"
 
 # Set some defaults in case altboot.cfg is missing
 REAL_INIT="/sbin/init.sysvinit"
@@ -17,7 +17,15 @@ REAL_INIT="/sbin/init.sysvinit"
 INIT_RUNLEVEL="`cat /etc/inittab | sed -n "/^id\:/s/id\:\([0-9]\)\:.*$/\1/p"`"
 test -z "$INIT_RUNLEVEL" && INIT_RUNLEVEL=5
 
-test -e /etc/altboot.cfg && . /etc/altboot.cfg || echo "WARNING: No altboot.cfg found! Check your installation of Altboot!" > /dev/tty1
+case "`uname -r`" in
+2.6*)	ALTBOOT_CFG_FILE="/etc/altboot-2.6.cfg";;
+2.4*)	ALTBOOT_CFG_FILE="/etc/altboot-2.4.cfg";;
+*)	echo "Warning: Unknown kernel [`uname -r`], using kernel 2.6 configuration!"
+	ALTBOOT_CFG_FILE="/etc/altboot-2.6.cfg";;
+esac
+
+echo "Using [${ALTBOOT_CFG_FILE}]"
+test -e "$ALTBOOT_CFG_FILE" && . "$ALTBOOT_CFG_FILE" || echo "WARNING: No $ALTBOOT_CFG_FILE found! Check your installation of Altboot!" > /dev/tty1
 
 C_RED="\033[31m"
 C_BLUE="\033[34m"
@@ -141,28 +149,37 @@ show_sub_menu() {
 run_timer() {
 	if test "$TIMEOUT" != 0
 	then
-		test -x /opt/QtPalmtop/bin/zgreeter.sh && /opt/QtPalmtop/bin/zgreeter.sh
 			
 		mount -t proc proc /proc >/dev/null 2>&1
-		key_ints="`cat /proc/interrupts | grep keyboard | awk '{print $2}'`"
+		
+		case "`uname -r`" in
+		2.4*)	key_ints="`cat /proc/interrupts | grep keyboard | awk '{print $2}'`";;
+		2.6*)	key_ints="`cat /proc/interrupts | grep Spitzkbd`";;	
+		esac		
 	
+		stty -echo
 		echo -en "\n\nPlease press any key to launch altboot." > /dev/tty1
 		
 		test -z "$TIMEOUT" && TIMEOUT="3"
 
 		cnt=0
 		while test "$cnt" != "$TIMEOUT"
-		do
+		do		
 			sleep 1
-			if test "`cat /proc/interrupts | grep keyboard | awk '{print $2}'`" != "$key_ints" 
+			case "`uname -r`" in
+			2.4*)	key_ints_now="`cat /proc/interrupts | grep keyboard | awk '{print $2}'`";;
+			2.6*)	key_ints_now="`cat /proc/interrupts | grep Spitzkbd`";;	
+			esac		
+			
+			if test "$key_ints_now" != "$key_ints" 
 			then				
 				launch_altboot=yes				
+				stty echo
 				break
 			fi
 			echo -n "." >/dev/tty1
 			let cnt=$cnt+1
 		done
-		#umount /proc
 	else
 		launch_altboot=yes
 	fi
@@ -195,8 +212,7 @@ launch_selection() {
 		#echo "[$file]"
 				
 		. $1/$file run "$file" >/dev/tty0	
-		echo "WARNING: Using failsafe shell" >/dev/tty0	
-		exec $SH_SHELL </dev/tty0 >/dev/tty0 2>&1				
+		die "WARNING: Using failsafe shell" >/dev/tty0			
 		
 		;;	
 	esac
@@ -206,16 +222,28 @@ launch_selection() {
 wait_for_input() {
 	while true
 	do
-		echo -n "Please choose one of the above [$last_selection]: " </dev/tty0 > /dev/tty0 2>&1
-		read junk < /dev/tty0 2>&1
-
+		
+		
+		# Do _not_ change the next few lines!
+		# 	
 		# This is required to work around an annoying busybox bug.
 		# Every key you press while this script runs will be
-		# picked up by the next "read $junk". And there's no goddamn way
-		# to prevent it. So the next read would pick up the "any" key the user pressed
+		# picked up by the next "read $junk".	
+		# So the next read would pick up the "any" key the user pressed
 		# above to launch the altboot menu.		
-		junk="`echo "$junk" |  sed -n "s/.*\([0-9]\)/\1/p"`"
+				
+ 		
+		# This filters an "<ENTER>" from the user as "any key"
+		( while :; do read x< /dev/tty0 2>&1; done; ) > /dev/null 2>&1 &
+		sleep 1; kill $!
+				
 		
+
+		echo -n "Please choose one of the above [$last_selection]: " </dev/tty0 > /dev/tty0 2>&1
+		read junk< /dev/tty0 2>&1
+		
+		# This filters other chars the user may have used
+		junk="`echo "$junk" |  sed -n "s/.*\([0-9]\)/\1/p"`"
 		
 		if test "$junk" -lt "$cnt" -o "$junk" -eq "$cnt" 
 		then
@@ -243,29 +271,29 @@ wait_for_input() {
 
 # * * * * * * This is the main function * * * * * *
 
-if ! test -z "$*" 
+if test "`runlevel`" != "unknown" -a "$1" != "-force"
 then
 	echo "altboot: Using real init [$REAL_INIT] [$*] *" >/dev/tty1
 	exec $REAL_INIT $*
 	exit 0
 else	
-
-	# Execute scripts in /etc/altboot.rc before doing anything else.
-	# Required for special situations, like booting spitz
-	RC_FILES=`ls /etc/altboot.rc | grep \.sh$`
-
-	for file in $RC_FILES
-	do
-		 . /etc/altboot.rc/$file >/dev/tty1 2>&1 || echo "/etc/altboot.rc/$file failed!"
-	done
-	
+	# Boot original init if altboot is turned off
 	if test "$ENABLE_ALTBOOT" != "yes" 
 	then	
 		echo "altboot: Using real init [$REAL_INIT] **" >/dev/tty1
 		exec $REAL_INIT $INIT_RUNLEVEL
 		exit 0
 	fi
-	
+
+	# Execute scripts in /etc/altboot.rc before doing anything else.
+	# Required in special situations, like booting spitz
+	RC_FILES=`ls /etc/altboot.rc | grep \.sh$`
+
+	for file in $RC_FILES
+	do
+		 . /etc/altboot.rc/$file >/dev/tty1 2>&1 || echo "/etc/altboot.rc/$file failed!"
+	done
+		
 	# Make sure altboots master password is set
 	set_password >/dev/tty0 
 	

@@ -10,7 +10,10 @@ PROVIDES += "virtual/ecore"
 inherit efl
 
 SRC_URI = "http://enlightenment.freedesktop.org/files/ecore-${PV}.tar.gz \
-           file://configure.patch;patch=1"
+           file://configure.patch;patch=1 \
+           file://fix-tslib-configure.patch;patch=1 \
+           cvs://anonymous@thinktux.net/root;module=e17/libs/ecore/m4;date=20050926"
+
 S = "${WORKDIR}/ecore-${PV}"
 FILESDIR = "${@os.path.dirname(bb.data.getVar('FILE',d,1))}/ecore"
 
@@ -19,6 +22,14 @@ EXTRA_OECONF = "<override me>"
 libraries = ""
 headers = ""
 parts = "<override me>"
+
+do_configure_prepend() {
+	if [ -e "${WORKDIR}/m4" ]; then
+		install -d "${S}/m4"
+		install "${WORKDIR}/m4/"*.m4 "${S}/m4"
+		aclocal -I m4
+	fi
+}
 
 do_stage_append() {
 	for p in ${parts}; do

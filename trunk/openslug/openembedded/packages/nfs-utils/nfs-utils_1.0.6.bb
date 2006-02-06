@@ -3,7 +3,7 @@ PRIORITY = "optional"
 SECTION = "console/networking"
 MAINTAINER = "dyoung <dyoung@thestuffguy.com>"
 LICENSE = "GPL"
-PR = "r2"
+PR = "r5"
 
 SRC_URI = "${SOURCEFORGE_MIRROR}/nfs/nfs-utils-${PV}.tar.gz \
 	file://acinclude-lossage.patch;patch=1 \
@@ -23,7 +23,7 @@ INITSCRIPT_NAME = "nfsserver"
 # in the shutdown levels, but that works fine.
 INITSCRIPT_PARAMS = "defaults"
 
-inherit autotools
+inherit autotools update-rc.d
 
 EXTRA_OECONF = "--with-statduser=nobody \
 		--enable-nfsv3 \
@@ -34,6 +34,8 @@ do_compile() {
 	cat ${WORKDIR}/forgotten-defines >> ${S}/support/include/config.h
 	oe_runmake 'BUILD=1'
 }
+
+INHIBIT_AUTO_STAGE = "1"
 
 do_install() {
 	install -d ${D}${sysconfdir}/init.d

@@ -37,6 +37,9 @@ execute "true"
    file "packages/dhcp/files/init-server"
 execute "true"
 
+        file "packages/dillo/dillo-0.8.5/dillo.png"
+manual_merge "true"
+
    file "packages/dnsmasq/files/dnsmasq.conf"
 execute "true"
 
@@ -44,6 +47,9 @@ execute "true"
 execute "true"
 
    file "packages/dropbear/dropbear/init"
+execute "true"
+
+   file "packages/ftpd-topfield/ftpd-topfield_0.6.3.bb"
 execute "true"
 
    file "packages/glib-1.2/glib-1.2-1.2.10/depcomp"
@@ -211,6 +217,9 @@ manual_merge "true"
    file "packages/lirc/files/lircd.init"
 execute "true"
 
+   file "packages/lirc/files/lircexec.init"
+execute "true"
+
    file "packages/lirc/files/lircmd.init"
 execute "true"
 
@@ -253,6 +262,9 @@ execute "true"
    file "packages/nonworking/apache/apache/files/init"
 execute "true"
 
+   file "packages/nslu2-binary-only/unslung-rootfs-2.3r63/ipkg-fl"
+execute "true"
+
    file "packages/nslu2-binary-only/unslung-rootfs-2.3r63/linuxrc"
 execute "true"
 
@@ -265,10 +277,10 @@ execute "true"
    file "packages/nslu2-binary-only/unslung-rootfs/rc.bootbin"
 execute "true"
 
-   file "packages/nslu2-binary-only/unslung-rootfs/rc.unslung-start"
+   file "packages/nslu2-binary-only/unslung-rootfs/rc.optware-start"
 execute "true"
 
-   file "packages/nslu2-binary-only/unslung-rootfs/rc.unslung-stop"
+   file "packages/nslu2-binary-only/unslung-rootfs/rc.optware-stop"
 execute "true"
 
    file "packages/nslu2-binary-only/unslung-rootfs/resling"
@@ -280,6 +292,9 @@ execute "true"
    file "packages/nslu2-binary-only/unslung-rootfs/unsling"
 execute "true"
 
+        file "packages/nslu2-binary-only/unslung-rootfs/unslung.gif"
+manual_merge "true"
+
    file "packages/nslu2-binary-only/unslung-rootfs/upgrade.cgi"
 execute "true"
 
@@ -290,39 +305,6 @@ execute "true"
 execute "true"
 
    file "packages/ntp/files/ntpdate"
-execute "true"
-
-   file "packages/openslug-init/openslug-init-0.10/boot/disk"
-execute "true"
-
-   file "packages/openslug-init/openslug-init-0.10/boot/flash"
-execute "true"
-
-   file "packages/openslug-init/openslug-init-0.10/boot/network"
-execute "true"
-
-   file "packages/openslug-init/openslug-init-0.10/boot/nfs"
-execute "true"
-
-   file "packages/openslug-init/openslug-init-0.10/boot/ram"
-execute "true"
-
-   file "packages/openslug-init/openslug-init-0.10/boot/udhcpc.script"
-execute "true"
-
-   file "packages/openslug-init/openslug-init-0.10/functions"
-execute "true"
-
-   file "packages/openslug-init/openslug-init-0.10/initscripts/leds_startup"
-execute "true"
-
-   file "packages/openslug-init/openslug-init-0.10/initscripts/rmrecovery"
-execute "true"
-
-   file "packages/openslug-init/openslug-init-0.10/linuxrc"
-execute "true"
-
-   file "packages/openslug-init/openslug-init-0.10/update-kernel"
 execute "true"
 
    file "packages/openvpn/files/openvpn"

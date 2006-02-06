@@ -4,7 +4,7 @@ SECTION = "kernel"
 PV = "2.4.20-rmk2-embedix"
 LICENSE = "GPL"
 KV = "2.4.20"
-PR = "r15"
+PR = "r18"
 
 SRC_URI = "http://developer.ezaurus.com/sl_j/source/c3100/20050602/linux-c3100-20050602-rom1_01.tar.bz2 \
            file://P01-C3000-clockup_050221.patch;pnum=2;patch=1 \
@@ -28,6 +28,7 @@ SRC_URI = "http://developer.ezaurus.com/sl_j/source/c3100/20050602/linux-c3100-2
            file://iw240_we15-6.diff;patch=1 \
            file://iw241_we16-6.diff;patch=1 \
            file://iw249_we17-13.diff;patch=1 \
+           file://iw240_we18-5.diff;patch=1 \
            file://bluecard_cs.patch;patch=1 \
            file://compile.patch;patch=1 \
            file://idecs.patch;patch=1 \
@@ -62,7 +63,7 @@ CMDLINE_SHARP_akita      = "EQUIPMENT=0 LOGOLANG=1 DEFYEAR=2006 LOGO=1 LAUNCH=q"
 CMDLINE_SHARP_borzoi     = "EQUIPMENT=4 LOGOLANG=1 DEFYEAR=2006 LOGO=1 LAUNCH=q"
 CMDLINE_ROOT = "root=/dev/mtdblock2"
 # Caution: ttyS0 doesn't seem to work for 2.4.20, so it's either NULL or tty1
-CMDLINE_CONSOLE = "tty1"
+CMDLINE_CONSOLE = "quiet tty1"
 CMDLINE = "${CMDLINE_CONSOLE} ${CMDLINE_ROOT} ${CMDLINE_MTDPARTS} ${CMDLINE_SHARP} ${CMDLINE_INIT}"
 
 #

@@ -57,7 +57,9 @@ UCLIBC_LOCALE_URI = "http://www.uclibc.org/downloads/${UCLIBC_LOCALE_FILE}"
 UCLIBC_LOCALE_URI_arm = "http://openembedded.org/dl/uclibc-locale/${UCLIBC_LOCALE_FILE}"
 
 SRC_URI = "${@['${UCLIBC_LOCALE_URI}', ''][bb.data.getVar('USE_NLS', d, 1) != 'yes']} \
-	   file://uClibc.config"
+	   file://uClibc.config \
+	   file://uClibc.machine \
+	   file://uClibc.distro"
 
 UCLIBC_PREFIX = "${CROSS_DIR}/${TARGET_SYS}"
 UCLIBC_STAGE_PREFIX = "${STAGING_DIR}/${HOST_SYS}"
@@ -76,6 +78,7 @@ configmangle = 's,^KERNEL_SOURCE=.*,KERNEL_SOURCE="${KERNEL_SOURCE}",g; \
 		s,^RUNTIME_PREFIX=.*,RUNTIME_PREFIX="/",g; \
 		s,^DEVEL_PREFIX=.*,DEVEL_PREFIX="/${prefix}",g; \
 		s,^SHARED_LIB_LOADER_PATH=.*,SHARED_LIB_LOADER_PATH="/lib",; \
+		s,^SHARED_LIB_LOADER_PREFIX=.*,SHARED_LIB_LOADER_PREFIX="/lib",; \
 		s,.*UCLIBC_HAS_WCHAR.*,UCLIBC_HAS_WCHAR=y,g; \
 		${@["s,.*UCLIBC_HAS_LOCALE.*,# UCLIBC_HAS_LOCALE is not set,;", ""][bb.data.getVar("USE_NLS", d, 1) == "yes"]}'
 CFLAGS := "${@oe_filter_out('-I\S+', '${CFLAGS}', d)}"
@@ -98,7 +101,11 @@ python do_patch () {
 }
 
 do_configure() {
-	cp ${WORKDIR}/uClibc.config ${S}/.config
+	rm -f ${S}/.config
+	# This stuff works like the standard OE OVERRIDES - keep the files
+	# in the same order as the default OVERRIDES (well, reverse order,
+	# because unlike overrides the last takes precedence)
+	cat ${WORKDIR}/uClibc.config ${WORKDIR}/uClibc.distro ${WORKDIR}/uClibc.machine >${S}/.config
 
 	perl -i -p -e 's,^CROSS=.*,TARGET_ARCH=${TARGET_ARCH}\nCROSS=${TARGET_PREFIX},g' ${S}/Rules.mak
 	perl -i -p -e '${configmangle}' ${S}/.config

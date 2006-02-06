@@ -1,6 +1,7 @@
-PR = "r1"
-CVSDATE_${PN} = "20050904"
-PV = "2.0.0-cvs-mco1-${CVSDATE}"
+PR = "r3"
+SRCDATE_${PN} = "20050904"
+#Change to x.y.z+cvs${SRCDATE}-mco1 when 2.0.0 changes
+PV = "2.0.0-cvs-mco1-${SRCDATE}"
 
 WEBCVSURL = "http://handhelds.org/cgi-bin/cvsweb.cgi/~checkout~/gaim"
 
@@ -19,6 +20,7 @@ SRC_URI = "cvs://anonymous@cvs.sourceforge.net/cvsroot/gaim;module=gaim \
 	${WEBCVSURL}/08-prefs-dialog.patch;patch=1 \
 	${WEBCVSURL}/09-filetransfer-dialog.patch;patch=1 \
 	${WEBCVSURL}/10-pda-default-settings.patch;patch=1 \
+	file://gaim-OE-branding.patch;patch=1 \
 	"
 
 include gaim.inc

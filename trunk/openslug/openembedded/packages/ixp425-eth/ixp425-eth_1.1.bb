@@ -10,19 +10,19 @@ SRC_URI = "http://www.intel.com/design/network/swsup/ixp400LinuxEthernetDriverPa
 	   file://mm4.patch;patch=1"
 SRC_URI += "file://2.6.13.patch;patch=1"
 SRC_URI += "file://2.6.14.patch;patch=1"
-PR = "r10"
+SRC_URI += "file://modprobe.conf"
+PR = "r15"
+
+RDEPENDS = "ixp4xx-csr"
 
 S = "${WORKDIR}"
 
 COMPATIBLE_HOST = "^armeb-linux.*"
 
-inherit module
+PROVIDES = "virtual/ixp-eth"
+RPROVIDES = "ixp-eth"
 
-# Add the architecture compiler flags to KERNEL_CC and KERNEL_LD as
-# required.  Notice that this has to be done for each separately built
-# module as well!
-KERNEL_CC += "${TARGET_CC_KERNEL_ARCH}"
-KERNEL_LD += "${TARGET_LD_KERNEL_ARCH}"
+inherit module
 
 do_pre_patch () {
 	patcher -p 0 -i ixp425_eth_1_1_update_nf_bridge.patch
@@ -42,4 +42,6 @@ do_compile () {
 do_install () {
 	install -d ${D}${base_libdir}/modules/${KERNEL_VERSION}/kernel/drivers/net
 	install -m 0644 ixp425_eth.ko ${D}${base_libdir}/modules/${KERNEL_VERSION}/kernel/drivers/net/
+	install -d ${D}${sysconfdir}/modprobe.d
+	install -m 0644 modprobe.conf ${D}${sysconfdir}/modprobe.d/eth0
 }

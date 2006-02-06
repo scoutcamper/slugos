@@ -4,11 +4,12 @@ DEPENDS = "zlib"
 HOMEPAGE = "http://www.linux-mtd.infradead.org/"
 LICENSE = "GPLv2"
 PR = "r0"
-CVSDATE = "${PV}"
+SRCDATE = "${PV}"
 
 SRC_URI = "cvs://anoncvs:anoncvs@cvs.infradead.org/home/cvs;module=mtd \ 
            file://add-exclusion-to-mkfs-jffs2.patch;patch=1 \
-           file://more-verbosity.patch;patch=1"
+           file://more-verbosity.patch;patch=1 \
+	   file://fix-ignoreerrors.patch;patch=1"
 S = "${WORKDIR}/mtd/"
 
 CFLAGS_prepend = "-I${S}/include "

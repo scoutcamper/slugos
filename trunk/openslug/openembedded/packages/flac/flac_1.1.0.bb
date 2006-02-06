@@ -3,7 +3,7 @@ MAINTAINER = "Chris Larson <kergoth@handhelds.org>"
 LICENSE = "BSD GPL"
 SECTION = "libs"
 DEPENDS = "libogg"
-PR = "r2"
+PR = "r4"
 
 SRC_URI = "${SOURCEFORGE_MIRROR}/flac/flac-${PV}.tar.gz \
 	   file://disable-xmms-plugin.patch;patch=1 \
