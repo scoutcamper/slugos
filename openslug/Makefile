@@ -25,6 +25,10 @@ distro: $(FIRMWARE_DEPS)
 image: $(FIRMWARE_DEPS)
 	. ./setup-env; exec ${BITBAKE} $(DISTRO)-image
 
+# The default rule is to build the firmware in an unprotected environment.
+kernel: $(FIRMWARE_DEPS)
+	. ./setup-env; exec ${BITBAKE} virtual/kernel
+
 # This rule clobbers the environment (note that ccache uses '$HOME' by
 # default, so the cache will end up there).
 distro-safe:
@@ -59,8 +63,8 @@ clobber:
 
 .PHONY: source
 source: $(REQUIRED_DIRS)
-	tar zcf $(DISTRO).tar.gz --exclude=MT --exclude=.svn README Makefile setup-env \
-		conf/site.conf conf/auto.conf conf/distro $(REQUIRED_DIRS:=/.)
+	tar zcf $(DISTRO).tar.gz --exclude=MT --exclude=.svn Makefile setup-env \
+		conf/site.conf conf/auto.conf conf/local.conf.sample $(REQUIRED_DIRS:=/.)
 
 # This target probably isn't important any longer, because the -source
 # target above does the right thing
