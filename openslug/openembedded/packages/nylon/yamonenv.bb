@@ -3,9 +3,9 @@ SECTION = "base"
 PRIORITY = "optional"
 MAINTAINER = "Michael Stickel <michael.stickel@4g-systems.biz>"
 LICENSE = "GPL"
-PV = "cvs${CVSDATE}"
+PV = "1:0.0+cvs${SRCDATE}"
 
-SRC_URI = "svn://meshcube.org/svn/application;module=${PN};proto=http"
+SRC_URI = "http://meshcube.org/download/${PN}_${SRCDATE}.tgz"
 S = "${WORKDIR}/${PN}"
 
 do_install() {

@@ -1,12 +1,12 @@
 DEFAULT_PREFERENCE = "-1"
 
-S =     "${WORKDIR}/${PN}"
-PV =        "0.1.25+cvs-${CVSDATE}"
-PR = "r0"
+S = "${WORKDIR}/${PN}"
+PV = "0.1.29+cvs${SRCDATE}"
+PR = "r1"
 
 inherit gpe
 
-SRC_URI =	"cvs://anoncvs:anoncvs@cvs.handhelds.org/cvs;module=gpe/base/${PN} \
+SRC_URI =	"${HANDHELDS_CVS};module=gpe/base/${PN} \
 		 file://Makefile.dpkg_ipkg \
     		 file://Makefile.translation"
 
@@ -14,6 +14,7 @@ PACKAGES = "gpe-conf gpe-conf-panel"
 LICENSE = "GPL"
 SECTION = "gpe"
 PRIORITY = "optional"
+MAINTAINER = "Florian Boor <florian.boor@kernelconcepts.de>"
 
 
 DEPENDS = "gtk+ libgpewidget libxsettings libxsettings-client pcmcia-cs xst xset ipaq-sleep ntp gpe-login gpe-icons"

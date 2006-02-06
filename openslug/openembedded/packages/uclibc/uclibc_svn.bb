@@ -4,10 +4,11 @@
 # try removing it
 #
 # UCLIBC_BASE can be set in a distro file, but whether this works depends
-# on whether the base patches apply to the selected (CVSDATE) svn release.
+# on whether the base patches apply to the selected (SRCDATE) svn release.
 #
 UCLIBC_BASE ?= "0.9.28"
-PV = "${UCLIBC_BASE}+svn${CVSDATE}"
+PV = "${UCLIBC_BASE}+svn${SRCDATE}"
+PR = "r2"
 #DEFAULT_PREFERENCE is 0 (empty), releases have a preference of 1 so take
 # precedence.
 
@@ -38,7 +39,16 @@ UCLIBC_PATCHES += " file://thumb-defined-arm-or-thumb.patch;patch=1"
 #
 # Thumb interworking support
 UCLIBC_PATCHES += " file://thumb-mov-pc-bx.patch;patch=1"
-UCLIBC_PATCHES += " file://thumb-resolve.patch;patch=1"
+UCLIBC_PATCHES += " file://thumb-swi-r7.patch;patch=1"
+UCLIBC_PATCHES += " file://thumb-sysnum-h.patch;patch=1"
+UCLIBC_PATCHES += " file://thumb-asm-swi.patch;patch=1"
+UCLIBC_PATCHES += " file://thumb-call-via-rx.patch;patch=1"
+#
+# This is a core change and is controversial, maybe even wrong
+# on some architectures
+THUMB_INTERWORK_RESOLVE_PATCH = ""
+THUMB_INTERWORK_RESOLVE_PATCH_thumb-interwork = " file://thumb-resolve.patch;patch=1"
+UCLIBC_PATCHES += " ${THUMB_INTERWORK_RESOLVE_PATCH}"
 
 # Set this for non-head patches (the above list should match the
 # requirements of the SVN head).

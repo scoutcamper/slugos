@@ -4,7 +4,6 @@ set of widgets, GTK+ is suitable for projects ranging from small one-off project
 HOMEPAGE = "http://www.gtk.org"
 SECTION = "libs"
 PRIORITY = "optional"
-MAINTAINER = "Philip Blundell <pb@handhelds.org>"
 DEPENDS = "glib-2.0 pango atk jpeg libpng xext libxcursor gtk-doc libgcrypt"
 PR = "r1"
 
@@ -64,6 +63,8 @@ if [ "x$D" != "x" ]; then
 fi
 
 }
+
+PACKAGES_DYNAMIC = "gdk-pixbuf-loader-* gtk-immodule-*"
 
 python populate_packages_prepend () {
 	import os.path

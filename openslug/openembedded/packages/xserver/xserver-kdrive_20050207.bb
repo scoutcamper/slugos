@@ -1,5 +1,5 @@
-PV = "0.0cvs${FIXEDCVSDATE}"
-FIXEDCVSDATE = "${@bb.data.getVar('FILE', d, 1).split('_')[-1].split('.')[0]}"
+PV = "0.0+cvs${FIXEDSRCDATE}"
+FIXEDSRCDATE = "${@bb.data.getVar('FILE', d, 1).split('_')[-1].split('.')[0]}"
 DEFAULT_PREFERENCE = "1"
 
 LICENSE = "MIT"
@@ -20,7 +20,7 @@ DESCRIPTION_xserver-kdrive-epson = "X server from freedesktop.org, supporting Ep
 DESCRIPTION_xserver-kdrive-fake = "Fake X server"
 DESCRIPTION_xserver-kdrive-xephyr = "X server in an X window"
 
-PR = "r3"
+PR = "r11"
 
 FILES_xserver-kdrive-fbdev = "${bindir}/Xfbdev"
 FILES_xserver-kdrive-ati = "${bindir}/Xati"
@@ -33,26 +33,38 @@ FILES_xserver-kdrive-i810 = "${bindir}/Xi810"
 FILES_xserver-kdrive-epson = "${bindir}/Xepson"
 FILES_xserver-kdrive-xephyr = "${bindir}/Xephyr"
 
-SRC_URI = "cvs://anoncvs:anoncvs@pdx.freedesktop.org/cvs/xserver;module=xserver;date=${FIXEDCVSDATE} \
+SRC_URI = "cvs://anoncvs:anoncvs@pdx.freedesktop.org/cvs/xserver;module=xserver;date=${FIXEDSRCDATE} \
 	file://kmode.patch;patch=1 \
-	file://fbdev-not-fix.patch;patch=1"
+	file://disable-apm.patch;patch=1 \
+	file://fbdev-not-fix.patch;patch=1 "
 
-SRC_URI_append_mnci   = 	"file://onlyfb.patch;patch=1 \
-                          	 file://devfs.patch;patch=1 \
-                          	 file://disable-apm.patch;patch=1"
-SRC_URI_append_poodle = 	"file://xserver-kdrive-poodle.patch;patch=1"
-SRC_URI_append_c7x0 = 		"file://disable-apm.patch;patch=1"
-SRC_URI_append_ipaq-pxa270= "file://disable-apm.patch;patch=1"
-SRC_URI_append_h3900 = 		"file://disable-apm.patch;patch=1"
+SRC_URI_h3600 = "cvs://anoncvs:anoncvs@pdx.freedesktop.org/cvs/xserver;module=xserver;date=${FIXEDSRCDATE} \
+        file://kmode.patch;patch=1 \
+        file://faster-rotated.patch;patch=1 \
+        file://fbdev-not-fix.patch;patch=1 "
 
 
+SRC_URI_append_mnci   = 	" file://onlyfb.patch;patch=1 \
+                         	  file://faster-rotated.patch;patch=1 \
+				  file://devfs.patch;patch=1"
+SRC_URI_append_collie = 	" file://faster-rotated.patch;patch=1"
+SRC_URI_append_poodle = 	" file://xserver-kdrive-poodle.patch;patch=1 \
+				  file://faster-rotated.patch;patch=1"
+SRC_URI_append_spitz =          " file://faster-rotated.patch;patch=1"
+SRC_URI_append_akita =          " file://faster-rotated.patch;patch=1"
+SRC_URI_append_borzoi =         " file://faster-rotated.patch;patch=1"
+
+PACKAGE_ARCH_mnci = "mnci"
+PACKAGE_ARCH_collie = "collie"
 PACKAGE_ARCH_poodle = "poodle"
-PACKAGE_ARCH_c7x0 = "c7x0"
-PACKAGE_ARCH_ipaq-pxa270 = "ipaq-pxa270"
-PACKAGE_ARCH_h3900 = "h3900"
+PACKAGE_ARCH_h3600 = "h3600"
+PACKAGE_ARCH_spitz = "spitz"
+PACKAGE_ARCH_akita = "akita"
+PACKAGE_ARCH_borzoi = "borzoi"
 
 S = "${WORKDIR}/xserver"
 
 inherit autotools pkgconfig 
 
-EXTRA_OECONF = "--enable-composite --disable-xinerama"
+LDFLAGS += " -lXfont -lXdmcp -lXau "
+EXTRA_OECONF = "--enable-static=no --disable-static  --enable-composite --disable-xinerama"

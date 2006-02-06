@@ -4,6 +4,7 @@ PRIORITY = "optional"
 MAINTAINER = "Greg Gilbert <greg@treke.net>"
 DEPENDS = "libid3tag"
 LICENSE = "GPL"
+PR = "r2"
 
 SRC_URI = "ftp://ftp.mars.org/pub/mpeg/libmad-${PV}.tar.gz"
 S = "${WORKDIR}/libmad-${PV}"

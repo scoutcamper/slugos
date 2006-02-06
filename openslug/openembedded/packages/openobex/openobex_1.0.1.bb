@@ -3,7 +3,7 @@ DESCRIPTION = "The Openobex project aims to make an \
 open source implementation of the Object Exchange \
 (OBEX) protocol."
 SECTION = "libs"
-PR = "r2"
+PR = "r4"
 
 # put openobex-config into -dev package
 FILES_${PN} = "${libdir}/lib*.so.*"

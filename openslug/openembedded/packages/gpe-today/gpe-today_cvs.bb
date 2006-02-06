@@ -1,18 +1,19 @@
 DEFAULT_PREFERENCE = "-1"
 
-DESCRIPTION = 	"Displays a summary of appointments and tasks for the day ahead"
-DEPENDS =		"gtk+ libxrandr libxsettings libxsettings-client libgpewidget libdisplaymigration libeventdb libgpepimc libtododb"
-SECTION = 		"gpe"
-PRIORITY = 		"optional"
+DESCRIPTION = "Displays a summary of appointments and tasks for the day ahead"
+DEPENDS = "gtk+ libxrandr libxsettings libxsettings-client libgpewidget libdisplaymigration libeventdb libgpepimc libtododb"
+SECTION = "gpe"
+PRIORITY = "optional"
 
 
-S =     		"${WORKDIR}/${PN}"
-PV =        	"0.0.10+cvs-${CVSDATE}"
-PR = 			"r0"
+S = "${WORKDIR}/${PN}"
+#Remove the dash below when 0.10 changes in PV
+PV = "0.10+cvs-${SRCDATE}"
+PR = "r0"
 
 inherit gpe
 
-SRC_URI =		"cvs://anoncvs:anoncvs@cvs.handhelds.org/cvs;module=gpe/base/${PN} \
+SRC_URI =		"${HANDHELDS_CVS};module=gpe/base/${PN} \
 		 		 file://Makefile.dpkg_ipkg \
     		 	 file://Makefile.translation"
 

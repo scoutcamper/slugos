@@ -1,4 +1,4 @@
-PV = "0.0cvs${CVSDATE}"
+PV = "0.0+cvs${SRCDATE}"
 SECTION = "x11/libs"
 PRIORITY = "optional"
 MAINTAINER = "Phil Blundell <pb@handhelds.org>"
@@ -22,11 +22,5 @@ do_compile() {
 
 
 do_stage () {
-	oe_runmake install \
-		DESTDIR="" \
-		prefix=${STAGING_DIR} \
-		bindir=${STAGING_BINDIR} \
-		includedir=${STAGING_INCDIR} \
-		libdir=${STAGING_LIBDIR} \
-		mandir=${STAGING_DATADIR}/man
+	autotools_stage_all
 }

@@ -1,4 +1,4 @@
-PR = "r4"
+PR = "r6"
 SECTION = "libs"
 LICENSE = "LGPL GPL"
 DESCRIPTION = "The Audio File Library provides a uniform and elegant \

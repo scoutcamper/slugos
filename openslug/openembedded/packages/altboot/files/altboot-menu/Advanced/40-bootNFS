@@ -36,12 +36,17 @@ run_module() {
 	
 	# After the PCMCIA service is started, an inserted WLAN card should automatically
 	# activate itself.
-	/etc/init.d/pcmcia start || die "/etc/init.d/pcmcia/start failed!"
+	/etc/init.d/pcmcia start >/dev/null 2>&1 || die "/etc/init.d/pcmcia/start failed!"
 
 	nfs_host="`cat /etc/fstab | grep -v ^# | grep nfs | awk '{print $1}'|sed -n "s/\(.*\)\:\(.*\)/\1/p" `"
 	nfs_mounts="`cat /etc/fstab | grep -v ^# | grep nfs | awk '{print $1}'`"
 	nfs_mountpoints="`cat /etc/fstab | grep -v ^# | grep nfs | awk '{print $2}'`"	
 	
+	if test -z "$nfs_host"
+	then
+		die "${C_RED}No configured NFS drives found in /etc/fstab$C_RESET"
+		
+	fi
 	
 	# WLAN with DHCP needs some time to get a lease, set up the routing, etc.	
 	echo -n "Waiting for WLAN"
@@ -62,7 +67,7 @@ run_module() {
 				then
 					echo "Restarting udhcpc"
 					killall udhcpc
-					udhcpc -i wlan0 -H `cat /etc/hostname`	
+					udhcpc -i wlan0 -H `cat /etc/hostname` >/dev/null 2>&1
 				else
 					die "Failed to activate WLAN!"
 					break			
@@ -90,6 +95,7 @@ run_module() {
 		
 		while test -z "$selection"
 		do
+			stty echo
 			echo -n "Boot NFS root: "
 			read junk < /dev/tty1
 			
@@ -113,6 +119,10 @@ run_module() {
 	
 	echo -n "Mounting NFS root..."
 	mount -t nfs "$selection" /media/nfsroot && echo ok || die "mount -t nfs "$selection" /media/nfsroot failed!"
+	
+	# Use configured resolv.conf in the pivoted rootfs
+	echo -n "Copying resolv.conf..."
+	cp /etc/resolv.conf /media/nfsroot/etc >/dev/null 2>&1 && echo ok || echo "FAILED"
 	
 	check_target "/media/nfsroot"
 	

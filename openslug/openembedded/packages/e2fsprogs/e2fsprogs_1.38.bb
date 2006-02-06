@@ -2,9 +2,10 @@ DESCRIPTION = "EXT2 Filesystem Utilities"
 HOMEPAGE = "http://e2fsprogs.sourceforge.net"
 LICENSE = "GPL"
 SECTION = "base"
-PR = "r1"
+PR = "r4"
 
-SRC_URI = "${SOURCEFORGE_MIRROR}/e2fsprogs/e2fsprogs-${PV}.tar.gz"
+SRC_URI = "${SOURCEFORGE_MIRROR}/e2fsprogs/e2fsprogs-${PV}.tar.gz \
+	file://no-hardlinks.patch;patch=1"
 S = "${WORKDIR}/e2fsprogs-${PV}"
 
 inherit autotools
@@ -34,17 +35,15 @@ do_stage () {
 	done
 }
 
-pkg_postinst_e2fsprogs-e2fsck() {
-	ln -s ${base_sbindir}/e2fsck ${base_sbindir}/fsck.ext2
-	ln -s ${base_sbindir}/e2fsck ${base_sbindir}/fsck.ext3
-}
+# blkid used to be part of e2fsprogs but is useful outside, add it
+# as an RDEPENDS so that anything relying on it being in e2fsprogs
+# still works
+RDEPENDS_e2fsprogs = "e2fsprogs-blkid e2fsprogs-uuidgen"
 
-pkg_postinst_e2fsprogs-mke2fs() {
-	ln -s ${base_sbindir}/mke2fs ${base_sbindir}/mkfs.ext2
-	ln -s ${base_sbindir}/mke2fs ${base_sbindir}/mkfs.ext3
-}
-
-PACKAGES_prepend = "e2fsprogs-e2fsck e2fsprogs-mke2fs e2fsprogs-fsck "
+PACKAGES =+ "e2fsprogs-blkid e2fsprogs-uuidgen e2fsprogs-e2fsck e2fsprogs-mke2fs e2fsprogs-fsck e2fsprogs-tune2fs"
+FILES_e2fsprogs-blkid = "${base_sbindir}/blkid"
+FILES_e2fsprogs-uuidgen = "${base_sbindir}/uuidgen"
 FILES_e2fsprogs-fsck = "${base_sbindir}/fsck"
-FILES_e2fsprogs-e2fsck = "${base_sbindir}/e2fsck"
-FILES_e2fsprogs-mke2fs = "${base_sbindir}/mke2fs"
+FILES_e2fsprogs-e2fsck = "${base_sbindir}/e2fsck ${base_sbindir}/fsck.ext*"
+FILES_e2fsprogs-mke2fs = "${base_sbindir}/mke2fs ${base_sbindir}/mkfs.ext*"
+FILES_e2fsprogs-tune2fs = "${base_sbindir}/tune2fs ${base_sbindir}/e2label ${base_sbindir}/findfs"
