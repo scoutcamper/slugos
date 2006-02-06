@@ -42,6 +42,8 @@ configuration:
 	fi
 	@make $(TARGET)-safe
 
+conf/auto.conf: configuration
+
 # This rule clobbers the environment (note that ccache uses '$HOME' by
 # default, so the cache will end up there).
 .PHONY: distro image kernel prefetch
