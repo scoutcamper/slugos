@@ -110,8 +110,9 @@ clobber:
 
 .PHONY: source
 source: $(REQUIRED_DIRS)
-	tar zcf $(DISTRO).tar.gz --exclude=MT --exclude=.svn Makefile setup-env \
-		conf/site.conf conf/local.conf.sample $(REQUIRED_DIRS:=/.)
+	tar zcf slugos-3.5-beta.tar.gz --exclude=MT --exclude=.svn \
+		Makefile setup-env README conf/site.conf conf/local.conf.sample \
+		$(REQUIRED_DIRS:=/.)
 
 # This target probably isn't important any longer, because the -source
 # target above does the right thing
