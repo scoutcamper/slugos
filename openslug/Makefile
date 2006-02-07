@@ -25,7 +25,7 @@ TARGET = image
 configuration:
 	@if test -n "$(DISTRO)";\
 	then\
-		{ echo 'DISTRO="'$(DISTRO)'"'; echo 'MACHINE="ixp4xx"'; } >conf/auto.new;\
+		{ echo 'DISTRO="'$(DISTRO)'"'; echo 'MACHINE="nslu2"'; } >conf/auto.new;\
 	else\
 		echo>&2;\
 		echo '*** SlugOS: use make DISTRO="<distro>" to initialise ***'>&2;\
