@@ -1,0 +1,96 @@
+This is SlugOS release [[[VERSION NUMBER HERE]]] beta
+
+See http://www.nslu2-linux.org
+
+SlugOS builds for a variety of Intel IXP4xx processor based boards and in a
+variety of configurations.  Each configuration builds kernels appropriate for
+all supported boards.  The configurations currently supported are:
+
+slugos-[bl][at][gu]
+	Six working base configurations depending on build endianness, ARM
+	instruction set and libc implementation as follows:
+
+	b:	big endian
+	l:	little endian
+
+	a:	32-bit ARM instruction set
+	t:	16-bit Thumb instruction set (UClibC only)
+
+	g:	GNU libc (glibc) implementation (only supports the ARM
+		instruction set.)
+	u:	uClibc (see http://www.uclibc.org/) implementation - supports
+		both ARM and Thumb executables (which may be mixed in the
+		same system).
+
+	The working configurations are four primary supported implementations
+	which have package feeds from http://www.nslu2-linux.org
+
+	slugos-bag	(OpenSlug - see below)
+	slugos-lag	(DebianSlug - see below)
+	slugos-btu	(UcSlugC is a synonym for this)
+	slugos-ltu
+
+	and the following two implementations which have had only very limited
+	testing:
+
+	slugos-bau
+	slugos-lau
+
+openslug
+	slugos-bag with a set of utilities in the root file system
+
+debianslug
+	slugos-lag with a set of utilities in the root file system
+
+ucslugc
+	A synonym for slugos-btu
+
+The tested boards are:
+
+	nslu2	The LinkSys NSLU2
+	loft	Variants of the Gateworks GW2348 Avila Network Platform
+	ixp4xx	Generic IXDP425 based boards (the kernel will select a platform
+		based on the machine ID passed by the boot loader).
+	nas100d	The IOMega NAS100D (limited testing, difficult to boot)
+
+
+To build this software you require the freely available source code for the
+IXP42x Network Processor Engines which are part of the Intel IXP42x processors.
+This software can be obtained by following the instructions in the file:
+
+openembedded/packages/ixp4xx/ixp4xx-csr_2.1.bb
+
+The 'downloads' directory which this file refers to should be created in the
+same directory as this README file.
+
+To build a particular configuration (referred to as a DISTRO, i.e. a
+distribution) after downloading the Intel software type:
+
+make <distro>-image
+
+for example "make openslug-image".
+
+This will build a firmware image in the sub-directory:
+
+<distro>-nslu2.tmp/deploy/images
+
+(The suffix is always 'nslu2' for historical reasons).
+
+The Linux kernel images will be called:
+
+zImage-<board>[le|be]
+
+The root file system will have the extension '.jffs2', a complete (NSLU2 only)
+image will have the extension '.img' (not all distros build full images.)
+
+It is also possible to build a complete set of the known-buildable packages:
+
+make <distro>-distro
+
+The packages will be in:
+
+<distro>-nslu2.tmp/deploy/ipk
+
+The source of the built software will be in:
+
+<distro>-nslu2.tmp/work/<package-name>/*
