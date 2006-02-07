@@ -19,6 +19,9 @@ REQUIRED_DIRS = bitbake openembedded
 FIRMWARE_DEPS = create-topdir $(BUILD_DIRS) $(REQUIRED_DIRS)
 BITBAKE = bitbake
 TARGET = image
+# Change these for a source release and edit the README file
+VERSION = unreleased
+VERSION_TYPE = development
 
 # the default makes auto.conf
 .PHONY: configuration
@@ -110,8 +113,9 @@ clobber:
 
 .PHONY: source
 source: $(REQUIRED_DIRS)
-	tar zcf $(DISTRO).tar.gz --exclude=MT --exclude=.svn Makefile setup-env \
-		conf/site.conf conf/local.conf.sample $(REQUIRED_DIRS:=/.)
+	tar zcf slugos-$(VERSION)-$(VERSION_TYPE).tar.gz --exclude=MT --exclude=.svn \
+		Makefile setup-env README conf/site.conf conf/local.conf.sample \
+		$(REQUIRED_DIRS:=/.)
 
 # This target probably isn't important any longer, because the -source
 # target above does the right thing
