@@ -110,7 +110,7 @@ clobber:
 
 .PHONY: source
 source: $(REQUIRED_DIRS)
-	tar zcf slugos-3.5-beta.tar.gz --exclude=MT --exclude=.svn \
+	tar zcf slugos-3.5.1-beta.tar.gz --exclude=MT --exclude=.svn \
 		Makefile setup-env README conf/site.conf conf/local.conf.sample \
 		$(REQUIRED_DIRS:=/.)
 
