@@ -21,6 +21,10 @@ BITBAKE = bitbake
 distro: $(FIRMWARE_DEPS)
 	. ./setup-env; exec ${BITBAKE} $(DISTRO)-packages
 
+# Convenience target for autobuilds. Does exactly the same as "distro"
+.PHONY: openslug-distro
+openslug-distro: distro
+
 # The default rule is to build the firmware in an unprotected environment.
 image: $(FIRMWARE_DEPS)
 	. ./setup-env; exec ${BITBAKE} $(DISTRO)-image
