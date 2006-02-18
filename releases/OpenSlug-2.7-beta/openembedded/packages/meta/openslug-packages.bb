@@ -82,6 +82,7 @@ OPENSLUG_PACKAGES = "\
 	nano \
 	ncftp \
 	ncurses \
+	netcat \
 	netpbm \
 	nfs-utils \
 	ntp \
