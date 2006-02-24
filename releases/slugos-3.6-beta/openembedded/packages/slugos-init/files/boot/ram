@@ -31,7 +31,7 @@ then
 		find . -mount -print |
 		sed '\@^./boot/@d;\@^./boot$@d;\@^./linuxrc@d;\@^./var/@d' |
 		cpio -p -d -m -u /mnt
-		# checkmount checks for sh, init and no .recovery plus
+		# checkmount checks for sh, init plus
 		# either mnt or initrd, mnt must exist!
 		if checkmount /mnt
 		then
