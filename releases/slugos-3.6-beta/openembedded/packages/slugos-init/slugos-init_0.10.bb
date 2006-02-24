@@ -4,7 +4,7 @@ PRIORITY = "required"
 LICENSE = "GPL"
 DEPENDS = "base-files devio"
 RDEPENDS = "busybox devio"
-PR = "r57"
+PR = "r58"
 
 SRC_URI = "file://boot/flash \
 	   file://boot/disk \
@@ -18,7 +18,8 @@ SRC_URI = "file://boot/flash \
 	   file://initscripts/syslog.network \
 	   file://initscripts/zleds \
 	   file://initscripts/leds_startup \
-	   file://initscripts/rmrecovery \
+	   file://initscripts/runonce \
+	   file://initscripts/rmrunonce \
 	   file://initscripts/sysconfsetup \
 	   file://initscripts/umountinitrd.sh \
 	   file://functions \
@@ -36,7 +37,7 @@ CPROGS = "${USRSBINPROGS} ${SBINPROGS}"
 SCRIPTS = "turnup reflash leds sysconf"
 BOOTSCRIPTS = "flash disk nfs ram network udhcpc.script"
 INITSCRIPTS = "syslog.buffer syslog.file syslog.network zleds\
-	leds_startup rmrecovery sysconfsetup umountinitrd.sh\
+	leds_startup runonce rmrunonce sysconfsetup umountinitrd.sh\
 	fixfstab"
 
 # This just makes things easier...
@@ -128,7 +129,7 @@ pkg_postinst_slugos-init() {
 	update-rc.d $opt syslog.file		start 39 S . start 47 0 6 .
 	update-rc.d $opt syslog.network		start 44 S . start 39 0 6 .
 	update-rc.d $opt zleds			start 99 S 1 2 3 4 5 . start 89 0 6 . stop  5 0 1 2 3 4 5 6 .
-	update-rc.d $opt rmrecovery             start 99 1 2 3 4 5 .
+	update-rc.d $opt rmrunonce              start 99 1 2 3 4 5 .
 	# bug fix for startup
 	update-rc.d $opt leds_startup		start  1 1 2 3 4 5 .
 }

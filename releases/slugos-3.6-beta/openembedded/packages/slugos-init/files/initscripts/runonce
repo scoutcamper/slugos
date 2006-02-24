@@ -1,0 +1,4 @@
+#!/bin/sh
+
+grep ROOTFSCK /etc/defaults/rcS || echo "ROOTFSCK=no" >> /etc/defaults/rcS
+grep DOSWAP /etc/defaults/rcS || echo "DOSWAP=yes" >> /etc/defaults/rcS

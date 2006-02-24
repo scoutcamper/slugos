@@ -1,0 +1,6 @@
+#!/bin/sh
+# If there is an /etc/init.d/runonce script, run it then 
+# remove it
+test -x /etc/init.d/runonce && . /etc/init.d/runonce
+test -e /etc/init.d/runonce && rm -f /etc/init.d/runonce
+exit 0
