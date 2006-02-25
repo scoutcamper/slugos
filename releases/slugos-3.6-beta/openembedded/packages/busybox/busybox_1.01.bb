@@ -10,7 +10,7 @@ HOMEPAGE = "http://www.busybox.net"
 LICENSE = "GPL"
 SECTION = "base"
 PRIORITY = "required"
-PR = "r6"
+PR = "r8"
 
 SRC_URI = "http://www.busybox.net/downloads/busybox-${PV}.tar.gz \
 	   file://udhcppidfile.patch;patch=1 \
@@ -28,6 +28,7 @@ SRC_URI = "http://www.busybox.net/downloads/busybox-${PV}.tar.gz \
 	   file://rmmod.patch;patch=1 \
 	   file://udhcpscript.patch;patch=1 \
 	   file://thumb-bsdlabel.patch;patch=1 \
+           file://uclibc_posix.patch;patch=1 \
            file://defconfig \
            file://busybox-cron \
 	   file://busybox-httpd \
@@ -38,6 +39,7 @@ SRC_URI = "http://www.busybox.net/downloads/busybox-${PV}.tar.gz \
 	   file://syslog.conf \
 	   file://mount.busybox \
 	   file://umount.busybox"
+SRC_URI_append_slugos += " file://sysctl.conf "
 
 S = "${WORKDIR}/busybox-${PV}"
 
@@ -127,6 +129,10 @@ do_install () {
 	fi
 
 	install -m 0644 ${S}/busybox.links ${D}${sysconfdir}
+}
+
+do_install_append_slugos() {
+	install -m 0644 ${WORKDIR}/sysctl.conf ${D}${sysconfdir}
 }
 
 pkg_postinst_${PN} () {
