@@ -33,6 +33,7 @@ OPENSLUG_PACKAGES = "\
 	diffstat \
 	diffutils \
 	dnsmasq \
+	eciadsl \
 	expat \
 	file \
 	findutils \
