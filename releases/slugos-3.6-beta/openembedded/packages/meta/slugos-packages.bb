@@ -68,6 +68,7 @@ SLUGOS_PACKAGES = "\
 	grep \
 	gtk-doc \
 	gzip \
+	icecast \
 	ifupdown \
 	ipkg-utils \
 	iptables \
@@ -109,6 +110,7 @@ SLUGOS_PACKAGES = "\
 	nano \
 	ncftp \
 	ncurses \
+	netcat \
 	netpbm \
 	nmap \
 	ntp \
@@ -134,7 +136,6 @@ SLUGOS_PACKAGES = "\
 	samba \
 	sane-backends \
 	sed \
-	setpwc \
 	ssmtp \
 	strace \
 	streamripper \
@@ -162,10 +163,10 @@ SLUGOS_PACKAGES = "\
 
 # Packages currently broken on all platforms
 SLUGOS_BROKEN_PACKAGES = "\
-	groff \
 	icecast \
 	irssi \
 	pvrusb2-mci \
+	setpwc \
 	watchdog \
 	memtester \
 	"
@@ -195,10 +196,14 @@ SLUGOS_PACKAGES_append_linux = "\
 	ctrlproxy \
 	dsniff \
 	iperf \
+	groff \
 	man man-pages \
 	psmisc \
 	screen \
 	timezones \
+        wview-sim wview-vpro wview-wxt510 \
+        wview-sim-mysql wview-vpro-mysql \
+        wview-wxt510-mysql \
 	xinetd \
 	"
 
