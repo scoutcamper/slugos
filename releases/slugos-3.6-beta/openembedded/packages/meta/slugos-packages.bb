@@ -40,6 +40,7 @@ SLUGOS_PACKAGES = "\
 	coreutils \
 	cron \
 	ctorrent \
+	cups \
 	cvs \
 	cyrus-imapd \
 	cyrus-sasl \
