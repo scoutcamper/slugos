@@ -1,224 +1,168 @@
 #!/bin/sh
 # leds
+# Generic script to control the leds in /sys/class/leds
+# (c) Oyvind Repvik 2006
+# Licence: GPL
+#set -x
 #
-# utilities to manipulate the settings of the system leds
+# configuration
 #
-# load the utility functions unless this script is being called
-# just to load its own functions.
-case "$1" in
-leds)	;;
-*)	. /etc/default/rcS
-	. /etc/default/functions;;
-esac
+LEDPATH="/sys/class/leds"
 
 #
-# led_set led-dir off|on|slow|fast|panic|blink|flash|user|*
-#  set the given LED (expressed as a directory) to the 
-#  given status.  USER_LED may be set to indicate how to
-#  handle the 'user' setting.
-led_user_default(){
-	case "$(machine)" in
-	nslu2)	echo -n "cpu-idle";;
-	*)	echo -n "cpu";;
-	esac
+# Give help output when no 
+#
+
+show_help() {
+	echo "Usage: leds <ledname> <command> [<parameters>]"
+	echo ""
+	echo "Available leds are: "
+	echo -n "	"
+	echo `for a in $LEDPATH/*; do echo -n $a|cut -d "/" -f 5 ; done`
+	# ugly hack
+	for a in $LEDPATH/*; do TMPVAR=`echo -n $a|cut -d "/" -f 5` ; done
+	echo ""
+	echo "The commands are:"
+	echo "	on "
+	echo "	off "
+	echo "	<trigger> "
+	echo ""
+	echo "Available triggers are: "
+	echo -n "	"
+	echo `cat $LEDPATH/$TMPVAR/trigger|sed s:\\\[::|sed s:\\\]::|sed s:"cpu":"cpu-idle cpu-busy":`
+	echo ""
+	echo "none, ide-disk and nand-disk take no further arguments"
+	echo "cpu-idle takes either on, off or flash"
+	echo "cpu-busy takes either on, off or flash"
+	echo "timer takes both 'duty' and 'frequency'"
+	echo
+	exit 1
 }
-#
-led_set(){
-	local setting
-	# expect led-dir state
-	if test -d "$1"
-	then
-		setting="$2"
-		case "$setting" in
-		user)	if test -n "$USER_LED"
-			then
-				setting="$USER_LED"
-			else
-				setting="$(led_user_default)"
-			fi;;
-		esac
 
-		case "$setting" in
-		off|on)		echo -n none
 
-				case "$setting" in
-				on)	echo -n 255;;
-				off)	echo -n 0;;
-				esac >"$1/brightness";;
+# Make sure that the led specified exists
 
-		slow|fast|panic|blink|flash)
-				echo -n timer
-
-				case "$setting" in
-				flash)	echo -n 0.6;;
-				blink)	echo -n 0.6;;
-				slow)	echo -n 1;;
-				fast)	echo -n 3;;
-				panic)	echo -n 6;;
-				esac >"$1/frequency"
-
-				case "$setting" in
-				flash)	echo -n 10;;
-				blink)	echo -n 90;;
-				*)	echo -n 50;;
-				esac >"$1/duty";;
-
-		cpu-idle)	echo -n cpu
-				# these settings work well on NSLU2
-				echo -n on >"$1/idle"
-				echo -n flash >"$1/active";;
-
-		*)		echo -n "$setting";;
-		esac >"$1/trigger"
+check_led() 
+{
+	if [ -d $LEDPATH/$1 ] ;
+	then 
+		return 0;
 	else
-		echo "leds: $1: no such directory" >&2
-		return 1
+		return 1;
 	fi
 }
 
-#
-# sysled [boot] system|user|singleuser|shutdown [error|panic|*]
-#  set the system LEDs to indicate the given boot state, the function
-#  will temporarily mount sysfs is necessary (using /mnt)
-#
-# the cases for two LEDs (ready+status)
-sysled_readystatus(){
-	local ready status
-	# expect dir [boot](system|user) [error|panic]
-	case "$3" in
-	error)	ready=fast;	status=off;;
-	panic)	ready=fast;	status=fast;;
-	*)	case "$2" in
-		bootsystem)	ready=slow;	status=slow;;
-		system)		ready=on;	status=on;;
-		bootuser)	ready=on;	status=slow;;
-		user)		ready=user;	status=off;;
-		bootsingleuser)	ready=on;	status=slow;;
-		singleuser)	ready=user;	status=user;;
-		bootshutdown)	ready=on;	status=slow;;
-		shutdown)	ready=slow;	status=on;;
-		esac;;
-	esac
-
-	led_set "$1/ready" "$ready"
-	led_set "$1/status" "$status"
+# Switch off the led
+led_off()
+{
+	echo "none" > $LEDPATH/$LEDNAME/trigger
+	echo -n 0 > $LEDPATH/$LEDNAME/brightness
 }
-#
-# the cases for one LED (just ready)
-sysled_ready(){
-	local ready
-	# expect dir [boot](system|user) [error|panic]
-	case "$3" in
-	error)	ready=fast;;
-	panic)	ready=panic;;
-	*)	case "$2" in
-		bootsystem)	ready=flash;;
-		system)		ready=blink;;
-		bootuser)	ready=slow;;
-		user)		ready=user;;
-		bootsingleuser)	ready=flash;;
-		singleuser)	ready=blink;;
-		bootshutdown)	ready=slow;;
-		shutdown)	ready=blink;;
-		esac;;
-	esac
 
-	led_set "$1/ready" "$ready"
+# Switch on the led
+led_on()
+{
+	echo "none" > $LEDPATH/$LEDNAME/trigger
+	echo -n 1 > $LEDPATH/$LEDNAME/brightness
 }
-#
-sysled(){
-	local mp st boot isst
-	mp=/sys
-	st=1
-	boot=
 
-	# validate arguments
-	if test "$1" = boot
-	then
-		shift
-		boot=boot
+led_ide()
+{
+	echo "ide-disk" > $LEDPATH/$LEDNAME/trigger
+	echo -n 1 > $LEDPATH/$LEDNAME/brightness
+}
+
+led_nand()
+{
+	echo "nand-disk" > $LEDPATH/$LEDNAME/trigger
+	echo -n 1 > $LEDPATH/$LEDNAME/brightness
+}
+
+led_none()
+{
+	led_on
+}
+
+led_timer()
+{
+	if [ $1 -gt 0 -o $2 -gt 0 ] ; then
+		echo "timer" > $LEDPATH/$LEDNAME/trigger
+		echo -n 1 > $LEDPATH/$LEDNAME/brightness
+		echo -n $2 > $LEDPATH/$LEDNAME/frequency
+		echo -n $1 > $LEDPATH/$LEDNAME/duty
+	else
+		echo "Expected two integer values greater than 0"
+		exit
 	fi
-	case "$1" in
-	system|user|singleuser|shutdown) :;;
-	*)	echo "sysled: unknown option '$1'" >&2
-		echo " usage: sysled [boot] system|user|singleuser|shutdown [error|panic|*]" >&2
-		return 1;;
-	esac
-
-	if test ! -d "$mp/class/leds" && mount -t sysfs sysfs /mnt
-	then
-		mp=/mnt
-	fi
-	#
-	# check for the 'ready' LED - otherwise do nothing
-	if test -d "$mp/class/leds/ready"
-	then
-		if test -d "$mp/class/leds/status"
-		then
-			sysled_readystatus "$mp/class/leds" $boot"$@"
-		else
-			sysled_ready "$mp/class/leds" $boot"$@"
-		fi
-	fi
-	#
-	# clean up
-	test "$mp" = /mnt && umount /mnt
-	return "$st"
 }
 
-#
-# beep {arguments}
-#  emit a beep
-#  does nothing if there is no beep executable, is very
-#  quiet in the presence of errors
-beep(){
-	local arg
-	arg=
-	test "$1" = beep && shift
-	if test -x /bin/beep
-	then
-		test -c /dev/buzzer && arg="-e /dev/buzzer"
-		/bin/beep $arg "$@" 2>/dev/null
+led_cpuidle()
+{
+	if [ "$1" = "on" -o "$1" = "off" -o "$1" = "flash" ] ; then
+		echo "cpu" > $LEDPATH/$LEDNAME/trigger
+		echo "$1" > $LEDPATH/$LEDNAME/idle
+		case "$1" in
+			on) echo "off" > $LEDPATH/$LEDNAME/active ;;
+			off)echo "on" > $LEDPATH/$LEDNAME/active ;;
+			flash)echo "off" > $LEDPATH/$LEDNAME/active ;;
+		esac
+		echo -n 1 > $LEDPATH/$LEDNAME/brightness
+	else
+		echo "Invalid function. cpu-idle accepts either 'on', 'off' or 'flash'"
+		exit 1
 	fi
-	return 0
 }
 
-#
-# leds_help
-#  be helpful
-# leds <led> off|on|slow|fast|panic|blink|flash|user|*
-# leds [boot] system|user|singleuser|shutdown [error|panic|*]
-leds_help(){
-	echo "leds: change the setting of the LEDs" >&2
-	echo " usage:" >&2
-	echo "  leds [boot] system|user|singleuser|shutdown [error|panic|*]" >&2
-	echo "    set leds during system boot to indicate a particular boot" >&2
-	echo "    state.  'boot' means that the system is transitioning to" >&2
-	echo "    the new state.  'error' or 'panic' means a (potentially)" >&2
-	echo "    recoverable error or an unrecoverable error ('panic') has" >&2
-	echo "    occured." >&2
-	echo "  <led> off|on|slow|fast|panic|blink|flash|user|cpu|cpu-idle" >&2
-	echo "    set the named led to the given display, an arbitrary led" >&2
-	echo "    trigger may be given.  'user' will use the default specified" >&2
-	echo "    in USER_LED from /etc/default/rcS, if not specified a cpu" >&2
-	echo "    activity setting appropriate to the machine is selected" >&2
-	echo "  beep {args}" >&2
-	echo "    if possible cause the machine to emit a beep" >&2
+led_cpubusy()
+{
+	if [ "$1" = "on" -o "$1" = "off" -o "$1" = "flash" ] ; then
+		echo "cpu" > $LEDPATH/$LEDNAME/trigger
+		echo "$1" > $LEDPATH/$LEDNAME/active
+		case "$1" in
+			on) echo "off" > $LEDPATH/$LEDNAME/idle ;;
+			off)echo "on" > $LEDPATH/$LEDNAME/idle ;;
+			flash)echo "off" > $LEDPATH/$LEDNAME/idle ;;
+		esac
+		echo -n 1 > $LEDPATH/$LEDNAME/brightness
+	else
+		echo "Invalid function. cpu-idle accepts either 'on', 'off' or 'flash'"
+		exit 1
+	fi                                               
 }
 
-#
-# the real command, if required
+# Basic check for other parameters than led name.
+
 case "$1" in
-boot|system|user|singleuser|shutdown)
-	sysled "$@";;
-
-beep)	beep "$@";;
-
-""|-*)	leds_help;;
-help)	leds_help;;
-
-leds)	# just load the functions
+help)	show_help
 	;;
+*)	if check_led "$1"
+		then LEDNAME="$1"
+	else
+		echo "Invalid led name. Try 'leds help'"
+		exit 1
+	fi
+	;;
+esac	
 
-*)	led_set /sys/class/leds/"$@"
+# Figure out which command we've been passed
+
+case "$2" in
+off)		led_off 
+		;;
+on)		led_on 
+		;;
+ide-disk)	led_ide 
+		;;
+nand-disk)	led_nand 
+		;;
+timer)		led_timer "$3" "$4"
+		;;
+cpu-idle)	led_cpuidle "$3"
+		;;
+cpu-busy)	led_cpubusy "$3"
+		;;
+none)		led_none
+		;;
+*)		echo "Invalid command. Try 'leds help' to see available led commands"
+		;;
 esac
