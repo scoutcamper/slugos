@@ -4,15 +4,6 @@
 # (c) Oyvind Repvik 2006
 # Licence: GPL
 #set -x
-#
-# configuration
-#
-mount|grep sysfs || {
-	echo "sysfs not mounted"
-	exit 1
-}
-
-LEDPATH="`mount|grep sysfs|cut -d " " -f 3`/class/leds"
 
 #
 # Give help output when no 
@@ -41,9 +32,32 @@ show_help() {
 	echo "cpu-busy takes either on, off or flash"
 	echo "timer takes both 'duty' and 'frequency'"
 	echo
-	exit 1
+	cleanup 1
 }
 
+checkmount {
+	TMPMOUNT=`mount|grep sysfs|cut -d " " -f 3`
+	if [ -z "$TMPMOUNT" ] ; then
+		if [ mount -t sysfs /mnt ] ; 
+		then
+			$LEDPATH="/mnt/class/leds"
+		else
+			echo "Failed to temporarily mount sysfs"
+			cleanup 1
+		fi
+	else
+		$LEDPATH="/sys/class/leds"
+	fi
+}
+
+cleanup() {
+	if [ -z "$TMPMOUNT" ] ; then
+		exit $1
+	else
+		umount $TMPMOUNT
+		exit $1
+	fi
+}
 
 # Make sure that the led specified exists
 
@@ -97,7 +111,7 @@ led_timer()
 		echo -n $1 > $LEDPATH/$LEDNAME/duty
 	else
 		echo "Expected two integer values greater than 0"
-		exit
+		cleanup 1
 	fi
 }
 
@@ -114,7 +128,7 @@ led_cpuidle()
 		echo -n 1 > $LEDPATH/$LEDNAME/brightness
 	else
 		echo "Invalid function. cpu-idle accepts either 'on', 'off' or 'flash'"
-		exit 1
+		cleanup 1
 	fi
 }
 
@@ -131,9 +145,11 @@ led_cpubusy()
 		echo -n 1 > $LEDPATH/$LEDNAME/brightness
 	else
 		echo "Invalid function. cpu-idle accepts either 'on', 'off' or 'flash'"
-		exit 1
+		cleanup 1
 	fi                                               
 }
+
+checkmount
 
 # Basic check for other parameters than led name.
 
@@ -144,7 +160,7 @@ help)	show_help
 		then LEDNAME="$1"
 	else
 		echo "Invalid led name. Try 'leds help'"
-		exit 1
+		cleanup 1
 	fi
 	;;
 esac	
@@ -169,5 +185,6 @@ cpu-busy)	led_cpubusy "$3"
 none)		led_none
 		;;
 *)		echo "Invalid command. Try 'leds help' to see available led commands"
+		cleanup 1
 		;;
 esac
