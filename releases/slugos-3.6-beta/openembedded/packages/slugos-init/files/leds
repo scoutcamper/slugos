@@ -7,7 +7,12 @@
 #
 # configuration
 #
-LEDPATH="/sys/class/leds"
+mount|grep sysfs || {
+	echo "sysfs not mounted"
+	exit 1
+}
+
+LEDPATH="`mount|grep sysfs|cut -d " " -f 3`/class/leds"
 
 #
 # Give help output when no 
