@@ -96,6 +96,7 @@ SLUGOS_PACKAGES = "\
 	lsof \
 	lvm2 \
 	m4 \
+	madplay \
 	mailx \
 	make \
 	masqmail \
