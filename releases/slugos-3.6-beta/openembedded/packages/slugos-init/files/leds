@@ -35,18 +35,21 @@ show_help() {
 	cleanup 1
 }
 
-checkmount {
+checkmount() {
 	TMPMOUNT=`mount|grep sysfs|cut -d " " -f 3`
 	if [ -z "$TMPMOUNT" ] ; then
 		if [ mount -t sysfs /mnt ] ; 
 		then
-			$LEDPATH="/mnt/class/leds"
+			TMPMOUNT="/mnt"
+			LEDPATH="/mnt/class/leds"
 		else
 			echo "Failed to temporarily mount sysfs"
+			TMPMOUNT=""
 			cleanup 1
 		fi
 	else
-		$LEDPATH="/sys/class/leds"
+		TMPMOUNT=""
+		LEDPATH="/sys/class/leds"
 	fi
 }
 
