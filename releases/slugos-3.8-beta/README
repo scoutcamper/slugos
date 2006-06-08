@@ -2,9 +2,9 @@ This is SlugOS release 3.8-beta
 
 See http://www.nslu2-linux.org
 
-SlugOS builds for a variety of Intel IXP4xx processor based boards and in a
+SlugOS builds for a variety of Intel IXP4xx processor based devices and in a
 variety of configurations.  Each configuration builds kernels appropriate for
-all supported boards.  The configurations currently supported are:
+all supported devices.  The configurations currently supported are:
 
 slugos-[bl][at][gu]
 	Six working base configurations depending on build endianness, ARM
