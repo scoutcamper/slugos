@@ -24,11 +24,12 @@ slugos-[bl][at][gu]
 
 	The working configurations are four primary supported implementations
 	which have package feeds from http://www.nslu2-linux.org
+	(NOTE: Two of the configurations don't have official "stable" feeds)
 
 	slugos-bag	(OpenSlug - see below)
 	slugos-lag	(DebianSlug - see below)
-	slugos-btu	(UcSlugC is a synonym for this)
-	slugos-ltu
+	slugos-btu	(UcSlugC is a synonym for this. Package feeds not provided)
+	slugos-ltu	(Package feeds not provided)
 
 	and the following two implementations which have had only very limited
 	testing:
