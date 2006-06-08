@@ -1,6 +1,0 @@
-#!/bin/sh
-
-grep ROOTFSCK /etc/defaults/rcS || \
-	echo -e  "# fsck rootfs on boot? \nROOTFSCK=no" >> /etc/defaults/rcS
-grep DOSWAP /etc/defaults/rcS || \
-	echo -e "# mount all swap on boot? \nDOSWAP=yes" >> /etc/defaults/rcS
