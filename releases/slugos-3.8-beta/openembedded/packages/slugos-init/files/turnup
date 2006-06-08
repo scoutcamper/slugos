@@ -395,9 +395,10 @@ boot_rootfs() {
 		};;
 	ram)	{	echo '#!/bin/sh'
 			echo 'leds beep'
+			echo 'mount -o remount,rw /'
 			echo 'rm -f /linuxrc.new'
 			echo 'ln -s boot/flash /linuxrc.new'
-			echo 'mv /linuxrc.new /linuxrc'
+			echo 'mv -f /linuxrc.new /linuxrc'
 			echo 'exec /boot/ram /dev/ram0'
 			echo 'exec /boot/flash'
 		} >"$ffs"/linuxrc.new &&
