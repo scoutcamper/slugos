@@ -36,6 +36,8 @@ SLUGOS_PACKAGES = "\
 	bwmon \
 	bzip2 \
 	ccxstream \
+	cdparanoia \
+	cdstatus \
 	cherokee \
 	coreutils \
 	cron \
@@ -69,6 +71,7 @@ SLUGOS_PACKAGES = "\
 	grep \
 	gtk-doc \
 	gzip \
+	hdparm \
 	ifupdown \
 	ipkg-utils \
 	iptables \
@@ -90,6 +93,7 @@ SLUGOS_PACKAGES = "\
 	libusb \
 	libvorbis \
 	libxml2 \
+	lirc \
 	lrzsz \
 	lsof \
 	lvm2 \
@@ -103,6 +107,7 @@ SLUGOS_PACKAGES = "\
 	miau \ 
 	microcom \
 	minicom \
+	motion \
 	mpd \
 	mt-daapd \
 	mtd-utils \
@@ -128,6 +133,8 @@ SLUGOS_PACKAGES = "\
 	ppp \
 	procps \
 	puppy \
+	pvrusb2-mci \
+	pwc \
 	python \
 	quilt \
 	reiserfsprogs reiser4progs \
@@ -135,6 +142,7 @@ SLUGOS_PACKAGES = "\
 	samba \
 	sane-backends \
 	sed \
+	setpwc \
 	setserial \
 	smartmontools \
 	ssmtp \
