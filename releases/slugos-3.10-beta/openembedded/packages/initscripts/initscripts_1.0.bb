@@ -6,7 +6,7 @@ DEPENDS = "makedevs"
 DEPENDS_openzaurus = "makedevs virtual/kernel"
 RDEPENDS = "makedevs"
 LICENSE = "GPL"
-PR = "r73"
+PR = "r74"
 
 SRC_URI = "file://halt \
            file://ramdisk \
@@ -90,7 +90,7 @@ do_install () {
 # Install device dependent scripts
 #
 
-	if [ "${DISTRO}" == "openzaurus" ]; then
+	if [ "${DISTRO}" = "openzaurus" ]; then
 		cat ${WORKDIR}/checkversion | sed -e "s,VERSION,${KERNEL_VERSION}-${DISTRO_VERSION}," > ${D}${sysconfdir}/init.d/checkversion
 		chmod 0755	${D}${sysconfdir}/init.d/checkversion
 		ln -sf		../init.d/checkversion  ${D}${sysconfdir}/rcS.d/S01version
