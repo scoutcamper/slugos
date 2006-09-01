@@ -215,11 +215,13 @@ SLUGOS_PACKAGES_append_linux = "\
 	psmisc \
 	screen \
 	timezones \
-        wview-sim wview-vpro wview-wxt510 \
-        wview-sim-mysql wview-vpro-mysql \
-        wview-wxt510-mysql \
 	xinetd \
 	"
+
+#        wview-sim wview-vpro wview-wxt510 \
+#        wview-sim-mysql wview-vpro-mysql \
+#        wview-wxt510-mysql \
+
 
 SLUGOS_PACKAGES_append_linux-uclibc = "\
 	"
