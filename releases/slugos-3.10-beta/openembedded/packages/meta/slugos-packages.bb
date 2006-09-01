@@ -199,6 +199,7 @@ UCLIBC_UNSUPPORTABLE_PACKAGES = "\
 UCLIBC_BROKEN_PACKAGES = "\
 	alsa-utils \
 	bogofilter \
+	ircp \
 	"
 
 # Packages which build only with glibc (some of these use internal
