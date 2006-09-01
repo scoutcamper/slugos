@@ -121,6 +121,7 @@ SLUGOS_PACKAGES = "\
 	nmap \
 	ntp \
 	openobex-apps \
+	openldap \
 	openntpd \
 	openssh \
 	openvpn \
