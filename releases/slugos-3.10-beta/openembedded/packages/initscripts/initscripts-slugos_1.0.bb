@@ -64,7 +64,7 @@ do_install_append() {
 	# udev will run at S04 if installed
 	rm	${D}${sysconfdir}/rcS.d/S03sysfs
 	rm	${D}${sysconfdir}/rcS.d/S38devpts.sh
-	rm	${D}${sysconfdir}/rcS.d/S06alignment
+	rm -f	${D}${sysconfdir}/rcS.d/S06alignment
 	rm 	${D}${sysconfdir}/rcS.d/S37populate-volatile.sh
 
 	# Check the result
