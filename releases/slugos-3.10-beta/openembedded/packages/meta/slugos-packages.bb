@@ -108,7 +108,6 @@ SLUGOS_PACKAGES = "\
 	microcom \
 	minicom \
 	motion \
-	mpd \
 	mt-daapd \
 	mtd-utils \
 	mutt \
