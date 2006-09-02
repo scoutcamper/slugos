@@ -117,6 +117,7 @@ SLUGOS_PACKAGES = "\
 	ncurses \
 	netcat \
 	netpbm \
+	nfs-utils \
 	nmap \
 	ntp \
 	openobex-apps \
@@ -189,7 +190,6 @@ SLUGOS_BROKEN_PACKAGES = "\
 # calls often still have 'yp' in the name).
 UCLIBC_UNSUPPORTABLE_PACKAGES = "\
 	libpam \
-	nfs-utils \
 	postfix \
 	yp-tools ypbind ypserv \
 	"
