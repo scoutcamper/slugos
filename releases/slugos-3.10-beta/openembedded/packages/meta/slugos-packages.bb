@@ -174,10 +174,7 @@ SLUGOS_BROKEN_PACKAGES = "\
 	icecast \
 	irssi \
 	obexftp openobex \
-	pvrusb2-mci \
-	pwc \
 	qc-usb-messenger \
-	setpwc \
 	unionfs-modules unionfs-utils \
 	watchdog \
 	memtester \
