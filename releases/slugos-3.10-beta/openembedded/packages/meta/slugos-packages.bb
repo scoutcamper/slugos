@@ -15,8 +15,10 @@ INHIBIT_DEFAULT_DEPS = "1"
 ALLOW_EMPTY = 1
 PACKAGES = "${PN}"
 
-# The list of packages to build for the ucslugc DISTRO.
-# KEEP IN ALPHABETICAL ORDER
+# The list of packages to build for all SlugOS-based distros
+# (slugos-bag/openslug, slugos-ltu/ucslugc, slugos-lag/debianslug)
+# KEEP IN ALPHABETICAL ORDER!
+
 SLUGOS_PACKAGES = "\
 	alsa-lib \
 	atftp \
@@ -170,6 +172,7 @@ SLUGOS_PACKAGES = "\
 	"
 
 # Packages currently broken on all platforms
+
 SLUGOS_BROKEN_PACKAGES = "\
 	icecast \
 	irssi \
