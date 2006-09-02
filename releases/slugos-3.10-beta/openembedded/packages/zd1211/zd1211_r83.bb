@@ -3,7 +3,7 @@ PRIORITY = "optional"
 SECTION = "kernel/modules"
 MAINTAINER = "Oyvind Repvik <nail@nslu2-linux.org>"
 LICENSE = "GPL"
-PR = "r2"
+PR = "r1"
 RDEPENDS = "wireless-tools"
 
 SRC_URI = "http://zd1211.ath.cx/download/zd1211-driver-${PV}.tgz \
@@ -11,8 +11,10 @@ SRC_URI = "http://zd1211.ath.cx/download/zd1211-driver-${PV}.tgz \
 	" 
 
 SRC_URI_unslung = "http://zd1211.ath.cx/download/zd1211-driver-${PV}.tgz \
-        	file://makefile-unslung.patch;patch=1 \
-        	"
+       	file://makefile-unslung.patch;patch=1 \
+	file://unslung-iwpriv-hack.patch;patch=1 \
+	file://unslung-writel-logging.patch;patch=1 \
+       	"
 
 S = "${WORKDIR}/zd1211-driver-${PV}"
 
@@ -32,4 +34,3 @@ do_install() {
         install -d ${D}${base_libdir}/modules/${KERNEL_VERSION}/kernel/drivers/net
         install -m 0644 ${S}/zd1211*${KERNEL_OBJECT_SUFFIX} ${D}${base_libdir}/modules/${KERNEL_VERSION}/kernel/drivers/net
 }
-
