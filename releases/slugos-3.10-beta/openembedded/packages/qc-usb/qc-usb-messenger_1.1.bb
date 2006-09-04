@@ -17,8 +17,8 @@ do_compile () {
         	   'KDIR=${STAGING_KERNEL_DIR}' \
                    'CC="${KERNEL_CC}"' \
                    'LD="${KERNEL_LD}"' \
-		   'LINUX_DIR=${STAGING_KERNEL_DIR}' \
-		   all 
+                   'LINUX_DIR=${STAGING_KERNEL_DIR}' \
+                   all 
 }
 
 do_install() {   
