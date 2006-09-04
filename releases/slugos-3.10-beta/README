@@ -63,6 +63,8 @@ openembedded/packages/ixp4xx/ixp4xx-csr_2.1.bb
 
 The 'downloads' directory which this file refers to should be created in the
 same directory as this README file.
+NOTE: The IPL_*.zip file has been renamed to BSD_*.zip. Rename it manually,
+then create the necessary md5sum.
 
 To build a particular configuration (referred to as a DISTRO, i.e. a
 distribution) after downloading the Intel software type:
