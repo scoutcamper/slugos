@@ -233,7 +233,7 @@ SLUGOS_OPTIONAL_PACKAGES = "\
 	mysql \
 	"
 
-SLUGOS_EXTRA_PACKAGES ?= ""
+SLUGOS_EXTRA_PACKAGES ?= "mysql"
 
 # The package-index at the end causes regeneration of the Packages.gz and
 # other control files.
