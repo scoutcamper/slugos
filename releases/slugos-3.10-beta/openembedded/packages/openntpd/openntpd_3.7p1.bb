@@ -6,7 +6,7 @@ LICENSE = "BSD"
 SECTION = "console/network"
 MAINTAINER = "Oyvind Repvik <nail@nslu2-linux.org>"
 DEPENDS = "timezones"
-PR="r12"
+PR="r13"
 
 SRC_URI = "http://www.zip.com.au/~dtucker/openntpd/release/openntpd-${PV}.tar.gz \
            file://autofoo.patch;patch=1 \
