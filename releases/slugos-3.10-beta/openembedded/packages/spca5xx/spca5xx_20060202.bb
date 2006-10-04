@@ -6,7 +6,7 @@ MAINTAINER = "dyoung <dyoung8888@yahoo.com>"
 LICENSE = "GPL"
 PR = "r0"
 
-SRC_URI = "http://mxhaard.free.fr/spca50x/Download/spca5xx-20060202.tar.gz \
+SRC_URI = "http://mxhaard.free.fr/spca50x/Download/oldrelease/spca5xx-20060202.tar.gz \
            file://Makefile.patch;patch=1" 
 
 S = "${WORKDIR}/spca5xx-20060202"
