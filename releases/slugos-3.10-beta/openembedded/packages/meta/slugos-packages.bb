@@ -159,6 +159,7 @@ SLUGOS_PACKAGES = "\
 	tiff \
 	unzip \
 	usbutils \
+	ushare \
 	util-linux \
 	vim \
 	vlan \
