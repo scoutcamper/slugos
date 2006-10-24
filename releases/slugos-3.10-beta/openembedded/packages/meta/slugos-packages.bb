@@ -147,6 +147,7 @@ SLUGOS_PACKAGES = "\
 	sed \
 	setpwc \
 	setserial \
+	sipsak \
 	smartmontools \
 	ssmtp \
 	strace \
