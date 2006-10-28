@@ -50,6 +50,7 @@ SLUGOS_PACKAGES = "\
 	devlabel \
 	diffstat \
 	diffutils \
+	dircproxy \
 	dnsmasq \
 	e2fsprogs \
 	e2fsprogs-libs \
