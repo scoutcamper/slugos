@@ -169,7 +169,6 @@ SLUGOS_PACKAGES = "\
 	wakelan \
 	wget \
 	wireless-tools \
-	wpa-supplicant \
 	zd1211 \
 	zip \
 	zlib \
@@ -185,6 +184,7 @@ SLUGOS_BROKEN_PACKAGES = "\
 	unionfs-modules unionfs-utils \
 	watchdog \
 	memtester \
+	wpa-supplicant \
 	"
 
 # These packages will never build because uclibc lacks (and always will lack)
