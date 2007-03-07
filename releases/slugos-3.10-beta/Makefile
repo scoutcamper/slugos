@@ -22,7 +22,7 @@ TARGET = image
 
 # the default makes auto.conf
 .PHONY: configuration
-configuration:
+configuration: create-topdir
 	@if test -n "$(DISTRO)";\
 	then\
 		{ echo 'DISTRO="'$(DISTRO)'"'; echo 'MACHINE="nslu2"'; } >conf/auto.new;\
