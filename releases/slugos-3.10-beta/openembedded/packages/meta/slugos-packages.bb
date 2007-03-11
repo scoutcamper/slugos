@@ -159,6 +159,7 @@ SLUGOS_PACKAGES = "\
 	tar \
 	thttpd \
 	tiff \
+	tzdata \
 	unzip \
 	usbutils \
 	ushare \
