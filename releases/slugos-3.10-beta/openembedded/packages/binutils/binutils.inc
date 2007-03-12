@@ -105,8 +105,8 @@ do_install () {
 
 
 pkg_postinst_${PN}-symlinks () {
-	update-alternatives --install ${bindir}/ar ar ${TARGET_SYS}-ar 100
-	update-alternatives --install ${bindir}/strings strings ${TARGET_SYS}-strings 100
+	update-alternatives --install ${bindir}/ar ar ${TARGET_SYS}-ar 40
+	update-alternatives --install ${bindir}/strings strings ${TARGET_SYS}-strings 40
 }
 
 
