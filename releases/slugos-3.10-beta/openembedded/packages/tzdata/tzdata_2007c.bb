@@ -2,6 +2,7 @@ DESCRIPTION = "Timezone data"
 SECTION = "base"
 PRIORITY = "optional"
 DEPENDS = "tzcode-native"
+PR = "r1"
 
 PROVIDES = "tzdata tzdata-misc tzdata-posix tzdata-right tzdata-africa \
             tzdata-americas tzdata-antarctica tzdata-arctic tzdata-asia \
@@ -23,11 +24,11 @@ TZONES= "africa antarctica asia australasia europe northamerica southamerica  \
 
 do_compile () {
         for zone in ${TZONES}; do \
-            ${STAGING_BINDIR_NATIVE}/zic -d ${WORKDIR}${datadir}/zoneinfo -L /dev/null \
+            ${STAGING_BINDIR}/zic -d ${WORKDIR}${datadir}/zoneinfo -L /dev/null \
                 -y ${S}/yearistype.sh ${S}/${zone} ; \
-            ${STAGING_BINDIR_NATIVE}/zic -d ${WORKDIR}${datadir}/zoneinfo/posix -L /dev/null \
+            ${STAGING_BINDIR}/zic -d ${WORKDIR}${datadir}/zoneinfo/posix -L /dev/null \
                 -y ${S}/yearistype.sh ${S}/${zone} ; \
-            ${STAGING_BINDIR_NATIVE}/zic -d ${WORKDIR}${datadir}/zoneinfo/right -L ${S}/leapseconds \
+            ${STAGING_BINDIR}/zic -d ${WORKDIR}${datadir}/zoneinfo/right -L ${S}/leapseconds \
                 -y ${S}/yearistype.sh ${S}/${zone} ; \
         done
 }
