@@ -3,10 +3,11 @@ PRIORITY = "optional"
 SECTION = "libs"
 LICENSE = "GPL"
 DEPENDS = "bison-native flex-native"
+PR = "r1"
 
 CFLAGS_append = " -I${S}/libcap/include"
 
-SRC_URI = "${KERNELORG_MIRROR}/pub/linux/libs/security/linux-privs/kernel-2.4/${PN}-${PV}.tar.bz2 \
+SRC_URI = "http://www.kernel.org/pub/linux/libs/security/linux-privs/kernel-2.4/${PN}-${PV}.tar.bz2 \
 	   file://makenames.patch;patch=1 \
 	   file://make.patch;patch=1 "
 
