@@ -7,6 +7,7 @@ DEPENDS = "openssl zlib tiff libcap spandsp speex readline js"
 DEPENDS_${PN}-ldap = "openldap"
 RRECOMMENDS = "logrotate"
 RRECOMMENDS_${PN}-ogi = "perl perl-module-strict"
+PN = "openpbx.org"
 PV = "1.2_rc3"
 PR = "r0"
 
