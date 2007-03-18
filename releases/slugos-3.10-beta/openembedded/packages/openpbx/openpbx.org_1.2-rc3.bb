@@ -16,6 +16,7 @@ SRC_URI = "http://www.openpbx.org/releases/openpbx.org-1.2_rc3.tar.gz \
            file://volatiles \
            file://init"
 
+S = "${WORKDIR}/${PN}-1.2_rc3/"
 PARALLEL_MAKE = ""
 INITSCRIPT_NAME = "openpbx"
 INITSCRIPT_PARAMS = "defaults 60"
