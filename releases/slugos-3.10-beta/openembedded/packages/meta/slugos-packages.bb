@@ -127,7 +127,7 @@ SLUGOS_PACKAGES = "\
 	openobex-apps \
 	openldap \
 	openntpd \
-	openpbx.org \
+	openpbxorg \
 	openssh \
 	openvpn \
 	patch \
