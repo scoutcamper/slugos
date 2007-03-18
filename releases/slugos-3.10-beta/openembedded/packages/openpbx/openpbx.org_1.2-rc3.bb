@@ -9,7 +9,7 @@ RRECOMMENDS = "logrotate"
 RRECOMMENDS_${PN}-ogi = "perl perl-module-strict"
 PR = "r0"
 
-SRC_URI = "http://www.openpbx.org/releases/${P}.tar.gz \
+SRC_URI = "http://www.openpbx.org/releases/openpbx.org-1.2_rc3.tar.gz \
            file://bootstrap.patch;patch=1 \
            file://openssl.m4.patch;patch=1 \
            file://logrotate \
