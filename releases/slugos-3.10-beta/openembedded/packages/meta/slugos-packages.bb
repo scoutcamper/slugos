@@ -127,6 +127,7 @@ SLUGOS_PACKAGES = "\
 	openobex-apps \
 	openldap \
 	openntpd \
+	openpbx \
 	openssh \
 	openvpn \
 	patch \
@@ -150,6 +151,7 @@ SLUGOS_PACKAGES = "\
 	setserial \
 	sipsak \
 	smartmontools \
+	spandsp \
 	ssmtp \
 	strace \
 	streamripper \
