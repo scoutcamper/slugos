@@ -128,6 +128,7 @@ SLUGOS_PACKAGES = "\
 	openldap \
 	openntpd \
 	openpbx.org \
+	openpbx.org-perl \
 	openssh \
 	openvpn \
 	patch \
