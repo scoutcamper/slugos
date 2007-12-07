@@ -2,7 +2,7 @@ DESCRIPTION = "Secure ftp daemon"
 SECTION = "console/network"
 DEPENDS = "openssl"
 MAINTAINER = "Oyvind Repvik <nail@nslu2-linux.org>"
-PR = "r3"
+PR = "r4"
 LICENSE = "GPL"
 SRC_URI = "ftp://vsftpd.beasts.org/users/cevans/vsftpd-${PV}.tar.gz \
            file://makefile.patch;patch=1 \
@@ -23,7 +23,7 @@ do_configure() {
 }
 
 do_compile() {
-        oe_runmake "LIBS=-lssl -lcrypto -lcrypt -L${STAGING_LIBDIR}"
+        oe_runmake "LIBS=-lssl -lcrypto -lcrypt -lcap -L${STAGING_LIBDIR}"
 }
 
 do_install() {
