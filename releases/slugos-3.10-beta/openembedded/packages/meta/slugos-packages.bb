@@ -173,6 +173,7 @@ SLUGOS_PACKAGES = "\
 	wget \
 	wireless-tools \
 	zd1211 \
+	zd1211b \
 	zip \
 	zlib \
 	"
