@@ -1,0 +1,24 @@
+*************** RRECOMMENDS_task-base-kernel24 = "\
+*** 159,172 ****
+      kernel-module-input \
+      kernel-module-uinput"
+  
+- # utf8 - Standard FS encoding
+- # iso8859-1, cp437 - These 2 are default encodings used by VFAT
+- # If you don't need VFAT support - don't enable them in defconfig. 
+- # If you build them, you want VFAT support and they're included by default.
+  RRECOMMENDS_task-base-kernel26 = "\
+-     kernel-module-nls-utf8 \
+-     kernel-module-nls-iso8859-1 \
+-     kernel-module-nls-cp437 \
+      kernel-module-input \
+      kernel-module-uinput \
+      kernel-module-rtc-dev \
+--- 161,167 ----
+      kernel-module-input \
+      kernel-module-uinput"
+  
+  RRECOMMENDS_task-base-kernel26 = "\
+      kernel-module-input \
+      kernel-module-uinput \
+      kernel-module-rtc-dev \
