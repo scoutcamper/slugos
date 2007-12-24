@@ -20,8 +20,8 @@ SLUGOS_VERSION = "4.8"
 DISTRO_REVISION ?= ""
 DISTRO_VERSION ?= "${SLUGOS_VERSION}${DISTRO_REVISION}-${DISTRO_TYPE}"
 # For release (only):
-# DISTRO_FEED ?= "${SLUGOS_VERSION}-${DISTRO_TYPE}"
-DISTRO_FEED ?= "unstable"
+DISTRO_FEED ?= "${SLUGOS_VERSION}-${DISTRO_TYPE}"
+# DISTRO_FEED ?= "unstable"
 
 IMAGE_BASENAME = "${@['slugos${SITEINFO_ENDIANESS}', 'ucslugc'][bb.data.getVar('TARGET_OS', d, 1) == 'linux-uclibc']}"
 
