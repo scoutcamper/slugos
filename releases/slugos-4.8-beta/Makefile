@@ -71,18 +71,6 @@ $(REQUIRED_DIRS):
 setup-machine-%:
 	sed -i -e 's/^MACHINE[[:space:]]*=[[:space:]]*\".*\"/MACHINE = \"$*\"/' conf/auto.conf
 
-.PHONY: setup-distro-%
-setup-distro-%:
-	sed -i -e 's/^DISTRO[[:space:]]*=[[:space:]]*\".*\"/DISTRO = \"$*\"/' conf/auto.conf
-
-.PHONY: setup-image-%
-setup-image-%:
-	sed -i -e 's/^IMAGE_TARGET[[:space:]]*=[[:space:]]*\".*\"/IMAGE_TARGET = \"$*\"/' conf/auto.conf
-
-.PHONY: setup-packages-%
-setup-packages-%:
-	sed -i -e 's/^DISTRO_TARGET[[:space:]]*=[[:space:]]*\".*\"/DISTRO_TARGET = \"$*\"/' conf/auto.conf
-
 .PHONY: clobber
 clobber:
 	rm -rf tmp
