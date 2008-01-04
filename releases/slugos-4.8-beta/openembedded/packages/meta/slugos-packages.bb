@@ -148,6 +148,7 @@ SLUGOS_PACKAGES = "\
 	ncftp \
 	ncurses \
 	net-tools \
+	netatalk \
 	netcat \
 	netpbm \
 	nfs-utils \
