@@ -152,6 +152,7 @@ SLUGOS_PACKAGES = "\
 	netcat \
 	netpbm \
 	nfs-utils \
+	ngrep \
 	nmap \
 	ntfs-3g \
 	ntp \
