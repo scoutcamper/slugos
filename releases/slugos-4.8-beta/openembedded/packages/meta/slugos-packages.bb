@@ -24,6 +24,7 @@ SLUGOS_PACKAGES = "\
 	apex-env \
 	apr \
 	asterisk \
+	asterisk-core-sounds-en-gsm \
 	asterisk-sounds \
 	atftp \
 	audiofile \
