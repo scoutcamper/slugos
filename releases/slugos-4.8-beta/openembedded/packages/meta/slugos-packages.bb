@@ -24,8 +24,18 @@ SLUGOS_PACKAGES = "\
 	apex-env \
 	apr \
 	asterisk \
+	asterisk-core-sounds-en-alaw \
+	asterisk-core-sounds-en-g729 \
 	asterisk-core-sounds-en-gsm \
-	asterisk-sounds \
+	asterisk-core-sounds-en-ulaw \
+	asterisk-extra-sounds-en-alaw \
+	asterisk-extra-sounds-en-g729 \
+	asterisk-extra-sounds-en-gsm \
+	asterisk-extra-sounds-en-ulaw \
+	asterisk-moh-freeplay-alaw \
+	asterisk-moh-freeplay-g729 \
+	asterisk-moh-freeplay-gsm \
+	asterisk-moh-freeplay-ulaw \
 	atftp \
 	audiofile \
 	aumix \
