@@ -79,6 +79,7 @@ SLUGOS_PACKAGES = "\
 	eciadsl \
 	expat \
 	ez-ipupdate \
+	faad2 \
 	fconfig \
 	file \
 	findutils \
