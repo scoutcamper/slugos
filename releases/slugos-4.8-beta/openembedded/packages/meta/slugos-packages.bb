@@ -206,6 +206,7 @@ SLUGOS_PACKAGES = "\
 	ssmtp \
 	strace \
 	streamripper \
+	stunnel \
 	sudo \
 	sysfsutils \
 	tar \
