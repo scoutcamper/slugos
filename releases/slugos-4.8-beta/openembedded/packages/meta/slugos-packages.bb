@@ -128,6 +128,7 @@ SLUGOS_PACKAGES = "\
 	libusb \
 	libvorbis \
 	libxml2 \
+	lighttpd \
 	linphone \
 	litestream \
 	logrotate \
