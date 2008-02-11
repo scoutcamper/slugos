@@ -203,6 +203,7 @@ SLUGOS_PACKAGES = "\
 	sipsak \
 	slugimage \
 	smartmontools \
+	sqlite \
 	ssmtp \
 	strace \
 	streamripper \
