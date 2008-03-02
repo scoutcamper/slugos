@@ -94,6 +94,7 @@ SLUGOS_PACKAGES = "\
 	gdbm \
 	glib-2.0 \
 	gnu-config \
+	gnuplot \
 	gphoto2 \
 	gpsd \
 	grep \
