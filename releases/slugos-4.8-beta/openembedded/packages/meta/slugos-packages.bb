@@ -205,6 +205,7 @@ SLUGOS_PACKAGES = "\
 	sipsak \
 	slugimage \
 	smartmontools \
+	spandsp \
 	sqlite \
 	ssmtp \
 	strace \
