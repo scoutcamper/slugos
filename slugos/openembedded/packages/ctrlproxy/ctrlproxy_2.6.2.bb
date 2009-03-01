@@ -1,8 +1,7 @@
 DESCRIPTION = "ctrlproxy is an IRC server with multiserver support."
 SECTION = "console/network"
 PRIORITY = "optional"
-MAINTAINER = "NSLU2 Linux <nslu2-linux@yahoogroups.com>"
-DEPENDS = "glib-2.0 libxml2 popt pcre openssl"
+DEPENDS = "glib-2.0 libxml2 popt libpcre openssl"
 PR = "r1"
 LICENSE = "GPL"
 
@@ -14,7 +13,7 @@ inherit autotools
 
 #INITSCRIPT_NAME = "ctrlproxy"
 #INITSCRIPT_PARAMS = "defaults 84"
-# CONFFILES_${PN} = "${sysconfdir}/foo.conf" 
+# CONFFILES_${PN} = "${sysconfdir}/foo.conf"
 
 # To fix this error in autotools_do_configure (which arises after a
 # change to pkg-config pkg.m4):

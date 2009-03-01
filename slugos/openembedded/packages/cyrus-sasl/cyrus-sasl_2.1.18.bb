@@ -3,9 +3,11 @@ DEPENDS = "virtual/db"
 DESCRIPTION = "Generic client/server library for SASL authentication."
 LICENSE = "BSD"
 
+PR = "r1"
+
 SRC_URI = "ftp://ftp.andrew.cmu.edu/pub/cyrus-mail/OLD-VERSIONS/sasl/cyrus-sasl-${PV}.tar.gz"
 
-inherit autotools 
+inherit autotools
 
 acpaths = "-I ${S}/cmulocal -I ${S}/config -I ."
 CFLAGS_append = " -I${S}/include -I${S}/saslauthd/include"

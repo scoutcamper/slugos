@@ -1,15 +1,23 @@
 inherit package
-DEPENDS_prepend="${@["ipkg-utils-native ", ""][(bb.data.getVar('PACKAGES', d, 1) == '')]}"
-BOOTSTRAP_EXTRA_RDEPENDS += "ipkg-collateral ipkg ipkg-link"
-PACKAGEFUNCS += "do_package_ipk"
+
+BOOTSTRAP_EXTRA_RDEPENDS += "opkg-collateral opkg"
+IMAGE_PKGTYPE ?= "ipk"
+
+IPKGCONF_TARGET = "${STAGING_ETCDIR_NATIVE}/opkg.conf"
+IPKGCONF_SDK =  "${STAGING_ETCDIR_NATIVE}/opkg-sdk.conf"
+IPKGCONF_CANSDK =  "${STAGING_ETCDIR_NATIVE}/opkg-canadian-sdk.conf"
 
 python package_ipk_fn () {
 	from bb import data
 	bb.data.setVar('PKGFN', bb.data.getVar('PKG',d), d)
 }
 
-python package_ipk_install () {
-	import os, sys
+python package_ipk_install () { 
+	#
+	# Warning - this function is not multimachine safe (see stagingdir reference)!
+	#
+
+	import os, sys, bb
 	pkg = bb.data.getVar('PKG', d, 1)
 	pkgfn = bb.data.getVar('PKGFN', d, 1)
 	rootfs = bb.data.getVar('IMAGE_ROOTFS', d, 1)
@@ -28,11 +36,11 @@ python package_ipk_install () {
 		raise bb.build.FuncFailed
 
 	# Generate ipk.conf if it or the stamp doesnt exist
-	conffile = os.path.join(stagingdir,"ipkg.conf")
-	if not  os.access(conffile, os.R_OK):
-		ipkg_archs = bb.data.getVar('IPKG_ARCHS',d)
+	conffile = os.path.join(stagingdir,"opkg.conf")
+	if not os.access(conffile, os.R_OK):
+		ipkg_archs = bb.data.getVar('PACKAGE_ARCHS',d)
 		if ipkg_archs is None:
-			bb.error("IPKG_ARCHS missing")
+			bb.error("PACKAGE_ARCHS missing")
 			raise FuncFailed
 		ipkg_archs = ipkg_archs.split()
 		arch_priority = 1
@@ -46,23 +54,81 @@ python package_ipk_install () {
 
 
 	if (not os.access(os.path.join(ipkdir,"Packages"), os.R_OK) or
-		not os.access(os.path.join(os.path.join(tmpdir, "stamps"),"do_packages"),os.R_OK)):
+		not os.access(os.path.join(tmpdir, "stamps", "IPK_PACKAGE_INDEX_CLEAN"),os.R_OK):
 		ret = os.system('ipkg-make-index -p %s %s ' % (os.path.join(ipkdir, "Packages"), ipkdir))
 		if (ret != 0 ):
 			raise bb.build.FuncFailed
-		f=open(os.path.join(os.path.join(tmpdir, "stamps"),"do_packages"),"w")
+		f = open(os.path.join(tmpdir, "stamps", "IPK_PACKAGE_INDEX_CLEAN"),"w")
 		f.close()
 
-	ret = os.system('ipkg-cl  -o %s -f %s update' % (rootfs, conffile))
-	ret = os.system('ipkg-cl  -o %s -f %s install %s' % (rootfs, conffile, pkgfn))
+	ret = os.system('opkg-cl  -o %s -f %s update' % (rootfs, conffile))
+	ret = os.system('opkg-cl  -o %s -f %s install %s' % (rootfs, conffile, pkgfn))
 	if (ret != 0 ):
 		raise bb.build.FuncFailed
 }
 
+#
+# Update the Packages index files in ${DEPLOY_DIR_IPK}
+#
+package_update_index_ipk () {
+	set -x
+
+	ipkgarchs="${PACKAGE_ARCHS}"
+
+	if [ ! -z "${DEPLOY_KEEP_PACKAGES}" ]; then
+		return
+	fi
+
+	touch ${DEPLOY_DIR_IPK}/Packages
+	ipkg-make-index -r ${DEPLOY_DIR_IPK}/Packages -p ${DEPLOY_DIR_IPK}/Packages -l ${DEPLOY_DIR_IPK}/Packages.filelist -m ${DEPLOY_DIR_IPK}
+
+	for arch in $ipkgarchs; do
+		if [ -e ${DEPLOY_DIR_IPK}/$arch/ ] ; then 
+			touch ${DEPLOY_DIR_IPK}/$arch/Packages
+			ipkg-make-index -r ${DEPLOY_DIR_IPK}/$arch/Packages -p ${DEPLOY_DIR_IPK}/$arch/Packages -l ${DEPLOY_DIR_IPK}/$arch/Packages.filelist -m ${DEPLOY_DIR_IPK}/$arch/
+		fi
+		if [ -e ${DEPLOY_DIR_IPK}/${BUILD_ARCH}-$arch-sdk/ ] ; then 
+			touch ${DEPLOY_DIR_IPK}/${BUILD_ARCH}-$arch-sdk/Packages
+			ipkg-make-index -r ${DEPLOY_DIR_IPK}/${BUILD_ARCH}-$arch-sdk/Packages -p ${DEPLOY_DIR_IPK}/${BUILD_ARCH}-$arch-sdk/Packages -l ${DEPLOY_DIR_IPK}/${BUILD_ARCH}-$arch-sdk/Packages.filelist -m ${DEPLOY_DIR_IPK}/${BUILD_ARCH}-$arch-sdk/
+		fi
+		if [ -e ${DEPLOY_DIR_IPK}/${SDK_SYS}-sdk-$arch/ ] ; then
+			touch ${DEPLOY_DIR_IPK}/${SDK_SYS}-sdk-$arch/Packages
+			ipkg-make-index -r ${DEPLOY_DIR_IPK}/${SDK_SYS}-sdk-$arch/Packages -p ${DEPLOY_DIR_IPK}/${SDK_SYS}-sdk-$arch/Packages -l ${DEPLOY_DIR_IPK}/${SDK_SYS}-sdk-$arch/Packages.filelist -m ${DEPLOY_DIR_IPK}/${SDK_SYS}-sdk-$arch/
+		fi
+	done
+}
+
+#
+# Generate an ipkg conf file ${IPKGCONF_TARGET} suitable for use against 
+# the target system and an ipkg conf file ${IPKGCONF_SDK} suitable for 
+# use against the host system in sdk builds
+#
+package_generate_ipkg_conf () {
+	mkdir -p ${STAGING_ETCDIR_NATIVE}/
+	echo "src oe file:${DEPLOY_DIR_IPK}" > ${IPKGCONF_TARGET}
+	echo "src oe file:${DEPLOY_DIR_IPK}" > ${IPKGCONF_SDK}
+	echo "src oe file:${DEPLOY_DIR_IPK}" > ${IPKGCONF_CANSDK}
+	ipkgarchs="${PACKAGE_ARCHS}"
+	priority=1
+	for arch in $ipkgarchs; do
+		echo "arch $arch $priority" >> ${IPKGCONF_TARGET}
+		echo "arch ${BUILD_ARCH}-$arch-sdk $priority" >> ${IPKGCONF_SDK}
+		echo "arch ${SDK_SYS}-sdk-$arch $priority" >> ${IPKGCONF_CANSDK}
+		priority=$(expr $priority + 5)
+		if [ -e ${DEPLOY_DIR_IPK}/$arch/Packages ] ; then
+		        echo "src oe-$arch file:${DEPLOY_DIR_IPK}/$arch" >> ${IPKGCONF_TARGET}
+		fi
+		if [ -e ${DEPLOY_DIR_IPK}/${BUILD_ARCH}-$arch-sdk/Packages ] ; then
+		        echo "src oe-${BUILD_ARCH}-$arch-sdk file:${DEPLOY_DIR_IPK}/${BUILD_ARCH}-$arch-sdk" >> ${IPKGCONF_SDK}
+		fi
+		if [ -e ${DEPLOY_DIR_IPK}/${SDK_SYS}-sdk-$arch/Packages ] ; then
+		        echo "src oe-${SDK_SYS}-sdk-$arch file:${DEPLOY_DIR_IPK}/${SDK_SYS}-sdk-$arch" >> ${IPKGCONF_CANSDK}
+		fi
+	done
+}
+
 python do_package_ipk () {
-	import copy # to back up env data
-	import sys
-	import re
+	import sys, re, copy, bb
 
 	workdir = bb.data.getVar('WORKDIR', d, 1)
 	if not workdir:
@@ -74,7 +140,6 @@ python do_package_ipk () {
 	if not outdir:
 		bb.error("DEPLOY_DIR_IPK not defined, unable to package")
 		return
-	bb.mkdirhier(outdir)
 
 	dvar = bb.data.getVar('D', d, 1)
 	if not dvar:
@@ -82,23 +147,18 @@ python do_package_ipk () {
 		return
 	bb.mkdirhier(dvar)
 
-	packages = bb.data.getVar('PACKAGES', d, 1)
-	if not packages:
-		bb.debug(1, "PACKAGES not defined, nothing to package")
-		return
-
 	tmpdir = bb.data.getVar('TMPDIR', d, 1)
-	# Invalidate the packages file
-	if os.access(os.path.join(os.path.join(tmpdir, "stamps"),"do_packages"),os.R_OK):
-		os.unlink(os.path.join(os.path.join(tmpdir, "stamps"),"do_packages"))
 
-	if packages == []:
-		bb.debug(1, "No packages; nothing to do")
-		return
+	if os.access(os.path.join(tmpdir, "stamps", "IPK_PACKAGE_INDEX_CLEAN"), os.R_OK):
+		os.unlink(os.path.join(tmpdir, "stamps", "IPK_PACKAGE_INDEX_CLEAN"))
 
+	packages = bb.data.getVar('PACKAGES', d, True)
 	for pkg in packages.split():
 		localdata = bb.data.createCopy(d)
-		root = "%s/install/%s" % (workdir, pkg)
+		pkgdest = bb.data.getVar('PKGDEST', d, 1)
+		root = "%s/%s" % (pkgdest, pkg)
+
+		lf = bb.utils.lockfile(root + ".lock")
 
 		bb.data.setVar('ROOT', '', localdata)
 		bb.data.setVar('ROOT_%s' % pkg, root, localdata)
@@ -115,7 +175,8 @@ python do_package_ipk () {
 
 		bb.data.update_data(localdata)
 		basedir = os.path.join(os.path.dirname(root))
-		pkgoutdir = outdir
+		arch = bb.data.getVar('PACKAGE_ARCH', localdata, 1)
+		pkgoutdir = "%s/%s" % (outdir, arch)
 		bb.mkdirhier(pkgoutdir)
 		os.chdir(root)
 		from glob import glob
@@ -125,25 +186,33 @@ python do_package_ipk () {
 			del g[g.index('./CONTROL')]
 		except ValueError:
 			pass
-		if not g and not bb.data.getVar('ALLOW_EMPTY', localdata):
+		if not g and bb.data.getVar('ALLOW_EMPTY', localdata) != "1":
 			from bb import note
-			note("Not creating empty archive for %s-%s-%s" % (pkg, bb.data.getVar('PV', localdata, 1), bb.data.getVar('PR', localdata, 1)))
+			note("Not creating empty archive for %s-%s" % (pkg, bb.data.expand('${PV}-${PR}${DISTRO_PR}', localdata, True)))
+			bb.utils.unlockfile(lf)
 			continue
+
 		controldir = os.path.join(root, 'CONTROL')
 		bb.mkdirhier(controldir)
 		try:
 			ctrlfile = file(os.path.join(controldir, 'control'), 'w')
 		except OSError:
+			bb.utils.unlockfile(lf)
 			raise bb.build.FuncFailed("unable to open control file for writing.")
 
 		fields = []
-		fields.append(["Version: %s-%s\n", ['PV', 'PR']])
+		pe = bb.data.getVar('PE', d, 1)
+		if pe and int(pe) > 0:
+			fields.append(["Version: %s:%s-%s%s\n", ['PE', 'PV', 'PR', 'DISTRO_PR']])
+		else:
+			fields.append(["Version: %s-%s%s\n", ['PV', 'PR', 'DISTRO_PR']])
 		fields.append(["Description: %s\n", ['DESCRIPTION']])
 		fields.append(["Section: %s\n", ['SECTION']])
 		fields.append(["Priority: %s\n", ['PRIORITY']])
 		fields.append(["Maintainer: %s\n", ['MAINTAINER']])
+		fields.append(["License: %s\n", ['LICENSE']])
 		fields.append(["Architecture: %s\n", ['PACKAGE_ARCH']])
-		fields.append(["OE: %s\n", ['P']])
+		fields.append(["OE: %s\n", ['PN']])
 		fields.append(["Homepage: %s\n", ['HOMEPAGE']])
 
 		def pullData(l, d):
@@ -163,14 +232,22 @@ python do_package_ipk () {
 		except KeyError:
 			(type, value, traceback) = sys.exc_info()
 			ctrlfile.close()
+			bb.utils.unlockfile(lf)
 			raise bb.build.FuncFailed("Missing field for ipk generation: %s" % value)
 		# more fields
+
+		bb.build.exec_func("mapping_rename_hook", localdata)
+
 		rdepends = explode_deps(bb.data.getVar("RDEPENDS", localdata, 1) or "")
 		rrecommends = explode_deps(bb.data.getVar("RRECOMMENDS", localdata, 1) or "")
 		rsuggests = (bb.data.getVar("RSUGGESTS", localdata, 1) or "").split()
 		rprovides = (bb.data.getVar("RPROVIDES", localdata, 1) or "").split()
 		rreplaces = (bb.data.getVar("RREPLACES", localdata, 1) or "").split()
 		rconflicts = (bb.data.getVar("RCONFLICTS", localdata, 1) or "").split()
+
+		if not '-locale-' and not '-dbg' and not '-dev' in pkgname:
+			rdepends.append('%s-locale*' % pkgname)
+
 		if rdepends:
 			ctrlfile.write("Depends: %s\n" % ", ".join(rdepends))
 		if rsuggests:
@@ -196,6 +273,7 @@ python do_package_ipk () {
 			try:
 				scriptfile = file(os.path.join(controldir, script), 'w')
 			except OSError:
+				bb.utils.unlockfile(lf)
 				raise bb.build.FuncFailed("unable to open %s script file for writing." % script)
 			scriptfile.write(scriptvar)
 			scriptfile.close()
@@ -206,6 +284,7 @@ python do_package_ipk () {
 			try:
 				conffiles = file(os.path.join(controldir, 'conffiles'), 'w')
 			except OSError:
+				bb.utils.unlockfile(lf)
 				raise bb.build.FuncFailed("unable to open conffiles for writing.")
 			for f in conffiles_str.split():
 				conffiles.write('%s\n' % f)
@@ -215,6 +294,7 @@ python do_package_ipk () {
 		ret = os.system("PATH=\"%s\" %s %s %s" % (bb.data.getVar("PATH", localdata, 1), 
                                                           bb.data.getVar("IPKGBUILDCMD",d,1), pkg, pkgoutdir))
 		if ret != 0:
+			bb.utils.unlockfile(lf)
 			raise bb.build.FuncFailed("ipkg-build execution failed")
 
 		for script in ["preinst", "postinst", "prerm", "postrm", "control" ]:
@@ -227,5 +307,27 @@ python do_package_ipk () {
 			os.rmdir(controldir)
 		except OSError:
 			pass
-		del localdata
+		bb.utils.unlockfile(lf)
 }
+
+python () {
+    import bb
+    if bb.data.getVar('PACKAGES', d, True) != '':
+        deps = (bb.data.getVarFlag('do_package_write_ipk', 'depends', d) or "").split()
+        deps.append('ipkg-utils-native:do_populate_staging')
+        deps.append('fakeroot-native:do_populate_staging')
+        bb.data.setVarFlag('do_package_write_ipk', 'depends', " ".join(deps), d)
+}
+
+python do_package_write_ipk () {
+	import bb
+	packages = bb.data.getVar('PACKAGES', d, True)
+	if not packages:
+		bb.debug(1, "No PACKAGES defined, nothing to package")
+		return
+
+	bb.build.exec_func("read_subpackage_metadata", d)
+	bb.build.exec_func("do_package_ipk", d)
+}
+do_package_write_ipk[dirs] = "${D}"
+addtask package_write_ipk before do_package_write after do_package

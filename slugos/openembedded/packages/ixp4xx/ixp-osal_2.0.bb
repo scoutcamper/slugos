@@ -1,6 +1,5 @@
 # Intel ixp4xx access library software.  Note that this has an Intel
 # license which restricts its use.
-MAINTAINER = "NSLU2 Linux <nslu2-linux@yahoogroups.com>"
 HOMEPAGE = "http://www.intel.com/design/network/products/npfamily/ixp420.htm"
 LICENSE = "http://www.intel.com/design/network/swsup/np_sla/ixp400.htm"
 LICENSE_HOMEPAGE = "http://www.intel.com/design/network/products/npfamily/ixp425swr1.htm"
@@ -30,10 +29,11 @@ S = "${WORKDIR}/ixp_osal"
 PR = "r4"
 
 COMPATIBLE_HOST = "^arm.*-linux.*"
+COMPATIBLE_MACHINE = "(nslu2|ixp4xx)"
 
 inherit module
 
-IX_TARGET = "linux${ARCH_BYTE_SEX}"
+IX_TARGET = "linux${SITEINFO_ENDIANESS}"
 
 EXTRA_OEMAKE = "'CC=${KERNEL_CC}' \
 		'LD=${KERNEL_LD}' \
@@ -61,9 +61,9 @@ do_stage () {
 
 	# First the include files, maintain the tree structure (ixp4xx-csr
 	# expects the exact same tree)
-	cp -rf --dereference include ${OSAL_DIR}
+	cp -RLf include ${OSAL_DIR}
 	install -d ${OSAL_DIR}/os/linux
-	cp -rf --dereference os/linux/include ${OSAL_DIR}/os/linux
+	cp -RLf os/linux/include ${OSAL_DIR}/os/linux
 
 	# Install the library/object
 	install -d ${OSAL_DIR}/${OSAL_PATH}

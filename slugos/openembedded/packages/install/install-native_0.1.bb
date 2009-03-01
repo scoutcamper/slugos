@@ -1,7 +1,6 @@
 # This package uses the GNU autotools install-sh script to implement
 # a target-capable 'install' command.
 DESCRIPTION = "Target install command"
-MAINTAINER = "John Bowler <jbowler@acm.org>"
 SECTION = "devel"
 PRIORITY = "optional"
 LICENSE = "MIT"
@@ -9,6 +8,8 @@ INHIBIT_DEFAULT_DEPS = "1"
 PR = "r1"
 
 SRC_URI = "file://install-sh"
+
+inherit native
 
 PACKAGES = ""
 S = "${WORKDIR}"

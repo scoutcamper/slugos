@@ -2,13 +2,12 @@ DESCRIPTION = "This collection of code replaces the existing linux-hotplug \
 package with very tiny, compiled executable programs, instead of the \
 existing bash scripts."
 LICENSE = "GPL"
-MAINTAINER = "Chris Larson <kergoth@handhelds.org>"
 RPROVIDES = "hotplug"
 RCONFLICTS = "hotplug"
 RREPLACES = "hotplug"
 PR = "r1"
 
-SRC_URI = "http://www.kernel.org/pub/linux/utils/kernel/hotplug/hotplug-ng-${PV}.tar.gz \
+SRC_URI = "${KERNELORG_MIRROR}/pub/linux/utils/kernel/hotplug/hotplug-ng-${PV}.tar.gz \
 	   file://flags.patch;patch=1"
 S = "${WORKDIR}/hotplug-ng-${PV}"
 

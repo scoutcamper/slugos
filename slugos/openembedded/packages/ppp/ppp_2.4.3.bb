@@ -3,9 +3,10 @@ DESCRIPTION = "Point-to-Point Protocol (PPP) daemon"
 HOMEPAGE = "http://samba.org/ppp/"
 DEPENDS = "libpcap"
 LICENSE = "BSD GPLv2"
-PR = "r1"
+PR = "r4"
 
-SRC_URI = "ftp://ftp.samba.org/pub/ppp/ppp-${PV}.tar.gz \
+SRC_URI = "http://ppp.samba.org/ftp/ppp/ppp-${PV}.tar.gz \
+        file://ppp-2.4.3-mppe-mppc-1.1.patch;patch=1 \
 	file://makefile.patch;patch=1 \
 	file://cifdefroute.patch;patch=1 \
 	file://pppd-resolv-varrun.patch;patch=1 \
@@ -20,12 +21,17 @@ SRC_URI = "ftp://ftp.samba.org/pub/ppp/ppp-${PV}.tar.gz \
 	file://ip-down \
 	file://08setupdns \
 	file://92removedns"
-	
+
+SRC_URI_append_nylon = " file://ppp-tdbread.patch;patch=1"
 
 inherit autotools
 
 EXTRA_OEMAKE = "STRIPPROG=${STRIP} MANDIR=${D}${datadir}/man/man8 INCDIR=${D}/usr/include LIBDIR=${D}/usr/lib/pppd/${PV} BINDIR=${D}/usr/sbin"
 EXTRA_OECONF = "--disable-strip"
+
+do_stage () {
+         make INCDIR=${STAGING_INCDIR} install-devel
+}
 
 do_install_append () {
 	make install-etcppp ETCDIR=${D}/${sysconfdir}/ppp
@@ -45,6 +51,8 @@ do_install_append () {
 CONFFILES_${PN} = "${sysconfdir}/ppp/pap-secrets ${sysconfdir}/ppp/chap-secrets ${sysconfdir}/ppp/options"
 PACKAGES += "ppp-oa ppp-oe ppp-radius ppp-winbind ppp-minconn ppp-password ppp-tools"
 FILES_${PN}        = "/etc /usr/bin /usr/sbin/chat /usr/sbin/pppd"
+FILES_${PN}_nylon  = "/etc /usr/bin /usr/sbin/chat /usr/sbin/pppd /usr/sbin/tdbread"
+FILES_${PN}-dbg += "${libdir}/pppd/2.4.3/.debug"
 FILES_ppp-oa       = "/usr/lib/pppd/2.4.3/pppoatm.so"
 FILES_ppp-oe       = "/usr/sbin/pppoe-discovery /usr/lib/pppd/2.4.3/rp-pppoe.so"
 FILES_ppp-radius   = "/usr/lib/pppd/2.4.3/radius.so /usr/lib/pppd/2.4.3/radattr.so /usr/lib/pppd/2.4.3/radrealms.so"

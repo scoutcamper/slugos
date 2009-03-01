@@ -5,13 +5,12 @@
 # the rpcsvc functionality is not present in uclibc
 DESCRIPTION ?= "NIS Server and Tools"
 HOMEPAGE ?= "http://www.linux-nis.org/nis/"
-MAINTAINER ?= "John Bowler <jbowler@acm.org>"
-SECTION ?= "console/networking"
+SECTION ?= "console/network"
 PRIORITY ?= "optional"
-LICENSE ?= "GPL-2"
+LICENSE ?= "GPLv2"
 
 # Override these *after* the include file if necessary!
-SRC_URI = "ftp://ftp.kernel.org/pub/linux/utils/net/NIS/${P}.tar.bz2"
+SRC_URI = "${KERNELORG_MIRROR}/pub/linux/utils/net/NIS/${P}.tar.bz2"
 
 inherit autotools gettext
 
@@ -29,7 +28,7 @@ do_install() {
 # so force the package to be skipped here (this will cause a
 # 'nothing provides' error)
 python () {
-	os = bb.data.getVar("TARGET_OS", d, 1)
-	if os == "linux-uclibc":
-		raise bb.parse.SkipPackage("NIS functionality requires rpcsvc/yp.h, uClibC does not provide this")
+    os = bb.data.getVar("TARGET_OS", d, 1)
+    if os == "linux-uclibc":
+        raise bb.parse.SkipPackage("NIS functionality requires rpcsvc/yp.h, uClibC does not provide this")
 }

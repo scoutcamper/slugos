@@ -3,14 +3,13 @@ SECTION = "opie/applications"
 PRIORITY = "optional"
 LICENSE = "GPL"
 DEPENDS = "glib-1.2 openssl"
-MAINTAINER = "Michael 'Mickey' Lauer"
 HOMEPAGE = "http://www.cartel-info.fr/pbiondi/zaurus/"
 APPNAME = "zethereal"
 APPTYPE = "binary"
 APPDESKTOP = "${WORKDIR}"
 PR = "r0"
 
-inherit autotools qmake-base
+inherit autotools qmake_base
 
 EXTRA_OECONF = "--disable-ethereal \
                 --enable-tethereal \
@@ -24,7 +23,7 @@ EXTRA_OECONF = "--disable-ethereal \
                 --with-zlib=${STAGING_LIBDIR}/.. \
                 --without-x"
 
-export GLIB_CONFIG = "${STAGING_BINDIR}/glib-config"
+export GLIB_CONFIG = "${STAGING_BINDIR_CROSS}/glib-config"
 
 CFLAGS += "-I${STAGING_INCDIR}/glib-1.2"
 LIBS += "-lglib-1.2"

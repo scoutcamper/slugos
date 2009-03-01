@@ -1,4 +1,4 @@
-DEPLOY_DIR_SRC ?= "${DEPLOY_DIR}/source"
+DEPLOY_DIR_SRC ?= "${DEPLOY_DIR}/sources"
 EXCLUDE_FROM ?= ".pc autom4te.cache"
 
 # used as part of a path. make sure it's set
@@ -104,8 +104,13 @@ sourcepkg_do_create_diff_gz(){
 
 EXPORT_FUNCTIONS do_create_orig_tgz do_archive_bb do_dumpdata do_create_diff_gz
 
+do_create_orig_tgz[deptask] = "do_unpack"
+do_create_diff_gz[deptask] = "do_patch"
+do_archive_bb[deptask] = "do_patch"
+do_dumpdata[deptask] = "do_unpack"
+
 addtask create_orig_tgz after do_unpack before do_patch
 addtask archive_bb after do_patch before do_dumpdata
-addtask dumpdata after archive_bb before do_create_diff_gz
-addtask create_diff_gz after do_dump_data before do_configure
+addtask dumpdata after do_archive_bb before do_create_diff_gz
+addtask create_diff_gz after do_dumpdata before do_configure
 

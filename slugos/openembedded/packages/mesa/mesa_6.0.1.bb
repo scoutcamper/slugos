@@ -6,6 +6,7 @@ S = "${WORKDIR}/Mesa-${PV}"
 LICENSE = "LGPL"
 # gcc-3.4 blows up in gtktext with -frename-registers on arm-linux
 CXXFLAGS := "${@'${CXXFLAGS}'.replace('-frename-registers', '')}"
+DEPENDS = "makedepend-native"
 
 do_compile() {
 	oe_runmake linux CC="${CC}" CXX="${CXX}" CFLAGS="${CFLAGS}" CXXFLAGS="${CXXFLAGS}" LD="${LD}" LDFLAGS="${LDFLAGS}"
@@ -13,12 +14,12 @@ do_compile() {
 
 do_install() {
 	install -d ${D}${libdir}
-	cp -pd lib/* ${D}${libdir}/
+	cp -pP lib/* ${D}${libdir}/
 	install -d ${D}${includedir}
-	cp -r include/GL ${D}${includedir}/
+	cp -R include/GL ${D}${includedir}/
 }
 
 do_stage() {
-        cp -pd lib/* ${STAGING_LIBDIR}/
-        cp -r include/GL ${STAGING_INCDIR}/
+        cp -pP lib/* ${STAGING_LIBDIR}/
+        cp -R include/GL ${STAGING_INCDIR}/
 }

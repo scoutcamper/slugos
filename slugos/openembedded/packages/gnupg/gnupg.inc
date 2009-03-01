@@ -2,7 +2,6 @@ SECTION = "console/utils"
 DESCRIPTION = "gnupg - GNU privacy guard"
 HOMEPAGE = "http://www.gnupg.org/"
 LICENSE = "GPLv2"
-MAINTAINER = "Pawel Osiczko <p.osiczko@tetrapyloctomy.org>"
 DEPENDS = "zlib bzip2"
 
 inherit autotools gettext
@@ -71,3 +70,7 @@ do_install () {
 	mv ${D}${datadir}/${PN}/* ${D}/${docdir}/${PN}/ || :
 	mv ${D}${prefix}/doc/* ${D}/${docdir}/${PN}/ || :
 }
+
+# Exclude debug files from the main packages
+FILES_${PN} = "${bindir}/* ${datadir}/${PN} ${libexecdir}/${PN}/*"
+FILES_${PN}-dbg += "${libexecdir}/${PN}/.debug"

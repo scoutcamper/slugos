@@ -1,5 +1,8 @@
 inherit base
 
+# use autotools_stage_all for native packages
+AUTOTOOLS_NATIVE_STAGE_INSTALL = "1"
+
 def autotools_dep_prepend(d):
 	import bb;
 
@@ -15,6 +18,10 @@ def autotools_dep_prepend(d):
 
 	if not pn in ['libtool', 'libtool-native', 'libtool-cross']:
 		deps += 'libtool-native '
+		if not bb.data.inherits_class('native', d) \
+                        and not bb.data.inherits_class('cross', d) \
+                        and not bb.data.getVar('INHIBIT_DEFAULT_DEPS', d, 1):
+                    deps += 'libtool-cross '
 
 	return deps + 'gnu-config-native '
 
@@ -93,9 +100,9 @@ autotools_do_configure() {
 			AUTOV=`automake --version |head -n 1 |sed "s/.* //;s/\.[0-9]\+$//"`
 			automake --version
 			echo "AUTOV is $AUTOV"
-			install -d ${STAGING_DIR}/${HOST_SYS}/share/aclocal
-			install -d ${STAGING_DIR}/${HOST_SYS}/share/aclocal-$AUTOV
-			acpaths="$acpaths -I ${STAGING_DIR}/${HOST_SYS}/share/aclocal-$AUTOV -I ${STAGING_DIR}/${HOST_SYS}/share/aclocal"
+			install -d ${STAGING_DATADIR}/aclocal
+			install -d ${STAGING_DATADIR}/aclocal-$AUTOV
+			acpaths="$acpaths -I${STAGING_DATADIR}/aclocal-$AUTOV -I ${STAGING_DATADIR}/aclocal"
 			# autoreconf is too shy to overwrite aclocal.m4 if it doesn't look
 			# like it was auto-generated.  Work around this by blowing it away
 			# by hand, unless the package specifically asked not to run aclocal.
@@ -115,7 +122,7 @@ autotools_do_configure() {
 			    echo "no" | glib-gettextize --force --copy
 			  fi
 			fi
-			if grep "^AC_PROG_INTLTOOL" $CONFIGURE_AC >/dev/null; then
+			if grep "^[AI][CT]_PROG_INTLTOOL" $CONFIGURE_AC >/dev/null; then
 			  oenote Executing intltoolize --copy --force --automake
 			  intltoolize --copy --force --automake
 			fi
@@ -127,7 +134,7 @@ autotools_do_configure() {
 	;;
 	esac
 	if [ -e ${S}/configure ]; then
-		oe_runconf
+		oe_runconf $@
 	else
 		oenote "nothing to configure"
 	fi
@@ -135,6 +142,20 @@ autotools_do_configure() {
 
 autotools_do_install() {
 	oe_runmake 'DESTDIR=${D}' install
+}
+
+do_install_append() {
+        for i in `find ${D} -name "*.la"` ; do \
+                sed -i -e '/^dependency_libs=/s,${WORKDIR}[[:alnum:]/\._+-]*/\([[:alnum:]\._+-]*\),${libdir}/\1,g' $i
+                sed -i -e s:${CROSS_DIR}/${HOST_SYS}::g $i
+                sed -i -e s:${CROSS_DIR}::g $i
+                sed -i -e s:${STAGING_LIBDIR}:${libdir}:g $i
+                sed -i -e s:${STAGING_DIR_HOST}::g $i
+                sed -i -e s:${STAGING_DIR}::g $i
+                sed -i -e s:${S}::g $i
+                sed -i -e s:${T}::g $i
+                sed -i -e s:${D}::g $i
+        done
 }
 
 STAGE_TEMP="${WORKDIR}/temp-staging"
@@ -150,6 +171,17 @@ autotools_stage_includes() {
 	fi
 }
 
+autotools_stage_dir() {
+	from="$1"
+	to="$2"
+	# This will remove empty directories so we can ignore them
+	rmdir "$from" 2> /dev/null || true
+	if [ -d "$from" ]; then
+		mkdir -p "$to"
+		cp -fpPR "$from"/* "$to"
+	fi
+}
+
 autotools_stage_all() {
 	if [ "${INHIBIT_AUTO_STAGE}" = "1" ]
 	then
@@ -158,25 +190,52 @@ autotools_stage_all() {
 	rm -rf ${STAGE_TEMP}
 	mkdir -p ${STAGE_TEMP}
 	oe_runmake DESTDIR="${STAGE_TEMP}" install
-	if [ -d ${STAGE_TEMP}/${includedir} ]; then
-		cp -fpPR ${STAGE_TEMP}/${includedir}/* ${STAGING_INCDIR}
+	autotools_stage_dir ${STAGE_TEMP}/${includedir} ${STAGING_INCDIR}
+	if [ "${BUILD_SYS}" = "${HOST_SYS}" ]; then
+		autotools_stage_dir ${STAGE_TEMP}/${bindir} ${STAGING_DIR_HOST}${layout_bindir}
+		autotools_stage_dir ${STAGE_TEMP}/${sbindir} ${STAGING_DIR_HOST}${layout_sbindir}
+		autotools_stage_dir ${STAGE_TEMP}/${base_bindir} ${STAGING_DIR_HOST}${layout_base_bindir}
+		autotools_stage_dir ${STAGE_TEMP}/${base_sbindir} ${STAGING_DIR_HOST}${layout_base_sbindir}
+		autotools_stage_dir ${STAGE_TEMP}/${libexecdir} ${STAGING_DIR_HOST}${layout_libexecdir}
+		if [ "${prefix}/lib" != "${libdir}" ]; then
+			# python puts its files in here, make sure they are staged as well
+			autotools_stage_dir ${STAGE_TEMP}/${prefix}/lib ${STAGING_DIR_HOST}${layout_prefix}/lib
+		fi
 	fi
 	if [ -d ${STAGE_TEMP}/${libdir} ]
 	then
-		for i in ${STAGE_TEMP}/${libdir}/*.la
+		olddir=`pwd`
+		cd ${STAGE_TEMP}/${libdir}
+		las=$(find . -name \*.la -type f)
+		cd $olddir
+		echo "Found la files: $las"		 
+		for i in $las
 		do
-			if [ ! -f "$i" ]; then
-				cp -fpPR ${STAGE_TEMP}/${libdir}/* ${STAGING_LIBDIR}
-				break
-			fi
-			oe_libinstall -so $(basename $i .la) ${STAGING_LIBDIR}
+			sed -e 's/^installed=yes$/installed=no/' \
+			    -e '/^dependency_libs=/s,${WORKDIR}[[:alnum:]/\._+-]*/\([[:alnum:]\._+-]*\),${STAGING_LIBDIR}/\1,g' \
+			    -e "/^dependency_libs=/s,\([[:space:]']\)${libdir},\1${STAGING_LIBDIR},g" \
+			    -i ${STAGE_TEMP}/${libdir}/$i
 		done
+		autotools_stage_dir ${STAGE_TEMP}/${libdir} ${STAGING_LIBDIR}
 	fi
-	if [ -d ${STAGE_TEMP}/${datadir}/aclocal ]; then
-		install -d ${STAGING_DATADIR}/aclocal
-		cp -fpPR ${STAGE_TEMP}/${datadir}/aclocal/* ${STAGING_DATADIR}/aclocal
+	# Ok, this is nasty. pkgconfig.bbclass is usually used to install .pc files,
+	# however some packages rely on the presence of .pc files to enable/disable
+	# their configurataions in which case we better should not install everything
+	# unconditionally, but rather depend on the actual results of make install.
+	# The good news though: a) there are not many packages doing this and
+	# b) packaged staging will fix that anyways. :M:
+	if [ "${AUTOTOOLS_STAGE_PKGCONFIG}" = "1" ]
+	then
+		if [ -e ${STAGE_TEMP}/${libdir}/pkgconfig/ ] ; then
+			echo "cp -f ${STAGE_TEMP}/${libdir}/pkgconfig/*.pc ${STAGING_LIBDIR}/pkgconfig/"
+			cp -f ${STAGE_TEMP}/${libdir}/pkgconfig/*.pc ${STAGING_LIBDIR}/pkgconfig/
+		fi
 	fi
+	rm -rf ${STAGE_TEMP}/${mandir} || true
+	rm -rf ${STAGE_TEMP}/${infodir} || true
+	autotools_stage_dir ${STAGE_TEMP}/${datadir} ${STAGING_DATADIR}
 	rm -rf ${STAGE_TEMP}
 }
 
 EXPORT_FUNCTIONS do_configure do_install
+

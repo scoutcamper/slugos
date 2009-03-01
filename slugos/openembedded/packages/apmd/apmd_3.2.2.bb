@@ -3,12 +3,14 @@ SECTION = "base"
 PRIORITY = "required"
 DEPENDS = "libtool-cross"
 LICENSE = "GPL"
-PR = "r7"
+PR = "r11.01"
 
-SRC_URI = "${DEBIAN_MIRROR}/main/a/apmd/apmd_${PV}.orig.tar.gz; \
+SRC_URI = "${DEBIAN_MIRROR}/main/a/apmd/apmd_${PV}.orig.tar.gz \
            file://debian.patch;patch=1 \
            file://workaround.patch;patch=1 \
            file://zaurus24.patch;patch=1 \
+           file://unlinux.patch;patch=1 \
+           file://libtool.patch;patch=1 \
            file://init \
            file://default \
            file://apmd_proxy \
@@ -22,7 +24,7 @@ INITSCRIPT_NAME = "apmd"
 INITSCRIPT_PARAMS = "defaults"
 
 do_compile() {
-	oe_runmake "LIBTOOL=${STAGING_BINDIR}/${TARGET_PREFIX}libtool" apm apmd
+	oe_runmake "LIBTOOL=${STAGING_BINDIR_NATIVE}/${TARGET_PREFIX}libtool" apm apmd
 }
 
 do_stage() {
@@ -44,6 +46,7 @@ do_install() {
 	install -d ${D}${bindir}
 	install -d ${D}${libdir}
 	install -d ${D}${datadir}/apmd
+	install -d ${D}${includedir}
 
 	install -m 4755 ${S}/.libs/apm ${D}${bindir}/apm
 	install -m 0755 ${S}/.libs/apmd ${D}${sbindir}/apmd
@@ -52,6 +55,10 @@ do_install() {
 	install -m 0644 ${WORKDIR}/default ${D}${sysconfdir}/default/apmd
 	oe_libinstall -so libapm ${D}${libdir}
 	install -m 0644 apm.h ${D}${includedir}
+        for i in `find ${D} -name "*.la"` ; do \
+                sed -i -e s:${STAGING_LIBDIR}:${libdir}:g $i
+                sed -i -e s:${STAGING_DIR_HOST}::g $i
+        done
 
 	cat ${WORKDIR}/init | sed -e 's,/usr/sbin,${sbindir},g; s,/etc,${sysconfdir},g;' > ${D}${sysconfdir}/init.d/apmd
 	chmod 755 ${D}${sysconfdir}/init.d/apmd

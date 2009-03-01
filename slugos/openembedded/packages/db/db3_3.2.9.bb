@@ -1,8 +1,8 @@
 SECTION = "libs"
 DESCRIPTION = "Berkeley DB v3."
-HOMEPAGE = "http://www.sleepycat.com"
-LICENSE = "BSD Sleepycat"
-PR = "r2"
+HOMEPAGE = "http://www.oracle.com/technology/products/berkeley-db/db/index.html"
+LICENSE = "BSD"
+PR = "r3"
 VIRTUAL_NAME ?= "virtual/db"
 CONFLICTS = "db"
 
@@ -11,7 +11,7 @@ CONFLICTS = "db"
 # a build to select the desired one.
 PROVIDES += "${VIRTUAL_NAME}"
 
-SRC_URI = "ftp://sleepycat1.inetu.net/releases/db-${PV}.tar.gz \
+SRC_URI = "http://download.oracle.com/berkeley-db/db-${PV}.tar.gz \
 	   file://autofoo.patch;patch=1"
 S = "${WORKDIR}/db-${PV}/dist"
 B = "${WORKDIR}/db-${PV}/build_unix"
@@ -23,7 +23,7 @@ EXTRA_OEMAKE = "'SHELL=/bin/sh' 'ar=`which ${AR}` cr' 'chmod=`which chmod`' \
 		'cp=`which cp`' 'ln=`which ln`' 'mkdir=`which mkdir`' 'ranlib=`which ${RANLIB}`' \
 		'rm=`which rm`' 'strip=`which ${STRIP}`'"
 
-PACKAGES = "${PN} ${PN}-bin ${PN}-dev ${PN}-doc ${PN}-locale"
+PACKAGES = "${PN}-dbg ${PN} ${PN}-bin ${PN}-dev ${PN}-doc ${PN}-locale"
 
 FILES_${PN} = "${libdir}/libdb-3.2*so*"
 FILES_${PN}-bin = "${bindir}"

@@ -1,7 +1,6 @@
 DESCRIPTION = "A image viewer"
 SECTION = "opie/applications"
 PRIORITY = "optional"
-MAINTAINER = "Team Opie <opie@handhelds.org>"
 LICENSE = "GPL"
 DEPENDS = "libopiecore2 libopieui2 libopiemm2"
 RDEPENDS = "opie-advancedfm-pics"
@@ -20,7 +19,8 @@ do_compile_append() {
 }
 
 do_install() {
-	install -m 0755 opie-eye_slave ${D}${palmtopdir}/bin/
+	install -d ${D}${bindir}
+	install -m 0755 opie-eye_slave ${D}${bindir}
         install -d ${D}${palmtopdir}/pics/${APPNAME}/
         install -m 0644 ${WORKDIR}/pics/${APPNAME}/*.png ${D}${palmtopdir}/pics/${APPNAME}/
 }

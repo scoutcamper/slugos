@@ -1,5 +1,4 @@
 DESCRIPTION = "Linux kernel for the SIEMENS SIMpad family of devices."
-MAINTAINER = "Frederic Devernay <frederic.devernay@m4x.org>"
 SECTION = "kernel"
 LICENSE = "GPL"
 KV = "${@bb.data.getVar('PV',d,True).split('-')[0]}"
@@ -7,11 +6,13 @@ VRSV = "${@bb.data.getVar('PV',d,True).split('-')[1]}"
 PXAV = "${@bb.data.getVar('PV',d,True).split('-')[2]}"
 JPMV = "${@bb.data.getVar('PV',d,True).split('-')[3]}"
 USBV= "usb20040610"
-PR = "r3"
+PR = "r4"
+
+COMPATIBLE_MACHINE = 'simpad'
 
 FILESPATH = "${FILE_DIRNAME}/opensimpad-${PV}:${FILE_DIRNAME}/opensimpad:${FILE_DIRNAME}/files:${FILE_DIRNAME}"
 
-SRC_URI = "ftp://ftp.kernel.org/pub/linux/kernel/v2.4/linux-${KV}.tar.bz2 \
+SRC_URI = "${KERNELORG_MIRROR}/pub/linux/kernel/v2.4/linux-${KV}.tar.bz2 \
            file://${KV}-${VRSV}.patch;patch=1 \
            file://${KV}-${VRSV}-${PXAV}.patch;patch=1 \
            file://${KV}-${VRSV}-${PXAV}-${JPMV}.patch;patch=1 \
@@ -34,6 +35,8 @@ SRC_URI = "ftp://ftp.kernel.org/pub/linux/kernel/v2.4/linux-${KV}.tar.bz2 \
            file://mppe-20040216.patch;patch=1 \
            file://sa1100-usb-tcl1.patch;patch=1 \
            file://mmc-spi.patch;patch=1 \
+           file://iw249_we17-13.diff;patch=1 \
+           file://iw240_we18-5.diff;patch=1 \
 "
 # This applies right after the jpm patch but is useless until we
 # have sa1100_udc.c
@@ -50,16 +53,16 @@ inherit kernel
 KERNEL_CCSUFFIX = "-3.3.4"
 COMPATIBLE_HOST = "arm.*-linux"
 
-SIMPAD_MEM     = ${@bb.data.getVar("SIMPAD_MEMORY_SIZE",d,1)  or "32"}
-SIMPAD_RD      = ${@bb.data.getVar("SIMPAD_RAMDISK_SIZE",d,1) or "32"}
-export CMDLINE = ${@bb.data.getVar("SIMPAD_CMDLINE",d,1) or  "mtdparts=sa1100:512k(boot),1m(kernel),14848k(root),-(home) console=ttySA root=1f02 noinitrd jffs2_orphaned_inodes=delete rootfstype=jffs2 "}
+SIMPAD_MEM     = '${@bb.data.getVar("SIMPAD_MEMORY_SIZE",d,1)  or "32"}'
+SIMPAD_RD      = '${@bb.data.getVar("SIMPAD_RAMDISK_SIZE",d,1) or "32"}'
+export CMDLINE = '${@bb.data.getVar("SIMPAD_CMDLINE",d,1) or  "mtdparts=sa1100:512k(boot),1m(kernel),14848k(root),-(home) console=ttySA root=1f02 noinitrd jffs2_orphaned_inodes=delete rootfstype=jffs2 "}'
 #EXTRA_OEMAKE = ""
 
 module_conf_sa1100_ir = "alias irda0 sa1100_ir"
 
-do_configure() { 
+do_configure() {
        install -m 0644 ${WORKDIR}/defconfig-${MACHINE} ${S}/.config || die "No default configuration for ${MACHINE} available."
-              
+
 	mem=${SIMPAD_MEM}
 	rd=${SIMPAD_RD}
         mempos=`echo "obase=16; $mem * 1024 * 1024" | bc`

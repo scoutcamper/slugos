@@ -1,13 +1,12 @@
 DESCRIPTION = "Advanced TFTP server and client"
 SECTION = "network"
 PRIORITY = "optional"
-MAINTAINER = "NSLU2 Linux <www.nslu2-linux.org>"
 HOMEPAGE = "http://packages.debian.org/atftp"
 LICENSE = "GPL"
-PR = "r2"
+PR = "r6"
 
 SRC_URI = "${DEBIAN_MIRROR}/main/a/atftp/atftp_${PV}.orig.tar.gz \
-	    ${DEBIAN_MIRROR}/main/a/atftp/atftp_${PV}-7.diff.gz;patch=1 \
+	   ${DEBIAN_MIRROR}/main/a/atftp/atftp_${PV}.dfsg-6.diff.gz;patch=1 \
 	   file://atftpd.init"
 S = "${WORKDIR}/atftp-${PV}"
 

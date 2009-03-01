@@ -1,12 +1,11 @@
 BROKEN = "1"
 # is unfetchable now - upstream updated to 20050728
 
-DEPENDS += "lua-native lua x11 xext"
+DEPENDS += "lua-native lua virtual/libx11 libxext"
 DESCRIPTION = "Ion is a tiling tabbed window manager designed with keyboard \
 users in mind."
 HOMEPAGE = "http://modeemi.fi/~tuomov/ion/"
 LICENSE = "LGPL"
-MAINTAINER = "Chris Larson <kergoth@handhelds.org>"
 PROVIDES += "ion"
 SECTION = "x11/wm"
 SNAPDATE = "${@(bb.data.getVar('PV', d, 1) or '')[-8:]}"
@@ -28,7 +27,7 @@ S = "${WORKDIR}/ion-3ds-${SNAPDATE}"
 
 EXTRA_OECONF += "--disable-xinerama --disable-xfree86-textprop-bug-workaround \
 		 --disable-Xutf8 --disable-sun-fix-remap --enable-shared \
-		 --with-lua-prefix=${STAGING_BINDIR}/.. \
+		 --with-lua-prefix=${STAGING_BINDIR_NATIVE}/.. \
 		 --x-libraries=${STAGING_LIBDIR} \
 		 --x-includes=${STAGING_INCDIR}"
 

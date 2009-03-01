@@ -4,10 +4,10 @@ cross-platform approach to connection establishment, terminal \
 sessions, file transfer, character-set translation, and automation \
 of communication tasks."
 LICENSE = "Kermit"
-MAINTAINER = "Holger Schurig"
 HOMEPAGE = "http://www.columbia.edu/kermit/"
 SECTION = "console/network"
 SRC_URI = "ftp://kermit.columbia.edu/kermit/archives/cku${PV}.tar.gz"
+PR = "r1"
 
 #
 # From http://www.columbia.edu/kermit/ck80.html#license
@@ -49,19 +49,17 @@ SRC_URI = "ftp://kermit.columbia.edu/kermit/archives/cku${PV}.tar.gz"
 # ... and probably other distro's as well.
 #
 
-
-
-python do_unpack () {
-	bb.mkdirhier(bb.data.expand('${S}', d))
-	bb.build.exec_func('base_do_unpack', d, [ '${S}' ])
-}
-
-
+S = "${WORKDIR}"
 
 export CC2 = "${CC}"
 export BINDIR = "${bindir}"
 export MANDIR = "${mandir}/man1"
 export INFODIR = "${infodir}"
+
+# Additional flags. For uclibc we add -DNOARROWKEYS which stops ckermit
+# trying to look inside the stdio headers.
+CKERMIT_ADDITIONAL = ""
+CKERMIT_ADDITIONAL_linux-uclibc = "-DNOARROWKEYS"
 
 do_compile () {
 	# The original makefile doesn't differentiate between CC and CC_FOR_BUILD,
@@ -83,10 +81,14 @@ do_compile () {
 		-DNOSERVER -DNOSEXP -DNORLOGIN -DNOOLDMODEMS -DNOSSH -DNOLISTEN \
 		-DNORESEND -DNOAUTODL -DNOSTREAMING -DNOHINTS -DNOCKXYZ -DNOLEARN \
 		-DNOMKDIR -DNOPERMS -DNOCKTIMERS -DNOCKREGEX -DNOREALPATH \
-		-DCK_SMALL -DNOLOGDIAL -DNORENAME -DNOWHATAMI"
+		-DCK_SMALL -DNOLOGDIAL -DNORENAME -DNOWHATAMI \
+		${CKERMIT_ADDITIONAL}"
 }
 
 do_install () {
 	install -d ${D}${BINDIR} ${D}${MANDIR} ${D}${INFODIR}
 	oe_runmake 'DESTDIR=${D}' 'MANDIR=${D}${MANDIR}' install
+	# Fix up dangling symlink
+	rm ${D}${BINDIR}/kermit-sshsub
+	(cd ${D}${BINDIR} && ln -s ${BINDIR}/kermit kermit-sshusb)
 }

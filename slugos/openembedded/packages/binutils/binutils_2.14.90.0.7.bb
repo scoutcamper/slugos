@@ -4,8 +4,7 @@ inherit autotools gettext
 DESCRIPTION = "A GNU collection of binary utilities"
 HOMEPAGE = "http://www.gnu.org/software/binutils/"
 LICENSE = "GPL"
-MAINTAINER = "Gerald Britton <gbritton@doomcom.org>"
-PR = "r3"
+PR = "r6"
 
 PACKAGES = "${PN} ${PN}-dev ${PN}-doc ${PN}-symlinks"
 
@@ -38,7 +37,7 @@ FILES_${PN}-symlinks = " \
 	${bindir}/strip"
 
 SRC_URI = \
-    "http://ftp.kernel.org/pub/linux/devel/binutils/binutils-${PV}.tar.bz2 \
+    "${KERNELORG_MIRROR}/pub/linux/devel/binutils/binutils-${PV}.tar.bz2 \
      file://ld_makefile.patch;patch=1 \
      file://better_file_error.patch;patch=1 \
      file://signed_char_fix.patch;patch=1 \
@@ -53,7 +52,7 @@ SRC_URI = \
 S = "${WORKDIR}/binutils-${PV}"
 B = "${S}/build.${HOST_SYS}.${TARGET_SYS}"
 
-EXTRA_OECONF = "--with-sysroot=${prefix} \
+EXTRA_OECONF = "--with-sysroot=/ \
 		--program-prefix=${TARGET_PREFIX} \
 		--enable-shared"
 

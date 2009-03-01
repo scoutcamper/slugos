@@ -1,26 +1,11 @@
-SECTION = "libs"
-LICENSE = "BSD"
-DESCRIPTION = "A library for configuring and customizing font access."
-DEPENDS = "expat freetype freetype-native zlib fontconfig-native"
+require fontconfig.inc
 
-SRC_URI = "http://pdx.freedesktop.org/fontconfig/release/fontconfig-${PV}.tar.gz \
-           file://fc-glyphname.patch;patch=1 \
+DEPENDS += "fontconfig-native"
+
+SRC_URI += "file://fc-glyphname.patch;patch=1 \
            file://fc-lang.patch;patch=1 \
 	   file://local.conf"
-PR = "r2"
-
-PACKAGES =+ "fontconfig-utils"
-FILES_fontconfig-utils = "${bindir}/*"
-AUTO_LIBNAME_PKGS = "fontconfig-utils"
-
-S = "${WORKDIR}/fontconfig-${PV}"
-
-inherit autotools pkgconfig
-
-export HASDOCBOOK="no"
-
-EXTRA_OECONF = " --disable-docs "
-EXTRA_OEMAKE = "FC_LANG=fc-lang FC_GLYPHNAME=fc-glyphname"
+PR = "r8"
 
 do_stage () {
 	oe_libinstall -so -a -C src libfontconfig ${STAGING_LIBDIR}
@@ -30,6 +15,8 @@ do_stage () {
 
 do_install () {
 	autotools_do_install
-	install -m 0644 ${WORKDIR}/local.conf ${D}${sysconfdir}/fonts/local.conf
+
+	install -d ${D}/etc/fonts/
+	install -m 0644 ${WORKDIR}/local.conf ${D}/etc/fonts/
 }
 

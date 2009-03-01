@@ -1,6 +1,5 @@
 # Intel ixp4xx access library software.  Note that this has an Intel
 # license which restricts its use.
-MAINTAINER = "NSLU2 Linux <nslu2-linux@yahoogroups.com>"
 HOMEPAGE = "http://www.intel.com/design/network/products/npfamily/ixp420.htm"
 LICENSE = "http://www.intel.com/design/network/swsup/np_sla/ixp400.htm"
 LICENSE_HOMEPAGE = "http://www.intel.com/design/network/products/npfamily/ixp425swr1.htm"
@@ -35,16 +34,19 @@ SRC_URI += "file://mii-debug.patch;patch=1"
 SRC_URI += "file://rtl8201-support.patch;patch=1"
 SRC_URI += "file://gcc4.patch;patch=1"
 SRC_URI += "file://oe-makefile.patch;patch=1"
+SRC_URI += "file://livelock.patch;patch=1"
+SRC_URI += "file://module-param.patch;patch=1"
 
 DEPENDS = "ixp-osal"
 S = "${WORKDIR}/ixp400_xscale_sw"
-PR = "r8"
+PR = "r12"
 
 COMPATIBLE_HOST = "^arm.*-linux.*"
+COMPATIBLE_MACHINE = "(nslu2|ixp4xx)"
 
 inherit module
 
-IX_TARGET = "linux${ARCH_BYTE_SEX}"
+IX_TARGET = "linux${SITEINFO_ENDIANESS}"
 IX_ENSURE = ""
 #IX_ENSURE = "IX_OSAL_ENSURE_ON=1"
 
@@ -103,7 +105,6 @@ do_stage () {
 	fi
 }
 
-PACKAGES = "${PN}"
 
 do_install () {
 	install -d ${D}${base_libdir}/modules/${KERNEL_VERSION}/kernel/drivers/ixp400

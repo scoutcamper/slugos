@@ -1,6 +1,6 @@
 DESCRIPTION = "AppWeb is an embedded HTTP Web server that has been designed with security in mind."
 SECTION = "console/network"
-LICENSE="GPL"
+LICENSE = "GPL"
 SRC_URI = "http://www.mbedthis.com/software/appWeb-src-1.2.0-1.tar.gz \
 	   file://makerules.patch;patch=1 \
 	   file://nonrootinstall.patch;patch=1"
@@ -9,10 +9,7 @@ S = "${WORKDIR}/appWeb-1.2.0"
 APPWEB_HOST = "${@get_appweb_host(d, bb)}"
 APPWEB_BUILD = "${BUILD_SYS}"
 
-def get_appweb_host(d, bb):
-    host = bb.data.getVar('HOST_SYS', d, 1)
-    return host.replace('-linux-uclibc', '-linux')
-    
+require appweb.inc
 
 #  --buildNumber=NUMBER     Set the build number part of the version (1.0.0.X).
 #  --name=NAME              Set the full product name (BLD_NAME define).
@@ -58,10 +55,10 @@ def get_appweb_host(d, bb):
 #  --with-esp               Include the ESP handler.
 #  --with-ssl               Build support for the SSL protocol.
 #  --with-upload            Build with the file upload handler
-#  --with-xdb               Build with XDB 
+#  --with-xdb               Build with XDB
 #  Supported PACKAGE names: openssl, php4, php5
-#  --with-PACKAGE=[builtin|, module]       
-#                           Include support for the PACKAGE. Link into appWeb 
+#  --with-PACKAGE=[builtin|, module]
+#                           Include support for the PACKAGE. Link into appWeb
 #                           statically and/or build as a module
 #  --with-PACKAGE-dir=DIR   Set the source directory of the package
 #  --with-PACKAGE-libs=libs Set a list of libraries to use when linking with

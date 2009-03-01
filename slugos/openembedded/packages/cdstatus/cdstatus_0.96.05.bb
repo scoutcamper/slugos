@@ -1,9 +1,9 @@
 # cdstatus OE build file
 
-PR="r2"
+PR ="r2"
 LICENSE="GPL"
 HOMEPAGE = "http://cdstatus.sourceforge.net/"
-FILES_${PN} += ${datadir}/cdstatus.cfg
+FILES_${PN} += "${datadir}/cdstatus.cfg"
 
 SRC_URI="${SOURCEFORGE_MIRROR}/cdstatus/cdstatus-0.96.05.tar.gz \
 	 file://cdstatus.patch;patch=1"

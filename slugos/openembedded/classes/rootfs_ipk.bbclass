@@ -2,144 +2,128 @@
 # Creates a root filesystem out of IPKs
 #
 # This rootfs can be mounted via root-nfs or it can be put into an cramfs/jffs etc.
-# See image_ipk.oeclass for a usage of this.
+# See image.bbclass for a usage of this.
 #
 
-DEPENDS_prepend="ipkg-native ipkg-utils-native fakeroot-native "
-DEPENDS_append=" ${EXTRA_IMAGEDEPENDS}"
+do_rootfs[depends] += "opkg-native:do_populate_staging ipkg-utils-native:do_populate_staging"
+do_rootfs[recrdeptask] += "do_package_write_ipk"
 
-PACKAGES = ""
+IPKG_ARGS = "-f ${IPKGCONF_TARGET} -o ${IMAGE_ROOTFS} ${@base_conditional("PACKAGE_INSTALL_NO_DEPS", "1", "-nodeps", "", d)}"
 
-do_rootfs[nostamp] = 1
-do_rootfs[dirs] = ${TOPDIR}
-do_build[nostamp] = 1
+PACKAGE_INSTALL_NO_DEPS ?= "0"
 
-IPKG_ARGS = "-f ${T}/ipkg.conf -o ${IMAGE_ROOTFS}"
+# What support to provide for online management of packages at run time?
+#  full -> traditional system, opkg is installed with all metadata
+#  add -> opkg is installed with basic conf files but no status database; can add new packages at runtime but not modify existing ones
+#  none -> opkg not installed at all, no metadata or config files provided
+ONLINE_PACKAGE_MANAGEMENT ?= "full"
 
-ROOTFS_POSTPROCESS_COMMAND ?= ""
+# Which packages to not install on the basis of a recommendation
+BAD_RECOMMENDATIONS ?= ""
 
-PID = "${@os.getpid()}"
+IPKG_VARIANT ?= "opkg"
 
-# some default locales
-IMAGE_LINGUAS ?= "de-de fr-fr en-gb"
+RDEPENDS_append = " ${@base_conditional("ONLINE_PACKAGE_MANAGEMENT", "none", "", "${IPKG_VARIANT} opkg-collateral", d)}"
+PACKAGE_INSTALL_append = " ${@base_conditional("ONLINE_PACKAGE_MANAGEMENT", "none", "", "${IPKG_VARIANT} opkg-collateral", d)}"
 
-LINGUAS_INSTALL = "${@" ".join(map(lambda s: "locale-base-%s" % s, bb.data.getVar('IMAGE_LINGUAS', d, 1).split()))}"
-
-real_do_rootfs () {
+fakeroot rootfs_ipk_do_rootfs () {
 	set -x
-		
-	mkdir -p ${IMAGE_ROOTFS}/dev
 
-	if [ -z "${DEPLOY_KEEP_PACKAGES}" ]; then
-		rm -f ${DEPLOY_DIR_IPK}/Packages
-		touch ${DEPLOY_DIR_IPK}/Packages
-		ipkg-make-index -r ${DEPLOY_DIR_IPK}/Packages -p ${DEPLOY_DIR_IPK}/Packages -l ${DEPLOY_DIR_IPK}/Packages.filelist -m ${DEPLOY_DIR_IPK}
-	fi
+	package_update_index_ipk
+	package_generate_ipkg_conf
+
 	mkdir -p ${T}
-	echo "src oe file:${DEPLOY_DIR_IPK}" > ${T}/ipkg.conf
-	ipkgarchs="all any noarch ${TARGET_ARCH} ${IPKG_ARCHS} ${MACHINE}"
-	priority=1
-	for arch in $ipkgarchs; do
-		echo "arch $arch $priority" >> ${T}/ipkg.conf
-		priority=$(expr $priority + 5)
+	mkdir -p ${IMAGE_ROOTFS}${libdir}/opkg/
+
+	STATUS=${IMAGE_ROOTFS}${libdir}/opkg/status
+	# prime the status file with bits that we don't want
+	for i in ${BAD_RECOMMENDATIONS}; do
+		echo "Package: $i" >> $STATUS
+		echo "Architecture: ${TARGET_ARCH}" >> $STATUS
+		echo "Status: deinstall ok not-installed" >> $STATUS
+		echo >> $STATUS
 	done
-	ipkg-cl ${IPKG_ARGS} update
-	if [ ! -z "${LINGUAS_INSTALL}" ]; then
-		ipkg-cl ${IPKG_ARGS} install glibc-localedata-i18n
-		for i in ${LINGUAS_INSTALL}; do
-			ipkg-cl ${IPKG_ARGS} install $i
-		done
+
+	opkg-cl ${IPKG_ARGS} update
+
+	# Uclibc builds don't provide this stuff...
+	if [ x${TARGET_OS} = "xlinux" ] || [ x${TARGET_OS} = "xlinux-gnueabi" ] ; then 
+		if [ ! -z "${LINGUAS_INSTALL}" ]; then
+			opkg-cl ${IPKG_ARGS} install glibc-localedata-i18n
+			for i in ${LINGUAS_INSTALL}; do
+				opkg-cl ${IPKG_ARGS} install $i 
+			done
+		fi
 	fi
-	if [ ! -z "${IPKG_INSTALL}" ]; then
-		ipkg-cl ${IPKG_ARGS} install ${IPKG_INSTALL}
+	if [ ! -z "${PACKAGE_INSTALL}" ]; then
+		opkg-cl ${IPKG_ARGS} install ${PACKAGE_INSTALL}
 	fi
 
 	export D=${IMAGE_ROOTFS}
+	export OFFLINE_ROOT=${IMAGE_ROOTFS}
 	export IPKG_OFFLINE_ROOT=${IMAGE_ROOTFS}
-	mkdir -p ${IMAGE_ROOTFS}/etc/ipkg/
-	grep "^arch" ${T}/ipkg.conf >${IMAGE_ROOTFS}/etc/ipkg/arch.conf
+	export OPKG_OFFLINE_ROOT=${IPKG_OFFLINE_ROOT}
+	
+	mkdir -p ${IMAGE_ROOTFS}${sysconfdir}/opkg/
 
-	for i in ${IMAGE_ROOTFS}${libdir}/ipkg/info/*.preinst; do
+	if [ "${ONLINE_PACKAGE_MANAGEMENT}" != "none" ]; then
+		grep "^arch" ${IPKGCONF_TARGET} >${IMAGE_ROOTFS}${sysconfdir}/opkg/arch.conf
+	fi
+
+	for i in ${IMAGE_ROOTFS}${libdir}/opkg/info/*.preinst; do
 		if [ -f $i ] && ! sh $i; then
-			ipkg-cl ${IPKG_ARGS} flag unpacked `basename $i .preinst`
+			opkg-cl ${IPKG_ARGS} flag unpacked `basename $i .preinst`
 		fi
 	done
-	for i in ${IMAGE_ROOTFS}${libdir}/ipkg/info/*.postinst; do
+	for i in ${IMAGE_ROOTFS}${libdir}/opkg/info/*.postinst; do
 		if [ -f $i ] && ! sh $i configure; then
-			ipkg-cl ${IPKG_ARGS} flag unpacked `basename $i .postinst`
+			opkg-cl ${IPKG_ARGS} flag unpacked `basename $i .postinst`
 		fi
 	done
 
 	install -d ${IMAGE_ROOTFS}/${sysconfdir}
 	echo ${BUILDNAME} > ${IMAGE_ROOTFS}/${sysconfdir}/version
 
+	if [ "${ONLINE_PACKAGE_MANAGEMENT}" != "none" ]; then
+		if [ "${ONLINE_PACKAGE_MANAGEMENT}" == "add" ]; then
+			rm -f ${IMAGE_ROOTFS}${libdir}/opkg/status
+			rm -f ${IMAGE_ROOTFS}${libdir}/opkg/*/*
+		else
+			rm -f ${IMAGE_ROOTFS}${libdir}/opkg/lists/*
+		fi
+	
+		# Keep these lines until package manager selection is implemented
+		ln -s opkg ${IMAGE_ROOTFS}${sysconfdir}/ipkg
+		ln -s opkg ${IMAGE_ROOTFS}${libdir}/ipkg
+	else
+		rm -rf ${IMAGE_ROOTFS}${libdir}/opkg
+	fi
+	
 	${ROOTFS_POSTPROCESS_COMMAND}
 	
 	log_check rootfs 	
 }
 
-log_check() {
-	set +x
-	for target in $*
-	do
-		lf_path="${WORKDIR}/temp/log.do_$target.${PID}"
-		
-		echo "log_check: Using $lf_path as logfile"
-		
-		if test -e "$lf_path"
+rootfs_ipk_log_check() {
+	target="$1"
+        lf_path="$2"
+
+	lf_txt="`cat $lf_path`"
+	for keyword_die in "Cannot find package" "exit 1" ERR Fail
+	do				
+		if (echo "$lf_txt" | grep -v log_check | grep -w "$keyword_die") >/dev/null 2>&1
 		then
-			lf_txt="`cat $lf_path`"
-			
-			for keyword_die in "Cannot find package" "exit 1" ERR Fail
-			do				
-				
-				if (echo "$lf_txt" | grep -v log_check | grep "$keyword_die") &>/dev/null
-				then
-					echo "log_check: There were error messages in the logfile"
-					echo -e "log_check: Matched keyword: [$keyword_die]\n"
-					echo "$lf_txt" | grep -v log_check | grep -i "$keyword_die"
-					echo ""
-					do_exit=1				
-				fi
-			done
-			test "$do_exit" = 1 && exit 1						
-		else
-			echo "Cannot find logfile [$lf_path]"
+			echo "log_check: There were error messages in the logfile"
+			printf "log_check: Matched keyword: [$keyword_die]\n"
+			echo "$lf_txt" | grep -v log_check | grep -i "$keyword_die" -C1
+			echo ""
+			do_exit=1				
 		fi
-		echo "Logfile is clean"		
 	done
-
-	set -x
-	
+	test "$do_exit" = 1 && exit 1
+	true
 }
 
-fakeroot do_rootfs () {
-	rm -rf ${IMAGE_ROOTFS}
-	real_do_rootfs
+remove_packaging_data_files() {
+	rm -rf ${IMAGE_ROOTFS}${libdir}/opkg/
 }
-
-# set '*' as the rootpassword so the images
-# can decide if they want it or not
-
-zap_root_password () {
-	sed 's%^root:[^:]*:%root:*:%' < ${IMAGE_ROOTFS}/etc/passwd >${IMAGE_ROOTFS}/etc/passwd.new
-	mv ${IMAGE_ROOTFS}/etc/passwd.new ${IMAGE_ROOTFS}/etc/passwd	
-} 
-
-create_etc_timestamp() {
-	date +%2m%2d%2H%2M%Y >${IMAGE_ROOTFS}/etc/timestamp
-}
-
-# Turn any symbolic /sbin/init link into a file
-remove_init_link () {
-	if [ -h ${IMAGE_ROOTFS}/sbin/init ]; then
-		LINKFILE=${IMAGE_ROOTFS}`readlink ${IMAGE_ROOTFS}/sbin/init`
-		rm ${IMAGE_ROOTFS}/sbin/init
-		cp $LINKFILE ${IMAGE_ROOTFS}/sbin/init
-	fi
-}
-
-# export the zap_root_password, create_etc_timestamp and remote_init_link
-EXPORT_FUNCTIONS zap_root_password create_etc_timestamp remove_init_link
-
-addtask rootfs before do_build after do_install

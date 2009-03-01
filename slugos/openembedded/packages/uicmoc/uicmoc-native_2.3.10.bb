@@ -1,17 +1,20 @@
 DESCRIPTION = "User Interface Generator and Meta Object Compiler (moc) for Qt(E) 2.x"
+HOMEPAGE = "http://www.trolltech.com"
 SECTION = "devel"
 PRIORITY = "optional"
 LICENSE = "GPL QPL"
-MAINTAINER = "Michael 'Mickey' Lauer <mickey@Vanille.de>"
-PR = "r0"
+PR = "r4"
 
 SRC_URI = "ftp://ftp.trolltech.com/pub/qt/source/qt-embedded-${PV}-free.tar.gz \
            file://fix-makefile.patch;patch=1 \
-           file://gcc3_4.patch;patch=1" \
-           file://gcc4.patch;patch=1"
+           file://gcc3_4.patch;patch=1 \
+           file://gcc4.patch;patch=1 \
+           file://gcc4_1.patch;patch=1 \
+           file://64bit-cleanup.patch;patch=1 \
+	   file://kernel-asm-page.patch;patch=1"
 S = "${WORKDIR}/qt-${PV}"
 
-inherit native qmake-base
+inherit native qmake_base
 
 export QTDIR = "${S}"
 EXTRA_OEMAKE = 'SYSCONF_CXX="${CXX}" SYSCONF_LINK="${CXX}"'

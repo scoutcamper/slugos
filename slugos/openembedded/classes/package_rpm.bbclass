@@ -2,7 +2,7 @@ inherit package
 inherit rpm_core
 
 RPMBUILD="rpmbuild --short-circuit ${RPMOPTS}"
-PACKAGEFUNCS += "do_package_rpm"
+IMAGE_PKGTYPE ?= "rpm"
 
 python write_specfile() {
 	from bb import data, build
@@ -10,7 +10,6 @@ python write_specfile() {
 	out_vartranslate = {
 		"PKG": "Name",
 		"PV": "Version",
-		"PR": "Release",
 		"DESCRIPTION": "%description",
 		"ROOT": "BuildRoot",
 		"LICENSE": "License",
@@ -41,7 +40,7 @@ python write_specfile() {
 			pass
 	if not files:
 		from bb import note
-		note("Not creating empty archive for %s-%s-%s" % (bb.data.getVar('PKG',d, 1), bb.data.getVar('PV', d, 1), bb.data.getVar('PR', d, 1)))
+		note("Not creating empty archive for %s" % (bb.data.expand('${PKG}-${PV}-${PR}${DISTRO_PR}', d, True))
 		return
 
 	# output .spec using this metadata store
@@ -53,12 +52,12 @@ python write_specfile() {
 	except OSError:
 		raise bb.build.FuncFailed("unable to open spec file for writing.")
 
-#	fd = sys.__stdout__
 	fd = specfile
 	for var in out_vartranslate.keys():
 		if out_vartranslate[var][0] == "%":
 			continue
 		fd.write("%s\t: %s\n" % (out_vartranslate[var], bb.data.getVar(var, d)))
+        fd.write("Release\t: %s\n" % bb.data.expand('${PR}${DISTRO_PR}', d, True)
 	fd.write("Summary\t: .\n")
 
 	for var in out_vartranslate.keys():
@@ -80,8 +79,8 @@ python write_specfile() {
 	bb.build.exec_func('BUILDSPEC', d)
 
 	# move the rpm into the pkgoutdir
-	rpm = bb.data.expand('${RPMBUILDPATH}/RPMS/${TARGET_ARCH}/${PKG}-${PV}-${PR}.${TARGET_ARCH}.rpm', d)
-	outrpm = bb.data.expand('${DEPLOY_DIR_RPM}/${PKG}-${PV}-${PR}.${TARGET_ARCH}.rpm', d)
+	rpm = bb.data.expand('${RPMBUILDPATH}/RPMS/${TARGET_ARCH}/${PKG}-${PV}-${PR}${DISTRO_PR}.${TARGET_ARCH}.rpm', d)
+	outrpm = bb.data.expand('${DEPLOY_DIR_RPM}/${PKG}-${PV}-${PR}${DISTRO_PR}.${TARGET_ARCH}.rpm', d)
 	bb.movefile(rpm, outrpm)
 }
 
@@ -122,7 +121,7 @@ python do_package_rpm () {
 		bb.data.setVar('OVERRIDES', '%s:%s' % (overrides, pkg), localdata)
 
 		bb.data.update_data(localdata)
-# stuff
+
 		root = bb.data.getVar('ROOT', localdata)
 		basedir = os.path.dirname(root)
 		pkgoutdir = outdir
@@ -131,3 +130,20 @@ python do_package_rpm () {
 		bb.build.exec_func('write_specfile', localdata)
 		del localdata
 }
+
+python () {
+    import bb
+    if bb.data.getVar('PACKAGES', d, True) != '':
+        deps = (bb.data.getVarFlag('do_package_write_rpm', 'depends', d) or "").split()
+        deps.append('rpm-native:do_populate_staging')
+        deps.append('fakeroot-native:do_populate_staging')
+        bb.data.setVarFlag('do_package_write_rpm', 'depends', " ".join(deps), d)
+}
+
+
+python do_package_write_rpm () {
+	bb.build.exec_func("read_subpackage_metadata", d)
+	bb.build.exec_func("do_package_rpm", d)
+}
+do_package_write_rpm[dirs] = "${D}"
+addtask package_write_rpm before do_build after do_package

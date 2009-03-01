@@ -2,7 +2,6 @@ DESCRIPTION = "Chess Game for Qt/Embedded based palmtop environments. \
 Uses the Phalanx chess engine."
 SECTION = "opie/games"
 PRIORITY = "optional"
-MAINTAINER = "Michael 'Mickey' Lauer <mickey@Vanille.de>"
 LICENSE = "GPL"
 DEPENDS = "phalanx"
 RDEPENDS = "phalanx"
@@ -18,7 +17,7 @@ inherit palmtop
 QMAKE_PROFILES = "knights.pro"
 
 do_configure_prepend() {
-        echo -e "TEMPLATE=subdirs\nSUBDIRS=qtcompat microkde knights\n" >knights.pro
+        printf "TEMPLATE=subdirs\nSUBDIRS=qtcompat microkde knights\n" >knights.pro
 }
 
 do_install() {

@@ -1,15 +1,17 @@
 DESCRIPTION = "User Interface Generator and Meta Object Compiler (moc) for Qt(E) 3.x"
+HOMEPAGE = "http://www.trolltech.com"
 SECTION = "devel"
 PRIORITY = "optional"
 LICENSE = "GPL QPL"
-PR = "r1"
+DEPENDS = "qmake-native"
+PR = "r3"
 
 SRC_URI = "ftp://ftp.trolltech.com/qt/source/qt-embedded-free-${PV}.tar.bz2 \
-	   file://no-examples.patch;patch=1"
-
+           file://no-examples.patch;patch=1 \
+           file://64bit-cleanup.patch;patch=1"
 S = "${WORKDIR}/qt-embedded-free-${PV}"
 
-inherit native qmake-base qt3e
+inherit native qmake_base qt3e
 
 export QTDIR = "${S}"
 export OE_QMAKE_LINK="${CXX}"

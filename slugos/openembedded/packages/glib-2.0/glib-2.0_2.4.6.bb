@@ -6,30 +6,32 @@ UNIX-like platforms, Windows, OS/2 and BeOS."
 LICENSE = "LGPL"
 SECTION = "libs"
 PRIORITY = "optional"
-MAINTAINER = "Philip Blundell <pb@handhelds.org>"
 DEPENDS += "glib-2.0-native gtk-doc"
 DEPENDS += "virtual/libiconv virtual/libintl"
 PACKAGES =+ "glib-2.0-utils "
-PR = "r3"
+PR = "r4"
 
 LEAD_SONAME = "libglib-2.0.*"
 FILES_glib-2.0-utils = "${bindir}/*"
+
+# Add some files to glib-2.0 dev that normally don't get pulled in
+
+FILES_${PN}-dev += "${libdir}/glib-2.0/include/glibconfig.h \
+	${datadir}/glib-2.0/gettext/po/Makefile.in.in"
 
 EXTRA_OECONF = "--disable-debug"
 
 SRC_URI = "ftp://ftp.gtk.org/pub/gtk/v2.4/glib-${PV}.tar.bz2 \
            file://glibinclude.patch;patch=1;pnum=2 \
            file://visibility.patch;patch=1 \
-           file://glibconfig-sysdefs.h"
+           file://glibconfig-sysdefs.h \
+           file://configure-libtool.patch;patch=1"
 
 S = "${WORKDIR}/glib-${PV}"
 
 inherit autotools pkgconfig gettext
 
-python () {
-	if bb.data.getVar("USE_NLS", d, 1) == "no":
-		raise bb.parse.SkipPackage("${PN} requires native language support.")
-}
+require glib-2.0.inc
 
 acpaths = ""
 do_configure_prepend () {

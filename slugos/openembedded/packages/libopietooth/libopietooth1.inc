@@ -2,7 +2,6 @@ DESCRIPTION = "Opie Bluetooth library"
 SECTION = "opie/libs"
 PRIORITY = "optional"
 DEPENDS = "libopie2"
-MAINTAINER = "Team Opie <opie@handhelds.org>"
 LICENSE = "LGPL"
 
 
@@ -17,6 +16,6 @@ do_stage() {
 }
 
 do_install() {
-    oe_libinstall -so libopietooth1 ${D}${palmtopdir}/lib
+    oe_libinstall -so libopietooth1 ${D}${libdir}
 }
 

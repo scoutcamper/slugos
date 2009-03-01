@@ -2,11 +2,11 @@ DESCRIPTION = "Video player and streamer - GPE edition"
 HOMEPAGE = "http://www.videolan.org"
 LICENSE = "GPL"
 PRIORITY = "optional"
-MAINTAINER = "Rene Wagner <rw@handhelds.org>"
-SECTION = "gpe"
-PR = "r1"
+SECTION = "x11/multimedia"
+PR = "r3"
 
-DEPENDS = "faad2 ffmpeg flac liba52 libid3tag libmad mpeg2dec"
+DEPENDS = "faad2 ffmpeg flac \
+           ${@base_conditional('ENTERPRISE_DISTRO', '1', '', 'libmad libid3tag liba52 mpeg2dec', d)}"
 
 SRC_URI = "http://download.videolan.org/pub/videolan/vlc/${PV}/vlc-${PV}.tar.gz"
 S = "${WORKDIR}/vlc-${PV}"

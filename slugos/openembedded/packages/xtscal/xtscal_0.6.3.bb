@@ -1,13 +1,13 @@
 LICENSE = "GPL"
 DESCRIPTION = "Touchscreen calibration utility"
-MAINTAINER = "Phil Blundell <pb@handhelds.org>"
 SECTION = "x11/base"
 
-DEPENDS = "x11 libxft libxrandr xcalibrate"
+DEPENDS = "virtual/libx11 libxft libxcalibrate"
 
-PR = "r1"
+PR = "r7"
 
 SRC_URI = "${GPE_MIRROR}/xtscal-${PV}.tar.bz2 \
-           file://xtscal-cxk.patch;patch=1"
+           file://change-cross.patch;patch=1 \
+	   file://cleanup.patch;patch=1"
 
 inherit autotools

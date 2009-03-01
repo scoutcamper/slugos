@@ -5,19 +5,22 @@
 #
 DESCRIPTION = "Packages that are required for the SlugOS native build environment"
 LICENSE = "MIT"
-PR = "r0"
+PR = "r7"
 
 INHIBIT_DEFAULT_DEPS = "1"
 EXCLUDE_FROM_WORLD = "1"
 ALLOW_EMPTY = "1"
 PACKAGES = "${PN}"
-PROVIDES += "${SLUGOS_IMAGENAME}-native"
+
+inherit meta
+
+do_package_write_ipk() {
+}
 
 # Run-time only (RDEPENDS) stuff - no package explicitly provides
 # these targets.
 SLUGOS_NATIVE_RT_prepend_linux = "\
-	glibc-extra-nss glibc-utils \
-	libc6 libc6-dev \
+	glibc-extra-nss glibc-utils glibc \
 	"
 SLUGOS_NATIVE_RT_prepend_linux-uclibc = "\
 	uclibc-dev uclibc-utils \
@@ -26,20 +29,18 @@ SLUGOS_NATIVE_RT = "\
 	binutils-dev binutils-symlinks \
 	cpp cpp-symlinks \
 	g++ g++-symlinks \
-	gcc-symlinks \
-	libg2c-dev \
-	libgdbm3 \
-	libperl5 \
-	libreadline4 libreadline-dev \
+	gcc gcc-symlinks \
+	gdbm \
 	libstdc++-dev \
-	libthread-db1 \
 	ncurses-dev ncurses-terminfo \
-	perl-modules \
+	perl perl-modules \
 	python-core python-crypt python-io python-lang python-pickle python-shell python-textutils \
+	readline \
 	"
 
 # Run-time and DEPENDS
 SLUGOS_NATIVE_prepend_linux = "\
+	glibc \
 	"
 SLUGOS_NATIVE_prepend_linux-uclibc = "\
 	libiconv \
@@ -69,7 +70,6 @@ SLUGOS_NATIVE = "\
 	patch \
 	perl \
 	pkgconfig \
-	python-core \
 	quilt \
 	sed \
 	tar \
@@ -83,15 +83,19 @@ SLUGOS_NATIVE = "\
 # even on a thumb system (and this can be set in the tool's .bb file),
 # however even this doesn't work for very large programs at present
 # (only monotone!)
-SLUGOS_NATIVE_THUMB_BROKEN = "\
-	monotone-5 \
-	"
+####### *-*-* TEMPORARY: mwester - remove monotone as it wont' build.
+#SLUGOS_NATIVE_THUMB_BROKEN = "\
+#	monotone-6 \
+#	"
+SLUGOS_NATIVE_THUMB_BROKEN = ""
+###### *-*-*
 
 SLUGOS_NATIVE_THUMB_BROKEN_thumb = ""
 
 # These things are required but are not valid RDEPENDS
 SLUGOS_NATIVE_DP = "\
 	gdbm \
+	python \
 	"
 
 RDEPENDS = '${SLUGOS_NATIVE_RT} ${SLUGOS_NATIVE}'

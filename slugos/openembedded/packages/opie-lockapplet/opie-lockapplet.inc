@@ -2,7 +2,6 @@ DESCRIPTION = "Lock Opie now Button to lock Opie (as configured in the Security 
 SECTION = "opie/applets"
 PRIORITY = "optional"
 LICENSE = "GPL"
-MAINTAINER = "Team Opie <opie@handhelds.org>"
 APPNAME = "lockapplet"
 DEPENDS = "opie-security"
 RDEPENDS = "opie-security"
@@ -16,13 +15,13 @@ pkg_postinst() {
 #!/bin/sh
 if [ -n "$D" ]; then exit 1; fi
 if pidof -s qpe >/dev/null; then
-  /opt/QtPalmtop/bin/qcop QPE/TaskBar "reloadApplets()"
+  ${bindir}/qcop QPE/TaskBar "reloadApplets()"
 fi
 }
 
 pkg_postrm() {
 #!/bin/sh
-/opt/QtPalmtop/bin/qcop QPE/TaskBar "reloadApplets()"
+${bindir}/qcop QPE/TaskBar "reloadApplets()"
  if [ -n "$D" ]; then false; fi
 }
 

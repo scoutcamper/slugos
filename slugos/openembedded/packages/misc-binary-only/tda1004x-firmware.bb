@@ -12,7 +12,7 @@ python do_unpack() {
 	if not overrides:
 		raise bb.build.FuncFailed('OVERRIDES not defined')
 	bb.data.setVar('OVERRIDES', overrides+':'+bb.data.getVar('PN', localdata, 1), localdata)
-	
+
 	bb.data.update_data(localdata)
 
 	src_uri = bb.data.getVar('SRC_URI', localdata)
@@ -23,7 +23,7 @@ python do_unpack() {
 	local = bb.data.expand(bb.fetch.localpath(src_uri, localdata), localdata)
 	# dont need any parameters for extraction, strip them off
 	local = re.sub(';.*$', '', local)
-	bindir = bb.data.getVar('STAGING_BINDIR', localdata, 1)
+	bindir = bb.data.getVar('STAGING_BINDIR_NATIVE', localdata, 1)
 	cmd = '%s/unzip %s' % (bindir, local)
 	if not os.path.exists(bb.data.getVar('S', localdata, 1)):
 		os.mkdir(bb.data.getVar('S', localdata, 1))

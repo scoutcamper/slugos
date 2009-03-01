@@ -1,13 +1,12 @@
-DESRIPTION = "Tools for monitoring and filtering incoming requests for tcp \
+DESCRIPTION = "Tools for monitoring and filtering incoming requests for tcp \
 	      services."
 LICENSE = "tcp-wrappers"
-MAINTAINER = "Chris Larson <kergoth@handhelds.org>"
 PRIORITY = "optional"
 SECTION = "console/network"
-PR="r1"
+PR ="r2"
 
 
-PACKAGES = "libwrap libwrap-doc libwrap-dev tcp-wrappers tcp-wrappers-doc"
+PACKAGES = "${PN}-dbg libwrap libwrap-doc libwrap-dev tcp-wrappers tcp-wrappers-doc"
 FILES_libwrap = "${libdir}/lib*.so.*"
 FILES_libwrap-doc = "${mandir}/man3 ${mandir}/man5"
 FILES_libwrap-dev = "${libdir}/lib*.so ${includedir}"
@@ -108,5 +107,6 @@ do_install () {
 
 do_stage() {
         oe_libinstall -C shared -so  libwrap ${STAGING_LIBDIR}
+		install -m 0644 tcpd.h ${STAGING_INCDIR}
 }
 

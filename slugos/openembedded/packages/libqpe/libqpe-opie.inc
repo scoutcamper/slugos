@@ -1,29 +1,22 @@
-DESCRIPTION = "Base library for the Qt Palmtop Environment"
+DESCRIPTION = "Base library for the Qt/Embedded based palmtop environments"
+HOMEPAGE = "http://www.trolltech.com"
+AUTHOR = "The Trolls"
 SECTION = "opie/libs"
 PRIORITY = "optional"
-MAINTAINER = "Michael 'Mickey' Lauer <mickey@Vanille.de>"
 LICENSE = "GPL"
-DEPENDS = "uicmoc-native qte"
-PROVIDES = "virtual/libqpe"
+DEPENDS = "uicmoc-native virtual/libqte2"
+PROVIDES = "virtual/libqpe1"
 
 S = "${WORKDIR}/library"
 
-inherit qmake
+inherit palmtop
 
+OE_QMAKE_CXXFLAGS := "${@oe_filter_out('-fno-rtti', '${OE_QMAKE_CXXFLAGS}', d)}"
 QMAKE_PROFILES = "library.pro"
-EXTRA_QMAKEVARS_PRE  = "CONFIG+=LIBQPE_WITHROHFEEDBACK"
-EXTRA_QMAKEVARS_POST = "DESTDIR= DEFINES+=LIBQPE_NO_INLINE_IMAGES"
-# EXTRA_QMAKEVARS_POST = "DESTDIR="
+EXTRA_QMAKEVARS_PRE += "CONFIG+=LIBQPE_WITHROHFEEDBACK"
+EXTRA_QMAKEVARS_POST += "DESTDIR= DEFINES+=LIBQPE_NO_INLINE_IMAGES"
 
-CXXFLAGS_append = " -DQWS -DOPIE_NO_ERASE_RECT_HACKFIX -DOPIE_NEW_MALLOC  -fno-rtti -fno-exceptions"
-CXXFLAGS_append_c7x0 =  " -DOPIE_NO_WINDOWED "
-CXXFLAGS_append_tosa =  " -DOPIE_NO_WINDOWED "
-CXXFLAGS_append_spitz = " -DOPIE_NO_WINDOWED "
-CXXFLAGS_append_akita = " -DOPIE_NO_WINDOWED "
-
-do_compile_prepend_mnci () {
-	ln -s custom-ramses.h custom.h
-}
+CXXFLAGS_append = " -frtti -DOPIE_NO_ERASE_RECT_HACKFIX -DOPIE_NEW_MALLOC"
 
 do_compile() {
         mkdir -p ${STAGING_INCDIR}/qpe \
@@ -44,7 +37,7 @@ do_compile() {
 		install -m 0644 $i ${STAGING_INCDIR}/qtopia/private/`basename $i`
 	done
 	rm -f ${STAGING_INCDIR}/qtopia/*_p.h # remove private stuff out of qtopia
-	oe_runmake MOC=${STAGING_BINDIR}/moc UIC=${STAGING_BINDIR}/uic
+	oe_runmake MOC=${STAGING_BINDIR_NATIVE}/moc UIC=${STAGING_BINDIR_NATIVE}/uic
 }
 
 do_stage() {
@@ -53,9 +46,22 @@ do_stage() {
 }
 
 do_install() {
-	oe_libinstall -so libqpe ${D}${palmtopdir}/lib
-}
+	oe_libinstall -so libqpe ${D}${libdir}
 
-PACKAGES = "libqpe1"
-FILES_libqpe1 = "${palmtopdir}/lib"
-PACKAGE_ARCH = "${MACHINE_ARCH}"
+        install -d ${D}${includedir}/qpe \
+               ${D}${includedir}/qtopia/private
+
+	for i in ${S}/*.h
+	do
+		install -m 0644 $i ${D}${includedir}/qpe/`basename $i`
+		install -m 0644 $i ${D}${includedir}/qtopia/`basename $i`
+		install -m 0644 $i ${D}${includedir}/qtopia/private/`basename $i`
+	done
+	for i in ${S}/backend/*.h
+	do
+		install -m 0644 $i ${D}${includedir}/qpe/`basename $i`
+		install -m 0644 $i ${D}${includedir}/qtopia/`basename $i`
+		install -m 0644 $i ${D}${includedir}/qtopia/private/`basename $i`
+	done
+	rm -f ${D}${includedir}/qtopia/*_p.h # remove private stuff out of qtopia
+}

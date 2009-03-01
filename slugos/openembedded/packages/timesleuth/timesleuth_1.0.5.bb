@@ -1,7 +1,6 @@
 DESCRIPTION = "Time Sleuth"
 SECTION = "opie/applications"
 PRIORITY = "optional"
-MAINTAINER = "Team Opie <opie@handhelds.org>"
 LICENSE = "GPL"
 AUTHOR = "Dafydd Walters"
 HOMEPAGE = "http://www.linux-solutions.at/projects/zaurus/applications-TimeSleuth.html"
@@ -19,7 +18,7 @@ APPDESKTOP = "${S}"
 do_install () {
 	install -d ${D}${palmtopdir}/pics/
 	install -m 0644 ${S}/*.png ${D}${palmtopdir}/pics/
-	
+
 }
 
 inherit opie

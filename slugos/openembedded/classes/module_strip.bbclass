@@ -3,9 +3,17 @@
 do_strip_modules () {
 	for p in ${PACKAGES}; do
 		if test -e ${WORKDIR}/install/$p/lib/modules; then
-			modules="`find ${WORKDIR}/install/$p/lib/modules -name \*${KERNEL_OBJECT_SUFFIX}`"
+			if [ "${KERNEL_MAJOR_VERSION}" == "2.6" ]; then
+				modules="`find ${WORKDIR}/install/$p/lib/modules -name \*.ko`"
+			else
+				modules="`find ${WORKDIR}/install/$p/lib/modules -name \*.o`"
+			fi
 			if [ -n "$modules" ]; then
-				${STRIP} -v -g $modules
+				for module in $modules ; do
+					if ! [ -d "$module"  ] ; then
+						${STRIP} -v -g $module
+					fi
+				done	
 #				NM="${CROSS_DIR}/bin/${HOST_PREFIX}nm" OBJCOPY="${CROSS_DIR}/bin/${HOST_PREFIX}objcopy" strip_module $modules
 			fi
 		fi

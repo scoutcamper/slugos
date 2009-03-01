@@ -1,11 +1,11 @@
-include apt.inc
-PR = "r1"
+require apt.inc
+PR = "r2"
 
 SRC_URI += "file://autofoo.patch;patch=1"
 
 inherit autotools gettext
 
-include apt-package.inc
+require apt-package.inc
 
 apt-manpages += "doc/vendors.list.5 \
 		 doc/fr/vendors.list.fr.5 \

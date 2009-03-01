@@ -2,10 +2,11 @@ DESCRIPTION = "Irssi is a modular IRC client with Perl scripting."
 HOMEPAGE = "http://irssi.org/"
 SECTION = "console/network"
 LICENSE = "GPL"
-MAINTAINER = "Chris Larson <kergoth@handhelds.org>"
-DEPENDS += "ncurses glib-1.2"
-PV = "0.8.10+svn${SRCDATE}"
-PR = "r2"
+DEPENDS += "ncurses glib-2.0"
+PV = "0.8.11+svn${SRCDATE}"
+PR = "r4"
+
+DEFAULT_PREFERENCE = "-1"
 
 PACKAGES += "${PN}-common"
 FILES_${PN} = "${bindir}/irssi"
@@ -14,8 +15,9 @@ RDEPENDS_${PN} += "${PN}-common"
 
 inherit autotools
 
+SVN_REPO_URI = "http://svn.irssi.org/repos/irssi/trunk"
 SRC_URI = "svn://svn.irssi.org/repos/irssi/;module=trunk;proto=http \
-	   file://autofoo.patch;patch=1"
+	  "
 S = "${WORKDIR}/trunk"
 
 EXTRA_OECONF = "--enable-ipv6 \
@@ -33,21 +35,24 @@ EXTRA_OECONF = "--enable-ipv6 \
 		--with-ncurses=${STAGING_LIBDIR}/.."
 
 do_configure () {
+	# create the ChangeLog file that hold irssi date and time version
+	TZ=UTC svn log -v "${SVN_REPO_URI}" > ChangeLog
+
 	# create help files
 	echo "Creating help files..."
 	perl syntax.pl
-	
+
 	files=`echo docs/help/in/*.in|sed -e 's,docs/help/in/Makefile.in ,,' -e 's,docs/help/in/,!,g' -e 's/\.in /.in ?/g'`
 	cat docs/help/in/Makefile.am.gen|sed "s/@HELPFILES@/$files/g"|sed 's/?/\\?/g'|tr '!?' '\t\n' > docs/help/in/Makefile.am
-	
+
 	files=`echo $files|sed 's/\.in//g'`
 	cat docs/help/Makefile.am.gen|sed "s/@HELPFILES@/$files/g"|sed 's/?/\\?/g'|tr '!?' '\t\n' > docs/help/Makefile.am
-	
+
 	# .HTML -> .txt with lynx
 	# echo "Documentation: html -> txt..."
 	# lynx -dump -nolist docs/faq.html|perl -pe 's/^ *//; if ($_ eq "\n" && $state eq "Q") { $_ = ""; } elsif (/^([QA]):/) { $state = $1 } elsif ($_ ne "\n") { $_ = "   $_"; };' > docs/faq.txt
 	> docs/faq.txt
-	
+
 	autotools_do_configure
 }
 

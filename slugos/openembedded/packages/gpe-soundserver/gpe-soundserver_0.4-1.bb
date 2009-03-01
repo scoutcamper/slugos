@@ -2,7 +2,6 @@ LICENSE = "GPL"
 SECTION = "gpe"
 inherit gpe
 
-DEPENDS = "diet-x11 esound-gpe"
-RDEPENDS_${PN} = "esd"
+DEPENDS = "virtual/libx11 esound"
 
 SRC_URI += "file://makefile-breakage.patch;patch=1"

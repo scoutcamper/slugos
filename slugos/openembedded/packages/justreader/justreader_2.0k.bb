@@ -1,7 +1,6 @@
 DESCRIPTION = "An E-Books reader for Qt/Embedded based Palmtop Environments"
 SECTION = "opie/applications"
 PRIORITY = "optional"
-MAINTAINER = "Michael 'Mickey' Lauer <mickey@Vanille.de>"
 LICENSE = "GPL"
 HOMEPAGE = "http://justreader.sourceforge.net/"
 PR = "r3"
@@ -13,7 +12,7 @@ S = "${WORKDIR}/TextReader2"
 
 inherit palmtop
 
-EXTRA_QMAKEVARS_POST = 'INCLUDEPATH+="${STAGING_INCDIR}/qpe" LIBS+=-lqpe'
+EXTRA_QMAKEVARS_POST += 'INCLUDEPATH+="${STAGING_INCDIR}/qpe" LIBS+=-lqpe'
 export OE_QMAKE_LINK="${CXX}"
 
 do_configure_prepend() {

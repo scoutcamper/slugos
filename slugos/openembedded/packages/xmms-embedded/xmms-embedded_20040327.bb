@@ -1,10 +1,11 @@
 DESCRIPTION = "XMMS embedded - lightweight audio player with video and codec plugins"
 SECTION = "opie/multimedia"
-DEPENDS = "zlib tremor libmad libid3tag libsidplay glib-2.0 libmikmod-3.1.11"
+DEPENDS = "zlib tremor glib-2.0 libmikmod \
+           ${@base_conditional('ENTERPRISE_DISTRO', '1', '', 'libsidplay libmad libid3tag', d)}"
 LICENSE = "GPL"
-PR = "r3"
+PR = "r6"
 
-SRC_URI = "cvs://anonymous@cvs.sourceforge.net/cvsroot/xmms-embedded;module=xmms-embedded;date=${PV} \
+SRC_URI = "cvs://anonymous@xmms-embedded.cvs.sourceforge.net/cvsroot/xmms-embedded;module=xmms-embedded;date=${PV} \
            file://bogusincdir.patch;patch=1 \
            file://gtkremoval.patch;patch=1 \
            file://removenativeincdir.patch;patch=1 \
@@ -13,14 +14,15 @@ SRC_URI = "cvs://anonymous@cvs.sourceforge.net/cvsroot/xmms-embedded;module=xmms
            file://bufferdefaults.patch;patch=1 \
            file://gcc34.patch;patch=1 \
            file://gcc34-enum.patch;patch=1 \
-		   file://mikmod-endian.patch;patch=1 \
-		   file://mikmod-update.patch;patch=1 \
+           file://mikmod-endian.patch;patch=1 \
+           file://mikmod-update.patch;patch=1 \
            file://xmms.png"
 S = "${WORKDIR}/xmms-embedded"
 
 inherit palmtop
 
-EXTRA_QMAKEVARS_POST += "CONFIG-=thread LIBS+=-lpthread LIBS+=-Wl,-rpath-link,${STAGING_LIBDIR} DEFINES+=_REENTRANT"
+EXTRA_QMAKEVARS_POST += "LIBS+=-Wl,-rpath-link,${STAGING_LIBDIR} DEFINES+=_REENTRANT"
+
 QMAKE_PROFILES = "xmms-e.pro"
 export OE_QMAKE_LINK="${CXX}"
 
@@ -30,7 +32,7 @@ do_configure_prepend() {
 }
 
 do_compile() {
-	oe_runmake "STAGING_DIR=${STAGING_DIR}/${HOST_SYS}"
+	oe_runmake "STAGING_DIR=${STAGING_EXECPREFIXDIR}"
 }
 
 do_install() {
@@ -60,3 +62,5 @@ do_install() {
         install -m 0644 Skins/winamp_xmms/${f} ${D}${palmtopdir}/lib/xmms/skin/${f}
     done
 }
+
+FILES-${PN}-dbg += "${palmtopdir}/lib/xmms/Input/.debug"

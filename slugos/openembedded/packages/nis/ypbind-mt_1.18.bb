@@ -14,9 +14,9 @@ of known secure NIS server (/etc/yp.conf) Binds to \
 the server which answered as first."
 HOMEPAGE="http://www.linux-nis.org/nis/ypbind-mt/index.html"
 
-include nis.inc
+require nis.inc
 
-SRC_URI = "ftp://ftp.kernel.org/pub/linux/utils/net/NIS/OLD/${PN}/${P}.tar.bz2"
+SRC_URI = "${KERNELORG_MIRROR}/pub/linux/utils/net/NIS/OLD/${PN}/${P}.tar.bz2"
 
 # ypbind-mt now provides all the functionality of ypbind
 # and is used in place of it.

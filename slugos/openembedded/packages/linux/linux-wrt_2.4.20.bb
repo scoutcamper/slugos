@@ -1,10 +1,9 @@
 SECTION = "kernel"
 DESCRIPTION = "Linux kernel for the Linksys WRT54 devices"
 LICENSE = "GPL"
-MAINTAINER = "Chris Larson <kergoth@handhelds.org>"
 PR = "r1"
 
-SRC_URI = "ftp://ftp.kernel.org/pub/linux/kernel/v2.4/linux-2.4.20.tar.bz2 \
+SRC_URI = "${KERNELORG_MIRROR}/pub/linux/kernel/v2.4/linux-2.4.20.tar.bz2 \
 	   file://linux-2.4.20-mipscvs.patch;patch=1 \
 	   file://2.4.20_broadcom_3_37_2_1109_US.patch;patch=1 \
 	   file://110-sch_htb.patch;patch=1 \
@@ -27,7 +26,6 @@ COMPATIBLE_HOST = 'mipsel.*-linux'
 
 inherit kernel
 
-KERNEL_IMAGETYPE ?= "zImage"
 CMDLINE_CONSOLE ?= "ttyS0,115200n8"
 CMDLINE_ROOT ?= "root=/dev/mtdblock2 noinitrd"
 # CMDLINE_INIT = "init=/bin/busybox ash"
@@ -49,18 +47,4 @@ do_configure_prepend() {
 	echo "CONFIG_CMDLINE=\"${CMDLINE}\"" >> ${S}/.config
 }
 
-do_deploy() {
-        install -d ${DEPLOY_DIR}/images
-        install -m 0644 arch/${ARCH}/boot/${KERNEL_IMAGETYPE} ${DEPLOY_DIR}/images/${KERNEL_IMAGETYPE}-${PACKAGE_ARCH}-${DATETIME}.bin
-}
-
-do_deploy[dirs] = "${S}"
-
-addtask deploy before do_build after do_compile
-
-python () {
-	# Don't build kernel unless we're targeting a wrt
-	mach = bb.data.getVar("MACHINE", d, 1)
-	if mach != 'wrt54':
-		raise bb.parse.SkipPackage("Unable to build for non-WRT54 device.")
-}
+COMPATIBLE_MACHINE = "wrt54"

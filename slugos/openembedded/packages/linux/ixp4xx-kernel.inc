@@ -25,7 +25,8 @@
 SECTION = "kernel"
 DESCRIPTION = "Linux kernel for the Intel IXP4xx device"
 LICENSE = "GPL"
-MAINTAINER = "NSLU2-Linux <www.nslu2-linux.org>"
+
+DEPENDS = "arm-kernel-shim devio-native"
 
 # Linux kernel source has the general form linux-X.Y.Z-patchP,
 # X.Y is the major version number, Z (which may have multiple
@@ -73,6 +74,9 @@ python () {
     # pre patches actually require the *preceding* kernel version the code
     # fixes that up appropriately.
     pv = bb.data.getVar("PV",d,1).split('-')
+    if pv[0].count('+'):
+	prev = pv[0].split('+')
+	pv[0] = prev[1];
     kernel = pv[0].split('.')
     base = pv[0]
     name = [base]
@@ -85,38 +89,38 @@ python () {
     pref = 10
     mmac = 0
     for patch in pv[1:]:
-	name.append(patch)
-	pname = '-'.join(name)
-    	if patch[0:2] == "rc" or patch[0:3] == "pre":
-	    patch_uri.append("ftp://ftp.kernel.org/pub/linux/kernel/v%s/testing/patch-%s.bz2;patch=1;pname=%s" % (major, pname, pname))
-	    kernel[-1] = str(int(kernel[-1]) - 1)
-	    if patch[0:2] == "rc" and pref == 10:
-	    	pref = 6
-		filepath[0:0] = [ filedir % name[0] ]
-		filepath[0:0] = [ filedir % (name[0] + "-rc") ]
-	    else:
-	    	pref = 2
-	elif patch[0:2] == "bk" or patch[0:3] == "git":
-	    patch_uri.append("ftp://ftp.kernel.org/pub/linux/kernel/v%s/snapshots/patch-%s.bz2;patch=1;pname=%s" % (major, pname, pname))
-	    pref = 2
-	elif patch[0:2] == "ac":
-	    patch_uri.append("ftp://ftp.kernel.org/pub/linux/kernel/people/alan/linux-%s/%s/patch-%s" % (major, base, pname))
-	    mmac = 2
-	    filepath[0:0] = [ filedir % (name[0] + "-ac") ]
-	elif patch[0:2] == "mm":
-	    patch_uri.append("ftp://ftp.kernel.org/pub/linux/kernel/people/akpm/patches/%s/%s/%s/%s.bz2;patch=1;pname=%s" % (major, base, pname, pname, pname))
-	    mmac = 2
-	    filepath[0:0] = [ filedir % (name[0] + "-mm") ]
-	else:
-	    raise bb.build.FuncFailed("ixp4xx-kernel: patch %s not recognized in %s" % (patch, '-'.join(pv)))
-	filepath[0:0] = [ filedir % pname ]
-	base = pname
+        name.append(patch)
+        pname = '-'.join(name)
+        if patch[0:2] == "rc" or patch[0:3] == "pre":
+            patch_uri.append("${KERNELORG_MIRROR}/pub/linux/kernel/v%s/testing/patch-%s.bz2;patch=1;pname=%s" % (major, pname, pname))
+            kernel[-1] = str(int(kernel[-1]) - 1)
+            if patch[0:2] == "rc" and pref == 10:
+                pref = 6
+                filepath[0:0] = [ filedir % name[0] ]
+                filepath[0:0] = [ filedir % (name[0] + "-rc") ]
+            else:
+                pref = 2
+        elif patch[0:2] == "bk" or patch[0:3] == "git":
+            patch_uri.append("${KERNELORG_MIRROR}/pub/linux/kernel/v%s/snapshots/patch-%s.bz2;patch=1;pname=%s" % (major, pname, pname))
+            pref = 2
+        elif patch[0:2] == "ac":
+            patch_uri.append("${KERNELORG_MIRROR}/pub/linux/kernel/people/alan/linux-%s/%s/patch-%s" % (major, base, pname))
+            mmac = 2
+            filepath[0:0] = [ filedir % (name[0] + "-ac") ]
+        elif patch[0:2] == "mm":
+            patch_uri.append("${KERNELORG_MIRROR}/pub/linux/kernel/people/akpm/patches/%s/%s/%s/%s.bz2;patch=1;pname=%s" % (major, base, pname, pname, pname))
+            mmac = 2
+            filepath[0:0] = [ filedir % (name[0] + "-mm") ]
+        else:
+            raise bb.build.FuncFailed("ixp4xx-kernel: patch %s not recognized in %s" % (patch, '-'.join(pv)))
+            filepath[0:0] = [ filedir % pname ]
+        base = pname
 
     base = '.'.join(kernel)
-    patch_uri[0] = "ftp://ftp.kernel.org/pub/linux/kernel/v%s/linux-%s.tar.bz2" % (major, base)
+    patch_uri[0] = "${KERNELORG_MIRROR}/pub/linux/kernel/v%s/linux-%s.tar.bz2" % (major, base)
     filepath[-1:-1] = [ filedir % base ]
     if base != minor:
-	    filepath[-1:-1] = [ filedir % minor ]
+        filepath[-1:-1] = [ filedir % minor ]
     filepath[-1:-1] = [ filedir % major ]
 
     bb.data.setVar("IXP4XX_SRCMAJ", major, d)
@@ -145,14 +149,13 @@ IXP4XX_PATCHES ?= ""
 
 SRC_URI  = "${IXP4XX_SRCURI}"
 SRC_URI += "${IXP4XX_PATCHES}"
-SRC_URI += "file://defconfig"
 
-COMPATIBLE_HOST = 'arm.*-linux'
+COMPATIBLE_HOST = 'arm.*-linux.*'
+COMPATIBLE_MACHINE = '(ixp4xx|nslu2|fsg3)'
 
 inherit kernel
 
 ARCH = "arm"
-KERNEL_IMAGETYPE = "zImage"
 
 # To specify the console set KERNEL_CONSOLE in the .bb file.
 # CMDLINE_ROOT contains the boot options, these will be
@@ -178,35 +181,41 @@ EXTRA_OEMAKE += "EXTRAVERSION="
 EXTRA_OEMAKE += "LOCALVERSION="
 EXTRA_OEMAKE += "MAKEFLAGS='--no-print-directory'"
 
-# Override KERNEL_RELEASE from kernel.bbclass to match:
-KERNEL_RELEASE = "${KERNEL_VERSION}"
-
 # Set the correct CONFIG_CPU_xxx_ENDIAN and CONFIG_CMDLINE at the head
 # of the .config file and remove any settings in defconfig then append
 # defconfig to .config
 do_configure_prepend() {
 	rm -f ${S}/.config
 	echo "CONFIG_CMDLINE=\"${CMDLINE}\"" >>'${S}/.config'
-	if test '${ARCH_BYTE_SEX}' = be
+	if test '${SITEINFO_ENDIANESS}' = be
 	then
 		echo 'CONFIG_CPU_BIG_ENDIAN=y' >>'${S}/.config'
 	fi
-	if test '${SLUGOS_IMAGESEX}' = big-endian
-	then
-		echo 'CONFIG_JFFS2_BIG_ENDIAN=y' >>'${S}/.config'
-	fi
-	if test '${SLUGOS_IMAGESEX}' = little-endian
-	then
-		echo 'CONFIG_JFFS2_LITTLE_ENDIAN=y' >>'${S}/.config'
-	fi
-	sed -e '/CONFIG_CPU_BIG_ENDIAN/d' -e '/CONFIG_CMDLINE=/d' \
-		-e '/CONFIG_JFFS2_NATIVE_ENDIAN=/d' \
-		-e '/CONFIG_JFFS2_BIG_ENDIAN=/d' \
-		-e '/CONFIG_JFFS2_LITTLE_ENDIAN=/d' \
+
+        if [ "${TARGET_OS}" == "linux-gnueabi" -o  "${TARGET_OS}" == "linux-uclibcgnueabi" ]; then               
+                echo "CONFIG_AEABI=y"                   >> ${S}/.config               
+                echo "CONFIG_OABI_COMPAT=y"             >> ${S}/.config       
+        else
+                echo "# CONFIG_AEABI is not set"        >> ${S}/.config
+                echo "# CONFIG_OABI_COMPAT is not set"  >> ${S}/.config
+        fi      
+
+        sed     -e '/CONFIG_CPU_BIG_ENDIAN/d' \
+	        -e '/CONFIG_CMDLINE=/d' \
+		-e '/CONFIG_AEABI/d' \
+		-e '/CONFIG_OABI_COMPAT=/d' \
 		'${WORKDIR}/defconfig' >>'${S}/.config'
 	rm -rf ${S}/include/asm-arm/arch ${S}/include/asm-arm/proc \
 	       ${S}/include/asm-arm/.proc ${S}/include/asm-arm/.arch
+
 }
+
+
+# Kernel module dependencies
+
+DEPENDS += "zd1211-firmware"
+RDEPENDS_kernel-module-zd1211rw += "zd1211-firmware"
+
 
 # MACHID and LE handling
 #
@@ -237,7 +246,7 @@ do_configure_prepend() {
 # The generic package only includes the generic image, the other
 # packages are made below (they are kernel-image packages but
 # with a different ARCH).
-FILES_kernel-image = "/boot/${KERNEL_IMAGETYPE}-${IXP4XX_SUFFIX}-${KERNEL_RELEASE}"
+FILES_kernel-image = "/boot/${KERNEL_IMAGETYPE}-${MACHINE_ARCH}-${KERNEL_VERSION}"
 
 # MACHINE DEFINITIONS: one block for each machine
 
@@ -245,50 +254,60 @@ FILES_kernel-image = "/boot/${KERNEL_IMAGETYPE}-${IXP4XX_SUFFIX}-${KERNEL_RELEAS
 nslu2_MACHID = "597"
 PACKAGES += "kernel-image-nslu2"
 PKG_kernel-image-nslu2 = "kernel-image-${KERNEL_VERSION}"
-PACKAGE_ARCH_kernel-image-nslu2 = "nslu2${ARCH_BYTE_SEX}"
+PACKAGE_ARCH_kernel-image-nslu2 = "nslu2${SITEINFO_ENDIANESS}"
 DESCRIPTION_kernel-image-nslu2 = "Linux kernel for the LinkSys NSLU2"
-FILES_kernel-image-nslu2 = "/${KERNEL_IMAGEDEST}/${KERNEL_IMAGETYPE}-nslu2${ARCH_BYTE_SEX}-${KERNEL_RELEASE}"
+FILES_kernel-image-nslu2 = "/${KERNEL_IMAGEDEST}/${KERNEL_IMAGETYPE}-nslu2${SITEINFO_ENDIANESS}-${KERNEL_VERSION}"
 pkg_postinst_kernel-image-nslu2 () {
-	update-alternatives --install /${KERNEL_IMAGEDEST}/${KERNEL_IMAGETYPE} ${KERNEL_IMAGETYPE} /${KERNEL_IMAGEDEST}/${KERNEL_IMAGETYPE}-nslu2${ARCH_BYTE_SEX}-${KERNEL_RELEASE} ${KERNEL_PRIORITY} || true
+	update-alternatives --install /${KERNEL_IMAGEDEST}/${KERNEL_IMAGETYPE} ${KERNEL_IMAGETYPE} /${KERNEL_IMAGEDEST}/${KERNEL_IMAGETYPE}-nslu2${SITEINFO_ENDIANESS}-${KERNEL_VERSION} ${KERNEL_PRIORITY} || true
 }
 pkg_postrm_kernel-image-nslu2 () {
-	update-alternatives --remove ${KERNEL_IMAGETYPE} /${KERNEL_IMAGEDEST}/${KERNEL_IMAGETYPE}-nslu2${ARCH_BYTE_SEX}-${KERNEL_RELEASE} || true
-}
-
-# The correct settings for Loft:
-loft_MACHID = "849"
-PACKAGES += "kernel-image-loft"
-PKG_kernel-image-loft = "kernel-image-${KERNEL_VERSION}"
-PACKAGE_ARCH_kernel-image-loft = "loft${ARCH_BYTE_SEX}"
-DESCRIPTION_kernel-image-loft = "Linux kernel for the Giant Shoulder Inc. Loft board"
-FILES_kernel-image-loft = "/${KERNEL_IMAGEDEST}/${KERNEL_IMAGETYPE}-loft${ARCH_BYTE_SEX}-${KERNEL_RELEASE}"
-pkg_postinst_kernel-image-loft () {
-	update-alternatives --install /${KERNEL_IMAGEDEST}/${KERNEL_IMAGETYPE} ${KERNEL_IMAGETYPE} /${KERNEL_IMAGEDEST}/${KERNEL_IMAGETYPE}-loft${ARCH_BYTE_SEX}-${KERNEL_RELEASE} ${KERNEL_PRIORITY} || true
-}
-pkg_postrm_kernel-image-loft () {
-	update-alternatives --remove ${KERNEL_IMAGETYPE} /${KERNEL_IMAGEDEST}/${KERNEL_IMAGETYPE}-loft${ARCH_BYTE_SEX}-${KERNEL_RELEASE} || true
+	update-alternatives --remove ${KERNEL_IMAGETYPE} /${KERNEL_IMAGEDEST}/${KERNEL_IMAGETYPE}-nslu2${SITEINFO_ENDIANESS}-${KERNEL_VERSION} || true
 }
 
 # The correct settings for the NAS100D board:
 nas100d_MACHID = "865"
 PACKAGES += "kernel-image-nas100d"
 PKG_kernel-image-nas100d = "kernel-image-${KERNEL_VERSION}"
-PACKAGE_ARCH_kernel-image-nas100d = "nas100d${ARCH_BYTE_SEX}"
+PACKAGE_ARCH_kernel-image-nas100d = "nas100d${SITEINFO_ENDIANESS}"
 DESCRIPTION_kernel-image-nas100d = "Linux kernel for the IOMega NAS100D"
-FILES_kernel-image-nas100d = "/${KERNEL_IMAGEDEST}/${KERNEL_IMAGETYPE}-nas100d${ARCH_BYTE_SEX}-${KERNEL_RELEASE}"
+FILES_kernel-image-nas100d = "/${KERNEL_IMAGEDEST}/${KERNEL_IMAGETYPE}-nas100d${SITEINFO_ENDIANESS}-${KERNEL_VERSION}"
 pkg_postinst_kernel-image-nas100d () {
-	update-alternatives --install /${KERNEL_IMAGEDEST}/${KERNEL_IMAGETYPE} ${KERNEL_IMAGETYPE} /${KERNEL_IMAGEDEST}/${KERNEL_IMAGETYPE}-nas100d${ARCH_BYTE_SEX}-${KERNEL_RELEASE} ${KERNEL_PRIORITY} || true
+	update-alternatives --install /${KERNEL_IMAGEDEST}/${KERNEL_IMAGETYPE} ${KERNEL_IMAGETYPE} /${KERNEL_IMAGEDEST}/${KERNEL_IMAGETYPE}-nas100d${SITEINFO_ENDIANESS}-${KERNEL_VERSION} ${KERNEL_PRIORITY} || true
 }
 pkg_postrm_kernel-image-nas100d () {
-	update-alternatives --remove ${KERNEL_IMAGETYPE} /${KERNEL_IMAGEDEST}/${KERNEL_IMAGETYPE}-nas100d${ARCH_BYTE_SEX}-${KERNEL_RELEASE} || true
+	update-alternatives --remove ${KERNEL_IMAGETYPE} /${KERNEL_IMAGEDEST}/${KERNEL_IMAGETYPE}-nas100d${SITEINFO_ENDIANESS}-${KERNEL_VERSION} || true
 }
 
-#FIXUP: the correct instructions to copy the kernel prepended with the le fixup
-#FIXME: do a fixup for BE too...
-FIXUP_armeb = "cp$"
-FIXUP_arm   = "wb 0xee110f10,4;wb 0xe3c00080,4;wb 0xee010f10,4;xp $,4"
+# The correct settings for the DSMG600 board:
+dsmg600_MACHID = "964"
+PACKAGES += "kernel-image-dsmg600"
+PKG_kernel-image-dsmg600 = "kernel-image-${KERNEL_VERSION}"
+PACKAGE_ARCH_kernel-image-dsmg600 = "dsmg600${SITEINFO_ENDIANESS}"
+DESCRIPTION_kernel-image-dsmg600 = "Linux kernel for the D-Link DSM-G600"
+FILES_kernel-image-dsmg600 = "/${KERNEL_IMAGEDEST}/${KERNEL_IMAGETYPE}-dsmg600${SITEINFO_ENDIANESS}-${KERNEL_VERSION}"
+pkg_postinst_kernel-image-dsmg600 () {
+	update-alternatives --install /${KERNEL_IMAGEDEST}/${KERNEL_IMAGETYPE} ${KERNEL_IMAGETYPE} /${KERNEL_IMAGEDEST}/${KERNEL_IMAGETYPE}-dsmg600${SITEINFO_ENDIANESS}-${KERNEL_VERSION} ${KERNEL_PRIORITY} || true
+}
+pkg_postrm_kernel-image-dsmg600 () {
+	update-alternatives --remove ${KERNEL_IMAGETYPE} /${KERNEL_IMAGEDEST}/${KERNEL_IMAGETYPE}-dsmg600${SITEINFO_ENDIANESS}-${KERNEL_VERSION} || true
+}
 
-DEPENDS += "devio-native"
+# The correct settings for the FSG-3 board:
+fsg3_MACHID = "1091"
+PACKAGES += "kernel-image-fsg3"
+PKG_kernel-image-fsg3 = "kernel-image-${KERNEL_VERSION}"
+PACKAGE_ARCH_kernel-image-fsg3 = "fsg3${SITEINFO_ENDIANESS}"
+DESCRIPTION_kernel-image-fsg3 = "Linux kernel for the Freecom FSG-3"
+FILES_kernel-image-fsg3 = "/${KERNEL_IMAGEDEST}/${KERNEL_IMAGETYPE}-fsg3${SITEINFO_ENDIANESS}-${KERNEL_VERSION}"
+pkg_postinst_kernel-image-fsg3 () {
+	update-alternatives --install /${KERNEL_IMAGEDEST}/${KERNEL_IMAGETYPE} ${KERNEL_IMAGETYPE} /${KERNEL_IMAGEDEST}/${KERNEL_IMAGETYPE}-fsg3${SITEINFO_ENDIANESS}-${KERNEL_VERSION} ${KERNEL_PRIORITY} || true
+}
+pkg_postrm_kernel-image-fsg3 () {
+	update-alternatives --remove ${KERNEL_IMAGETYPE} /${KERNEL_IMAGEDEST}/${KERNEL_IMAGETYPE}-fsg3${SITEINFO_ENDIANESS}-${KERNEL_VERSION} || true
+}
+
+BYTESWAP_armeb = "cp$"
+BYTESWAP_arm   = "xp $,4"
 
 # We need the alternatives to happen in the kernel-image packages, not in
 # the kernel package, because only the images know the name of the kernel.
@@ -297,66 +316,54 @@ pkg_postinst_kernel () {
 pkg_postrm_kernel () {
 }
 
-# copy_image <dest> <cmdline> <machine-id>
+# copy_image <dest> <machine>
 #	copy the zImage and append the appropriate shim
 #  dest:       where to copy to
-#  cmdline:    command line to pass to image
-#  machine-id: decimal machine id to prepend, empty for none
+#  machine:    machine shim to prepend, empty for none
 copy_image() {
-	local setmach
+	local shim
 
-	setmach=""
-	test -n "$2" && setmach="wb $2 . 256/ 255& 0xe3a01c00+, 4; wb 255& 0xe3811000+, 4;"
+	shim="/dev/null"
+	test -n "$2" && shim="${STAGING_LOADER_DIR}/arm-kernel-shim-$2.bin"
 
-	rm -f "$1".new
-	devio '<<${KERNEL_OUTPUT}' >"$1".new "$setmach"'${FIXUP}' || {
+	rm -f "$1".new "$1".shimmed
+	cat $shim ${KERNEL_OUTPUT} > "$1".shimmed
+	devio '<<'"$1"'.shimmed' >"$1".new '${BYTESWAP}' || {
 		echo 'ERROR: ${KERNEL_OUTPUT}: failed to copy zImage' >&2
 		return 1
 	}
+	rm -f "$1".shimmed
 	mv "$1".new "$1"
 }
 
 install_image() {
-	copy_image '${D}/${KERNEL_IMAGEDEST}/${KERNEL_IMAGETYPE}-'"$1"'-${KERNEL_RELEASE}' "$2"
+	copy_image '${D}/${KERNEL_IMAGEDEST}/${KERNEL_IMAGETYPE}-'"$1"'-${KERNEL_VERSION}' "$2"
 }
 
 do_install_append() {
 	# Overwrite the unshimmed generic image with a shimmed one (but without
 	# any command line or machine id override).
-	rm -f '${D}/${KERNEL_IMAGEDEST}/${KERNEL_IMAGETYPE}-${KERNEL_RELEASE}'
-	install_image '${IXP4XX_SUFFIX}'
+	rm -f '${D}/${KERNEL_IMAGEDEST}/${KERNEL_IMAGETYPE}-${KERNEL_VERSION}'
+	install_image '${MACHINE_ARCH}'
 
 	# Add the machine specific images, with appropriate suffixes
-	install_image 'nslu2${ARCH_BYTE_SEX}' '${nslu2_MACHID}'
-	install_image 'loft${ARCH_BYTE_SEX}' '${loft_MACHID}'
-	install_image 'nas100d${ARCH_BYTE_SEX}' '${nas100d_MACHID}'
+	install_image 'nslu2${SITEINFO_ENDIANESS}' 'nslu2'
+	install_image 'nas100d${SITEINFO_ENDIANESS}' 'nas100d'
+	install_image 'dsmg600${SITEINFO_ENDIANESS}' 'dsmg600'
+	install_image 'fsg3${SITEINFO_ENDIANESS}' 'fsg3'
 }
 
-do_deploy[dirs] = "${S}"
-
 deploy_image() {
-	copy_image '${DEPLOY_DIR}/images/${KERNEL_IMAGETYPE}-'"$1" "$2"
+	copy_image '${DEPLOY_DIR_IMAGE}/${KERNEL_IMAGETYPE}-'"$1" "$2"
 }
 
 do_deploy() {
-        install -d ${DEPLOY_DIR}/images
-	deploy_image '${IXP4XX_SUFFIX}'
+        install -d ${DEPLOY_DIR_IMAGE}
+	deploy_image '${MACHINE_ARCH}'
 
 	# And the machine specific images
-	deploy_image 'nslu2${ARCH_BYTE_SEX}' '${nslu2_MACHID}'
-	deploy_image 'loft${ARCH_BYTE_SEX}' '${loft_MACHID}'
-	deploy_image 'nas100d${ARCH_BYTE_SEX}' '${nas100d_MACHID}'
-}
-
-addtask deploy before do_build after do_compile
-
-python () {
-	# check for IXP4XX_SUFFIX - if not set then we don't know what to build,
-	# also sanity check the SLUGOS_IMAGESEX
-	sex = bb.data.getVar("SLUGOS_IMAGESEX", d, 1)
-	if sex != 'little-endian' and sex != 'big-endian':
-		raise bb.parse.SkipPackage("slugos kernels require SLUGOS_IMAGESEX")
-	suffix = bb.data.getVar("IXP4XX_SUFFIX", d, 1)
-	if suffix == '':
-		raise bb.parse.SkipPackage("slugos kernels require IXP4XX_SUFFIX")
+	deploy_image 'nslu2${SITEINFO_ENDIANESS}' 'nslu2'
+	deploy_image 'nas100d${SITEINFO_ENDIANESS}' 'nas100d'
+	deploy_image 'dsmg600${SITEINFO_ENDIANESS}' 'dsmg600'
+	deploy_image 'fsg3${SITEINFO_ENDIANESS}' 'fsg3'
 }

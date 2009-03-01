@@ -1,6 +1,5 @@
-MAINTAINER="David Karlstrom <daka@nslu2-linux.org>"
 SECTION = "net"
-DEPENDS = "openssl expat pcre"
+DEPENDS = "openssl expat libpcre"
 
 PR = "r4"
 
@@ -27,7 +26,7 @@ CONFFILES_${PN} = "${sysconfdir}/apache/httpd.conf \
 		   ${datadir}/apache/htdocs/apache_pb.gif \
 		  "
 
-PACKAGES = "libaprutil libapr apache-dev apache-doc apache"
+PACKAGES = "${PN}-dbg libaprutil libapr apache-dev apache-doc apache"
 FILES_libapr = "${libdir}/libapr*.so.0* ${libdir}/apr.exp"
 FILES_libaprutil = "${libdir}/libaprutil*.so.0* ${libdir}/aprutil.exp"
 
@@ -53,7 +52,7 @@ EXTRA_OECONF = "--enable-ssl \
 		--sysconfdir=${sysconfdir}/apache \
 		"
 
-export LD_LIBRARY_PATH=${STAGING_LIBDIR}
+export LD_LIBRARY_PATH = "${STAGING_LIBDIR}"
 
 do_configure () {
 	# Looks like rebuilding configure doesn't work, so we are skipping
@@ -76,17 +75,17 @@ do_install_append () {
 		    -e 's,/etc/,${sysconfdir}/,g' \
 		    -e 's,/usr/,${prefix}/,g' > ${D}/${sysconfdir}/init.d/apache
 	chmod 755 ${D}/${sysconfdir}/init.d/apache
-	
+
 	install -m 0644 ${FILESDIR}/httpd.conf ${D}/${sysconfdir}/apache/httpd.conf
-	
+
 	rm ${D}/${libdir}/libexpat.*
 }
 
 python () {
-	# Don't build apache unless we are building nativly
-	target = bb.data.getVar("TARGET_ARCH", d, 1)
-	build = bb.data.getVar("BUILD_ARCH", d, 1)
-	if target != build:
-		raise bb.parse.SkipPackage("Apache will only build nativly (TARGET_ARCH == BUILD_ARCH)")
+    # Don't build apache unless we are building nativly
+    target = bb.data.getVar("TARGET_ARCH", d, 1)
+    build = bb.data.getVar("BUILD_ARCH", d, 1)
+    if target != build:
+        raise bb.parse.SkipPackage("Apache will only build nativly (TARGET_ARCH == BUILD_ARCH)")
 }
 

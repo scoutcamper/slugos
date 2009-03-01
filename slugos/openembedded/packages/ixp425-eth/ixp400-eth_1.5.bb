@@ -1,11 +1,11 @@
 # This is the Intel GPL IXP4XX ethernet driver (Linux) plus patches
 # to make it work on 2.6 kernels.
 #
-MAINTAINER = "NSLU2 Linux <nslu2-linux@yahoogroups.com>"
 HOMEPAGE = "http://www.intel.com/design/network/products/npfamily/ixp420.htm"
 LICENSE = "GPL"
-PR = "r8"
+PR = "r15"
 
+DEPENDS = "ixp-osal"
 DEPENDS = "ixp4xx-csr"
 RDEPENDS = "ixp4xx-csr"
 
@@ -15,18 +15,20 @@ SRC_URI += "file://2.6.15.patch;patch=1"
 SRC_URI += "file://device-name.patch;patch=1"
 SRC_URI += "file://poll-controller.patch;patch=1"
 SRC_URI += "file://le.patch;patch=1"
-SRC_URI += "file://mac-address.patch;patch=1"
 SRC_URI += "file://int-random.patch;patch=1"
 SRC_URI += "file://stop-on-rmmod.patch;patch=1"
 SRC_URI += "file://continue-if-qmgr-init-fails.patch;patch=1"
 SRC_URI += "file://netdev_max_backlog.patch;patch=1"
 SRC_URI += "file://debug.patch;patch=1"
 SRC_URI += "file://Makefile.patch;patch=1"
+SRC_URI += "file://params.patch;patch=1"
+SRC_URI += "file://module-param.patch;patch=1"
 SRC_URI += "file://modprobe.conf"
 
 S = "${WORKDIR}"
 
 COMPATIBLE_HOST = "^arm.*-linux.*"
+COMPATIBLE_MACHINE = "(nslu2|ixp4xx)"
 
 PROVIDES = "virtual/ixp-eth"
 RPROVIDES = "ixp-eth"
@@ -36,7 +38,7 @@ inherit module
 # This is a somewhat arbitrary choice:
 OSAL_DIR = "${STAGING_KERNEL_DIR}/ixp_osal"
 
-IX_TARGET = "linux${ARCH_BYTE_SEX}"
+IX_TARGET = "linux${SITEINFO_ENDIANESS}"
 IX_ENSURE = ""
 #IX_ENSURE = "-DIX_OSAL_ENSURE_ON=1"
 # The following controls the name of the ethernet devices which get

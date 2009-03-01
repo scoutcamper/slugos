@@ -1,6 +1,5 @@
 HOMEPAGE = "http://www.muppetlabs.com/~breadbox/software/elfkickers.html"
 LICENSE = "GPL"
-MAINTAINER = "Chris Larson <kergoth@handhelds.org>"
 PRIORITY = "optional"
 SECTION = "devel"
 
@@ -12,7 +11,7 @@ S = "${WORKDIR}/ELFkickers"
 ELFPKGS = "ebfc elfls elftoc \
            rebind sstrip"
 
-PACKAGES = "${ELFPKGS}"
+PACKAGES = "${PN}-dbg ${ELFPKGS} ${PN}"
 FILES_ebfc = "${bindir}/ebfc"
 FILES_elfls = "${bindir}/elfls"
 FILES_elftoc = "${bindir}/elftoc"

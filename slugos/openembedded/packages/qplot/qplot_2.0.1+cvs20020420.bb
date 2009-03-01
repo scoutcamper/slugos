@@ -1,15 +1,14 @@
 DESCRIPTION = "QPlot is an Advanced Matematical Calculator for Qt/Embedded based Palmtop Environments"
 SECTION = "opie/applications"
 PRIORITY = "optional"
-MAINTAINER = "Michael 'Mickey' Lauer <mickey@Vanille.de>"
 LICENSE = "GPL"
 HOMEPAGE = "http://qplot.sourceforge.net/"
-SRCDATE = 20020420
+SRCDATE = "20020420"
 #Change to form x.y.z+cvs${SRCDATE} when 2.0.1 changes in PV
 PV = "2.0.1-cvs-${SRCDATE}"
 PR = "r1"
 
-SRC_URI = "cvs://anonymous@cvs.sourceforge.net/cvsroot/qplot;module=qplot \
+SRC_URI = "cvs://anonymous@qplot.cvs.sourceforge.net/cvsroot/qplot;module=qplot \
 	   file://gcc3.patch;patch=1"
 S = "${WORKDIR}/qplot"
 

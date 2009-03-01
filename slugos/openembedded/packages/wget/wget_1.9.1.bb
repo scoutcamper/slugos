@@ -1,23 +1,24 @@
 DESCRIPTION = "A console URL download utility featuring HTTP, FTP, and more."
 SECTION = "console/network"
-MAINTAINER = "Chris Larson <kergoth@handhelds.org>"
 DEPENDS = ""
-PR = "r4"
+PR = "r7"
 LICENSE = "GPL"
 
 SRC_URI = "${GNU_MIRROR}/wget/wget-${PV}.tar.gz \
 	   file://m4macros.patch;patch=1 \
-	   file://autotools.patch;patch=1"
+	   file://autotools.patch;patch=1 \
+           file://ipv6-fix.patch;patch=1"
 S = "${WORKDIR}/wget-${PV}"
 
 inherit autotools gettext
 
-EXTRA_OECONF = "--enable-ipv6"
+# Disable checking for SSL since that searches the system paths
+EXTRA_OECONF = "--enable-ipv6 --without-ssl"
 
 # The unslung kernel does not support ipv6
-EXTRA_OECONF_unslung = ""
-# SlugOS kernels do not support ipv6. Can be loaded as a module. 
-EXTRA_OECONF_slugos = ""
+EXTRA_OECONF_unslung = "--without-ssl"
+# SlugOS kernels do not support ipv6. Can be loaded as a module.
+EXTRA_OECONF_slugos = "--without-ssl"
 
 do_configure () {
 	if [ ! -e acinclude.m4 ]; then

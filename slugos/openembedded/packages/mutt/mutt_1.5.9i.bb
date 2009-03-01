@@ -7,6 +7,7 @@ bindings, keyboard macros, mail threading, regular expression \
 searches, and a powerful pattern matching language for selecting \
 groups of messages."
 LICENSE = "GPL"
+PR = "r0"
 SRC_URI = "ftp://ftp.mutt.org/mutt/devel/mutt-${PV}.tar.gz \
 	   http://mutt.kiev.ua/download/mutt-1.5.9/patch-1.5.9.rr.compressed.gz;patch=1 \
 	   http://mutt.kiev.ua/download/mutt-1.5.9/patch-1.5.9.vvv.nntp.gz;patch=1 \
@@ -20,7 +21,7 @@ SRC_URI = "ftp://ftp.mutt.org/mutt/devel/mutt-${PV}.tar.gz \
 #	   file://configure.patch;patch=1"
 S = "${WORKDIR}/mutt-1.5.9"
 
-DEFAULT_PREFERENCE = -1
+DEFAULT_PREFERENCE = "-1"
 
 inherit autotools
 

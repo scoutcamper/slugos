@@ -14,6 +14,8 @@
 
 . /etc/default/rcS
 
+[ "$UTC" = yes ] && UTC=--utc || UTC=--localtime
+
 case "$1" in
         start)
                 if [ "$VERBOSE" != no ]
@@ -26,9 +28,9 @@ case "$1" in
 		then
 			if [ -z "$TZ" ]
 			then
-	                   hwclock --hctosys
+	                   hwclock -s $UTC;# --hctosys
 			else
-			   TZ="$TZ" hwclock --hctosys
+			   TZ="$TZ" hwclock -s $UTC;# --hctosys
 			fi
 		fi
 
@@ -51,7 +53,7 @@ case "$1" in
 		fi
 		if [ "$HWCLOCKACCESS" != no ]
 		then
-			hwclock --systohc
+			hwclock -w $UTC;# --systohc
 		fi
 		if [ "$VERBOSE" != no ]
 		then
@@ -62,7 +64,7 @@ case "$1" in
 	show)
 		if [ "$HWCLOCKACCESS" != no ]
 		then
-			hwclock --show
+			hwclock -r $UTC;# --show
 		fi
 		;;
         *)

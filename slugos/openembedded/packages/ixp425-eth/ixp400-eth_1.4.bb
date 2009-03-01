@@ -2,7 +2,6 @@
 # to make it work on 2.6 kernels.
 #
 LICENSE = "GPL"
-MAINTAINER = "Chris Larson <kergoth@handhelds.org>"
 SRC_URI = "ftp://aiedownload.intel.com/df-support/8500/eng/GPL_ixp400LinuxEthernetDriverPatch-1_4.zip"
 SRC_URI += "file://ixp400-le-be.patch;patch=1"
 SRC_URI += "file://makefile.patch;patch=1"
@@ -19,6 +18,7 @@ RDEPENDS = "ixp4xx-csr"
 S = "${WORKDIR}"
 
 COMPATIBLE_HOST = "^arm.*-linux.*"
+COMPATIBLE_MACHINE = "(nslu2|ixp4xx)"
 
 PROVIDES = "virtual/ixp-eth"
 RPROVIDES = "ixp-eth"
@@ -28,7 +28,7 @@ inherit module
 # This is a somewhat arbitrary choice:
 OSAL_DIR = "${STAGING_KERNEL_DIR}/ixp_osal"
 
-IX_TARGET = "linux${ARCH_BYTE_SEX}"
+IX_TARGET = "linux${SITEINFO_ENDIANESS}"
 
 EXTRA_OEMAKE = "'CC=${KERNEL_CC}' \
 		'LD=${KERNEL_LD}' \

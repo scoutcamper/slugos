@@ -6,9 +6,8 @@ DESCRIPTION = "LIVE555 Streaming Media libraries"
 HOMEPAGE = "http://live.com/"
 LICENSE = "LGPL"
 SECTION = "devel"
-MAINTAINER = "Eddy Pronk <epronk@muftor.com>"
 
-SRC_URI = "http://live.com/liveMedia/public/live.2005.10.05.tar.gz \
+SRC_URI = "http://downloads.videolan.org/pub/videolan/vlc/0.8.5/contrib/live.2005.10.05.tar.gz \
            file://config.linux-cross"
 
 S = "${WORKDIR}/live"

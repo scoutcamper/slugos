@@ -2,7 +2,6 @@ DESCRIPTION = "A highly-portable Java virtual machine implementing the Java virt
 HOMEPAGE = "http://sablevm.org"
 LICENSE = "LGPL"
 PRIORITY = "optional"
-MAINTAINER = "Rene Wagner <rw@handhelds.org>"
 SECTION = "interpreters"
 
 DEPENDS = "libffi libtool popt \
@@ -22,7 +21,7 @@ ALTERNATIVE_NAME = "java"
 ALTERNATIVE_PATH = "${bindir}/java-sablevm"
 ALTERNATIVE_PRIORITY = "350"
 
-PACKAGES = "${PN} ${PN}-doc lib${PN} lib${PN}-dev"
+PACKAGES = "${PN}-dbg ${PN} ${PN}-doc lib${PN} lib${PN}-dev"
 
 FILES_${PN} = "${bindir} \
 	       ${libdir}/${PN}/bin"

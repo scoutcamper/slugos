@@ -1,5 +1,4 @@
 LICENSE = 	""
-MAINTAINER = "Koen Kooi <koen@handhelds.org>"
 
 DEPENDS =	"dbus gconf glib-2.0 libosso bluez-libs"
 
@@ -16,4 +15,4 @@ do_stage() {
     install -d ${STAGING_INCDIR}
     install -m 644 src/*.h ${STAGING_INCDIR}
 }
-	
+

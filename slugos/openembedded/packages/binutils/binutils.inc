@@ -1,6 +1,11 @@
+DESCRIPTION = "A GNU collection of binary utilities"
+HOMEPAGE = "http://www.gnu.org/software/binutils/"
+SECTION = "devel"
+LICENSE = "GPL"
+
 inherit autotools gettext
 
-PACKAGES = "${PN} ${PN}-dev ${PN}-doc ${PN}-symlinks"
+PACKAGES += "${PN}-symlinks"
 
 FILES_${PN} = " \
 	${bindir}/${TARGET_PREFIX}* \
@@ -28,6 +33,9 @@ FILES_${PN}-symlinks = " \
 	${bindir}/size \
 	${bindir}/strip"
 
+S = "${WORKDIR}/binutils-${PV}"
+B = "${S}/build.${HOST_SYS}.${TARGET_SYS}"
+
 EXTRA_OECONF = "--program-prefix=${TARGET_PREFIX} \
 		--enable-shared"
 
@@ -48,18 +56,30 @@ export LD_FOR_TARGET = "${TARGET_PREFIX}ld"
 export NM_FOR_TARGET = "${TARGET_PREFIX}nm"
 export RANLIB_FOR_TARGET = "${TARGET_PREFIX}ranlib"
 
-export CC_FOR_HOST = "${CCACHE} ${HOST_PREFIX}gcc ${HOST_CC_ARCH}"
-export CXX_FOR_HOST = "${CCACHE} ${HOST_PREFIX}gcc ${HOST_CC_ARCH}"
+export CC_FOR_HOST = "${CCACHE}${HOST_PREFIX}gcc ${HOST_CC_ARCH}"
+export CXX_FOR_HOST = "${CCACHE}${HOST_PREFIX}gcc ${HOST_CC_ARCH}"
 
 export CC_FOR_BUILD = "${BUILD_CC}"
 export CPP_FOR_BUILD = "${BUILD_CPP}"
 export CFLAGS_FOR_BUILD = "${BUILD_CFLAGS}"
 
-export CC = "${CCACHE} ${HOST_PREFIX}gcc ${HOST_CC_ARCH}"
+export CC = "${CCACHE}${HOST_PREFIX}gcc ${HOST_CC_ARCH}"
 
 do_configure () {
 	(cd ${S}; gnu-configize) || die "Failed to run gnu-configize"
+
+        # Fix for issues when system's texinfo version >= 4.10
+        # (See https://bugzilla.redhat.com/show_bug.cgi?id=345621)
+        sed -i -e "s@egrep 'texinfo.*'@egrep 'texinfo[^0-9]*([1-3][0-9]|4\.[4-9]|4.[1-9][0-9]+|[5-9])'@" '${S}/configure'
+
 	oe_runconf
+#
+# must prime config.cache to ensure the build of libiberty
+#
+        mkdir -p ${B}/build-${BUILD_SYS}
+	for i in ${CONFIG_SITE}; do
+	    cat $i >> ${B}/build-${BUILD_SYS}/config.cache
+	done
 }
 
 do_stage () {

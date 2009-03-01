@@ -1,4 +1,8 @@
 DEPENDS = "zlib openssl"
+
+RCONFLICTS_openssh = "dropbear"
+RCONFLICTS_openssh-sshd = "dropbear"
+
 SECTION = "console/network"
 DESCRIPTION = "Secure rlogin/rsh/rcp/telnet replacement (OpenSSH) \
 Ssh (Secure Shell) is a program for logging into a remote machine \
@@ -10,12 +14,12 @@ It is intended as a replacement for rlogin, rsh and rcp, and can be \
 used to provide applications with a secure communication channel."
 HOMEPAGE = "http://www.openssh.org/"
 LICENSE = "BSD"
-MAINTAINER = "Bruno Randolf <bruno.randolf@4g-systems.biz>"
-PR = "r5"
+PR = "r10"
 
 SRC_URI = "ftp://ftp.openbsd.org/pub/OpenBSD/OpenSSH/portable/openssh-${PV}.tar.gz \
            file://configure.patch;patch=1 \
            file://sshd_config \
+	   file://ssh_config \
            file://init"
 
 inherit autotools
@@ -29,8 +33,9 @@ EXTRA_OECONF = "--disable-suid-ssh --with-ssl=${STAGING_LIBDIR}/ssl \
 	        --with-rand-helper=no --without-pam \
 	        --without-zlib-version-check \
 		--with-privsep-path=/var/run/sshd \
-		--sysconfdir=${sysconfdir}/ssh"
-		
+		--sysconfdir=${sysconfdir}/ssh \
+		--with-xauth=/usr/bin/xauth"
+
 EXTRA_OEMAKE = "'STRIP_OPT='"
 
 do_configure_prepend () {
@@ -41,6 +46,7 @@ do_configure_prepend () {
 
 do_compile_append () {
 	install -m 0644 ${WORKDIR}/sshd_config ${S}/
+	install -m 0644 ${WORKDIR}/ssh_config ${S}/
 }
 
 do_install_append() {
@@ -98,5 +104,5 @@ else
 fi
 }
 
-CONFFILES_openssh-sshd_nylon = "${sysconfdir}/ssh/sshd_config"
-CONFFILES_openssh-ssh_nylon = "${sysconfdir}/ssh/ssh_config"
+CONFFILES_openssh-sshd = "${sysconfdir}/ssh/sshd_config"
+CONFFILES_openssh-ssh = "${sysconfdir}/ssh/ssh_config"

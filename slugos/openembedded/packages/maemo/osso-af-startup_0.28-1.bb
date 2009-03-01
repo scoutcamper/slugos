@@ -1,5 +1,4 @@
 LICENSE =	"unknown"
-MAINTAINER=	"Florian Boor <florian@kernelconcepts.de"
 PR 	= "r4"
 
 PACKAGES=	"${PN} osso-af-services osso-af-base-apps"
@@ -11,13 +10,13 @@ SRC_URI = "http://stage.maemo.org:80/pool/maemo/ossw/source/o/${PN}/${PN}_${PV}.
            file://osso-af-startup-source.patch;patch=1;pnum=0 \
            file://launch-no-o.patch;patch=1;pnum=0"
 
-S = ${WORKDIR}/${PN}-0.28
+S = "${WORKDIR}/${PN}-0.28"
 
 FILES_${PN} = "${sysconfdir}/osso-af-init ${sysconfdir}/init.d/af-startup"
 FILES_osso-af-services = "${sysconfdir}/init.d/af-services"
 FILES_osso-af-base-apps = "${sysconfdir}/init.d/af-base-apps"
 
-INITSCRIPT_PACKAGES = ${PACKAGES}
+INITSCRIPT_PACKAGES = "${PACKAGES}"
 INITSCRIPT_NAME_${PN} = "af-startup"
 INITSCRIPT_PARAMS_${PN} = "defaults 50"
 INITSCRIPT_NAME_osso-af-services = "af-services"

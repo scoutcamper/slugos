@@ -2,21 +2,22 @@ DESCRIPTION = "statistics & graphing for nylon"
 RDEPENDS = "rrdtool"
 SECTION = "base"
 PRIORITY = "optional"
-MAINTAINER = "Bruno Randolf <bruno.randolf@4g-systems.biz>"
 LICENSE = "GPLv2"
-PV = "1:0.0+cvs${SRCDATE}"
+SRCDATE = "20050909"
+PV = "1.0.0+cvs${SRCDATE}"
 PR = "r1"
 
 SRC_URI = "http://meshcube.org/download/${PN}_${SRCDATE}.tgz"
 S = "${WORKDIR}/${PN}"
+INHIBIT_PACKAGE_STRIP = "1"
 
 do_install() {
 	install -d ${D}/srv/www/cgi-bin
-	install -d ${D}${sbindir}
+	install -d ${D}/${sbindir}
 	ln -s /var/tmp ${D}/srv/www/rrd-img
 	install -m 755 ${S}/*.html ${D}/srv/www/cgi-bin
 	ln -s /var/tmp/nav.inc.html ${D}/srv/www/cgi-bin
-	install -m 755 ${S}/collect.sh ${D}${sbindir}
+	install -m 755 ${S}/collect.sh ${D}/${sbindir}
 }
 
 pkg_postinst() {
@@ -32,9 +33,9 @@ else
 	/etc/init.d/busybox-cron reload
 	if [ ! -e /etc/httpd.conf ]; then
 		echo "A:*" > /etc/httpd.conf
-	fi	
+	fi
 	update-rc.d -s busybox-httpd defaults
-	
+
 	if ! grep -q "/var/lib/rrd/" /etc/nylon/backup.list; then
 		echo "adding to backup list"
 		echo "/var/lib/rrd/" >> /etc/nylon/backup.list

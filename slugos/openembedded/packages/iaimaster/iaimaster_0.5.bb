@@ -1,6 +1,5 @@
 DESCRIPTION = "Pen action mini game. You fight evil Iai-Master and must survive. \
 (Iai is a kind of the samurai fighting style)"
-MAINTAINER = "Michael 'Mickey' Lauer <mickey@Vanille.de>"
 SECTION = "opie/games"
 LICENSE = "GPL"
 APPNAME = "${PN}"
@@ -14,7 +13,7 @@ S = "${WORKDIR}/IaiMaster"
 
 inherit opie
 
-EXTRA_QMAKEVARS_POST = "TARGET=${PN}"
+EXTRA_QMAKEVARS_POST += "TARGET=${PN}"
 
 do_configure_prepend() {
 	qmake -project

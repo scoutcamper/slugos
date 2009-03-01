@@ -1,6 +1,6 @@
-include changedfiles.inc
+require changedfiles.inc
 
-PR = "r1"
+PR = "r2"
 B = "${WORKDIR}/changedfiles-${PV}/module"
 
 inherit module

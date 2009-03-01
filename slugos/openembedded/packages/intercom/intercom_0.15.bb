@@ -3,10 +3,13 @@
 # Released under the MIT license (see packages/COPYING)
 
 DESCRIPTION="A flexible audio communication utility"
-
-SRC_URI="http://mirror.optusnet.com.au/sourceforge/i/in/intercom/intercom-${PV}.tar.gz"
+SECTION = "console/telephony"
 LICENSE="GPL"
 
-inherit autotools
-EXTRA_OECONF="--disable-crypto --with-cpu=${TARGET_ARCH}"
+PR = "r1"
 
+SRC_URI="ftp://ftp.cm.nu/pub/people/shane/intercom/intercom-${PV}.tar.gz"
+
+inherit autotools
+
+EXTRA_OECONF="--disable-crypto --with-cpu=${TARGET_ARCH}"

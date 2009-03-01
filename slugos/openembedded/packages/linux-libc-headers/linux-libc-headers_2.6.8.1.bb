@@ -1,15 +1,13 @@
-SECTION = "devel"
-DESCRIPTION = "Sanitized set of 2.6 kernel headers for the C library's use."
+require linux-libc-headers.inc
+
 HOMEPAGE = "http://ep09.pld-linux.org/~mmazur/linux-libc-headers/"
-# license note from the package: 
+# license note from the package:
 #   Linux-libc-headers are derived from linux kernel headers. For license of a
 #   particular header, check it's content, and if copyright notice isn't present,
-#   standard linux kernel license applies. 
+#   standard linux kernel license applies.
 # since we assume GPL for linux i think we can also assume it here
-LICENSE = "GPL"
-MAINTAINER = "Chris Larson <kergoth@handhelds.org>"
 INHIBIT_DEFAULT_DEPS = "1"
-PR = "r7"
+PR = "r8"
 
 # NOTE: no need to package these headers, since the c library includes them.
 PACKAGES = ""
@@ -17,7 +15,7 @@ PACKAGES = ""
 SRC_URI = "http://ep09.pld-linux.org/~mmazur/linux-libc-headers/linux-libc-headers-${PV}.tar.bz2 \
 	file://mips-asm-atomic-system.diff;patch=1;pnum=0 \
 	file://keyboard.patch;patch=1"
-	
+
 S = "${WORKDIR}/linux-libc-headers-${PV}"
 
 do_configure () {
@@ -53,9 +51,4 @@ do_stage () {
 	rm -rf ${STAGING_INCDIR}/linux ${STAGING_INCDIR}/asm
 	cp -pfLR include/linux ${STAGING_INCDIR}/
 	cp -pfLR include/asm ${STAGING_INCDIR}/
-	rm -rf ${CROSS_DIR}/${TARGET_SYS}/include/linux
-	rm -rf ${CROSS_DIR}/${TARGET_SYS}/include/asm
-	install -d ${CROSS_DIR}/${TARGET_SYS}/include
-	cp -pfLR include/linux ${CROSS_DIR}/${TARGET_SYS}/include/
-	cp -pfLR include/asm ${CROSS_DIR}/${TARGET_SYS}/include/
 }

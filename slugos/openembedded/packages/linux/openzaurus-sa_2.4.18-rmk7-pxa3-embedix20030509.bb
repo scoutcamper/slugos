@@ -8,6 +8,7 @@ PXAV = "3"
 SHARPV = "20030509"
 PR = "r23"
 FILESDIR = "${@os.path.dirname(bb.data.getVar('FILE',d,1))}/openzaurus-sa-${KV}-rmk${RMKV}-pxa${PXAV}-embedix${SHARPV}"
+COMPATIBLE_MACHINE = "collie"
 
 SRC_URI = "http://www.openzaurus.org/mirror/linux-sl5500-${SHARPV}-rom3_10.tar.bz2 \
            file://cacko.patch;patch=1 \
@@ -38,7 +39,7 @@ SRC_URI = "http://www.openzaurus.org/mirror/linux-sl5500-${SHARPV}-rom3_10.tar.b
 
 # that patch allow to use buzzer as sound device but it removes alarms,
 # touchclicks etc so it is removed until be fixed
-#           file://sound-2.4.18r2.patch;patch=1 
+#           file://sound-2.4.18r2.patch;patch=1
 
 # apply this when we have a patch that allows building with gcc 3.x:
 # SRC_URI_append = file://gcc-3.3.patch;patch=1
@@ -52,11 +53,12 @@ inherit kernel
 # Compensate for sucky bootloader on all Sharp Zaurus models
 #
 FILES_kernel-image = ""
-ALLOW_EMPTY = 1
+ALLOW_EMPTY = "1"
 
 KERNEL_CCSUFFIX = "-2.95"
 KERNEL_LDSUFFIX = "-2.11.2"
 COMPATIBLE_HOST = "arm.*-linux"
+COMPATIBLE_MACHINE = "collie"
 EXTRA_OEMAKE = " EMBEDIXRELEASE=-${DISTRO_VERSION}"
 
 module_conf_usbdmonitor = "alias usbd0 usbdmonitor"
@@ -67,8 +69,8 @@ module_autoload_collie_tc35143af = "collie_tc35143af"
 #
 # FIXME: Use configuration system
 #
-export mem = ${@bb.data.getVar("COLLIE_MEMORY_SIZE",d,1) or "32"}
-export rd  = ${@bb.data.getVar("COLLIE_RAMDISK_SIZE",d,1) or "32"}
+export mem = '${@bb.data.getVar("COLLIE_MEMORY_SIZE",d,1) or "32"}'
+export rd  = '${@bb.data.getVar("COLLIE_RAMDISK_SIZE",d,1) or "32"}'
 export CMDLINE = "${CMDLINE_CONSOLE} root=/dev/mtdblock4 rootfstype=jffs2 jffs2_orphaned_inodes=delete"
 
 do_configure_prepend() {
@@ -90,13 +92,5 @@ do_configure_prepend() {
         echo "CONFIG_CMDLINE=\"$CMDLINE mem=${mem}M\"" >> ${S}/.config
 }
 
-do_deploy() {
-        install -d ${DEPLOY_DIR}/images
-        install -m 0644 arch/${ARCH}/boot/${KERNEL_IMAGETYPE} \
-	${DEPLOY_DIR}/images/${KERNEL_IMAGETYPE}-${MACHINE}-${COLLIE_MEMORY_SIZE}-${COLLIE_RAMDISK_SIZE}-${DATETIME}.bin
-}
-
-do_deploy[dirs] = "${S}"
-
-addtask deploy before do_build after do_compile
-
+KERNEL_IMAGE_BASE_NAME = "${KERNEL_IMAGETYPE}-${MACHINE}-${COLLIE_MEMORY_SIZE}-${COLLIE_RAMDISK_SIZE}-${DATETIME}.bin"
+KERNEL_IMAGE_SYMLINK_NAME = "${KERNEL_IMAGETYPE}-${MACHINE}-${COLLIE_MEMORY_SIZE}-${COLLIE_RAMDISK_SIZE}.bin"

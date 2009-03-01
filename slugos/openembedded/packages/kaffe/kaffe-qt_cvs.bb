@@ -4,12 +4,12 @@ PV = "1.1.4+cvs${SRCDATE}"
 SRC_URI = "cvs://readonly:readonly@cvs.kaffe.org/cvs/kaffe;module=kaffe"
 S = "${WORKDIR}/kaffe"
 
-include kaffe.inc
+require kaffe.inc
 
 DEPENDS += "libqpe-opie"
 
 CXXFLAGS += " -DQPE "
-EXTRA_OEMAKE += "MOC=${STAGING_BINDIR}/moc"
+EXTRA_OEMAKE += "MOC=${STAGING_BINDIR_NATIVE}/moc"
 EXTRA_OECONF += " --with-qtdir=$QTDIR \
 	--with-awt=qt \
 	--enable-pure-java-math \

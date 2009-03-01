@@ -1,16 +1,15 @@
 SECTION = "kernel"
 DESCRIPTION = "Linux kernel for MNCI device"
-MAINTAINER = "M&N Solutions <info@mn-solutions.de>"
 LICENSE = "GPL"
 DEPENDS = "modutils-cross virtual/${TARGET_PREFIX}gcc${KERNEL_CCSUFFIX}"
-COMPATIBLE_HOST = "arm.*-linux"
+COMPATIBLE_MACHINE = "mnci"
 KV = "2.4.21"
 RMKV = "2"
 PXAV = "1"
 PR = "r5"
 
-SRC_URI = "ftp://ftp.kernel.org/pub/linux/kernel/v2.4/linux-${KV}.tar.bz2 \
-	   http://lorien.handhelds.org/ftp.arm.linux.org.uk/kernel/v2.4/patch-${KV}-rmk${RMKV}.bz2;patch=1 \
+SRC_URI = "${KERNELORG_MIRROR}/pub/linux/kernel/v2.4/linux-${KV}.tar.bz2 \
+	   http://ftp.linux.org.uk/pub/linux/arm/kernel/v2.4/patch-${KV}-rmk${RMKV}.bz2;patch=1 \
 	   file://diff-${KV}-rmk${RMKV}-pxa${PXAV}.gz;patch=1 \
 	   file://mnci-combined.patch;patch=1"
 
@@ -58,7 +57,7 @@ pkg_postinst_kernel () {
 
 pkg_postinst_modules () {
 if [ -n "$D" ]; then
-	${HOST_PREFIX}depmod -A -b $D -F $D/boot/System.map-${PV} ${KERNEL_VERSION}
+	${HOST_PREFIX}depmod-${KERNEL_MAJOR_VERSION} -A -b $D -F $D/boot/System.map-${PV} ${KERNEL_VERSION}
 else
 	depmod -A
 fi

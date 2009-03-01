@@ -2,10 +2,11 @@ SECTION = "base"
 DESCRIPTION = "These utilities are intended to make a Linux modular kernel \
 manageable for all users, administrators and distribution maintainers."
 LICENSE = "GPLv2"
+DEPENDS = "bison-native"
 FILESDIR = "${@os.path.dirname(bb.data.getVar('FILE',d,1))}/files"
-PR = "r7"
+PR = "r8"
 
-SRC_URI = "ftp://ftp.kernel.org/pub/linux/utils/kernel/modutils/v2.4/modutils-${PV}.tar.bz2 \
+SRC_URI = "${KERNELORG_MIRROR}/pub/linux/utils/kernel/modutils/v2.4/modutils-${PV}.tar.bz2 \
            file://lex.l.diff;patch=1 \
            file://modutils-notest.patch;patch=1 \
            file://configure.patch;patch=1 \
@@ -39,10 +40,10 @@ for f in sbin/insmod sbin/modprobe sbin/rmmod bin/lsmod; do
 done
 if test -n "$D"; then
 	D="-r $D"
-	if test -n "`which ${TARGET_PREFIX}depmod`"; then
+	if test -n "`which ${TARGET_PREFIX}depmod-2.4`"; then
 		for kerneldir in `ls -p ${IMAGE_ROOTFS}/lib/modules|grep /`; do
 			kernelver=`basename $kerneldir`
-			${TARGET_PREFIX}depmod -a -b ${IMAGE_ROOTFS} -C ${IMAGE_ROOTFS}/${sysconfdir}/modules.conf -r $kernelver
+			${TARGET_PREFIX}depmod-2.4 -a -b ${IMAGE_ROOTFS} -C ${IMAGE_ROOTFS}/${sysconfdir}/modules.conf -r $kernelver
 		done
 	fi
 fi
@@ -66,7 +67,7 @@ pkg_postinst_modutils-depmod() {
 update-alternatives --install /sbin/depmod depmod /sbin/depmod.24 10
 }
 
-pkg_postinst_modutils-modinfo() { 
+pkg_postinst_modutils-modinfo() {
 #!/bin/sh
 update-alternatives --install /sbin/modinfo modinfo /sbin/modinfo.24 10
 }
@@ -81,7 +82,7 @@ pkg_prerm_modutils-modinfo() {
 update-alternatives --remove modinfo /sbin/modinfo.24
 }
 
-PACKAGES = "modutils-depmod modutils-modinfo modutils-doc modutils"
+PACKAGES = "${PN}-dbg modutils-depmod modutils-modinfo modutils-doc modutils"
 
 FILES_modutils-depmod = "sbin/depmod.24"
 FILES_modutils-modinfo = "sbin/modinfo.24"

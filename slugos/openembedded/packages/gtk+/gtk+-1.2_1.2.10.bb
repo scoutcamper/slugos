@@ -3,9 +3,8 @@ DESCRIPTION = "GTK+1.2 is a deprecated library provided for running programs not
 HOMEPAGE = "http://www.gtk.org"
 SECTION = "libs"
 PRIORITY = "optional"
-MAINTAINER = "Rob Taylor <robtaylor@fastmail.fm>"
-DEPENDS = "glib-1.2 jpeg libpng xext"
-PR = "r2"
+DEPENDS = "glib-1.2 jpeg libpng libxext"
+PR = "r3"
 
 SRC_URI = "ftp://ftp.gtk.org/pub/gtk/v1.2/gtk+-${PV}.tar.gz \
            file://timezone-fix.patch;patch=1 \
@@ -18,6 +17,7 @@ inherit autotools pkgconfig flow-lossage
 do_configure_prepend() {
 	install -d m4
 	rm -f ltconfig libtool ltmain.sh aclocal.m4
+	sed -i -e s:AM_LC_MESSAGES:gt_LC_MESSAGES:g acinclude.m4
 }
 
 FILES_${PN} += "${datadir}/themes"
@@ -49,7 +49,7 @@ do_stage () {
 	mkdir -p ${STAGING_LIBDIR}/gtk-1.2/include
 
 	install -m 0644 gtk.m4 ${STAGING_DATADIR}/aclocal/
-	install -m 0755 gtk-config ${STAGING_BINDIR}
+	install -m 0755 gtk-config ${STAGING_BINDIR_CROSS}/
 }
 
 do_install_append () {

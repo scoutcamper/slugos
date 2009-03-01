@@ -10,12 +10,12 @@ RPROVIDES_${PN} += "readline"
 LEAD_SONAME = "libreadline.so"
 PR = "r3"
 
-SRC_URI = "ftp://ftp.cwru.edu/pub/bash/readline-${PV}.tar.gz \
+SRC_URI = "${GNU_MIRROR}/readline/readline-${PV}.tar.gz \
 	   file://shlink-termcap.patch;patch=1 \
 	   file://acinclude.m4"
 S = "${WORKDIR}/readline-${PV}"
 
-inherit autotools 
+inherit autotools
 
 do_configure () {
 	install -m 0644 ${WORKDIR}/acinclude.m4 ${S}/

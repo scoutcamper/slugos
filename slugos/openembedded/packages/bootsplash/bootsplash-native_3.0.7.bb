@@ -2,13 +2,15 @@
 # Copyright (C) 2004, Advanced Micro Devices, Inc.  All Rights Reserved
 # Released under the MIT license (see packages/COPYING)
 
-include bootsplash_${PV}.bb
+require bootsplash_${PV}.bb
+
+DEPENDS += "jpeg-native"
 
 inherit native
 S="${WORKDIR}/bootsplash-${PV}"
 
 do_compile() {
-	oe_runmake -C Utilities splash
+	oe_runmake splash
 }
 
 do_stage() {

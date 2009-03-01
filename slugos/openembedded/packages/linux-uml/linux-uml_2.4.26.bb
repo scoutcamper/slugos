@@ -4,7 +4,7 @@ LICENSE = "GPL"
 UMLR = "2"
 PR = "1"
 
-SRC_URI = "ftp://ftp.kernel.org/pub/linux/kernel/v2.4/linux-${PV}.tar.bz2 \
+SRC_URI = "${KERNELORG_MIRROR}/pub/linux/kernel/v2.4/linux-${PV}.tar.bz2 \
            ${SOURCEFORGE_MIRROR}/user-mode-linux/uml-patch-${PV}-${UMLR}.bz2;patch=1 \
            file://defconfig \
            file://aio_abi.h"
@@ -13,6 +13,7 @@ S = "${WORKDIR}/linux-${PV}"
 inherit kernel
 
 COMPATIBLE_HOST = 'i.86.*-linux'
+COMPATIBLE_MACHINE = "x86-uml"
 
 export OS = "Linux"
 ARCH = "um"

@@ -1,10 +1,10 @@
 DESCRIPTION = "Python Ogg Vorbis Bindings"
 SECTION = "devel/python"
 PRIORITY = "optional"
-MAINTAINER = "Michael 'Mickey' Lauer <mickey@Vanille.de>"
 LICENSE = "LGPL"
 DEPENDS = "libogg"
 SRCNAME = "pyogg"
+PR = "r1"
 
 SRC_URI = "http://www.andrewchatham.com/pyogg/download/${SRCNAME}-${PV}.tar.gz"
 S = "${WORKDIR}/${SRCNAME}-${PV}"
