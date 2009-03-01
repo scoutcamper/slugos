@@ -1,9 +1,13 @@
+# FIXME, consider using kernel staging directory instead of KERNEL_SOURCE which is
+# located in the work directory. see module.bbclass
+
 DESCRIPTION = "Utilities and system configuration files for the Linux PCMCIA card services"
 SECTION = "base"
 PRIORITY = "required"
 LICENSE = "GPL"
 DEPENDS = "virtual/kernel"
-PR = "r27"
+RDEPENDS = "hostap-conf orinoco-conf"
+PR = "r28"
 
 SRC_URI = "${SOURCEFORGE_MIRROR}/pcmcia-cs/pcmcia-cs-${PV}.tar.gz \
 	   file://busybox.patch;patch=1 \
@@ -20,6 +24,8 @@ SRC_URI = "${SOURCEFORGE_MIRROR}/pcmcia-cs/pcmcia-cs-${PV}.tar.gz \
 	   file://wnv.conf"
 
 SRC_URI_append_spitz = " file://nocleanup.patch;patch=1"
+SRC_URI_append_sh3 = " file://superh-noO3.patch;patch=1"
+
 S = "${WORKDIR}/pcmcia-cs-${PV}"
 
 INITSCRIPT_NAME = "pcmcia"
@@ -27,7 +33,7 @@ INITSCRIPT_PARAMS = "defaults"
 
 inherit update-rc.d module-base
 
-export KERNEL_SOURCE = ${@base_read_file('${STAGING_KERNEL_DIR}/kernel-source')}
+export KERNEL_SOURCE = "${@base_read_file('${STAGING_KERNEL_DIR}/kernel-source')}"
 
 sbindir = "/sbin"
 
@@ -83,7 +89,7 @@ do_install() {
 
 	# ensure that config.opts always exists, albeit empty
 	echo >> ${D}${sysconfdir}/pcmcia/config.opts
-	
+
 	install -m 0644 ${WORKDIR}/ide.opts ${D}${sysconfdir}/pcmcia/
 	install -m 0644 ${WORKDIR}/wireless.opts ${D}${sysconfdir}/pcmcia/
 	for i in etc/cis/*; do

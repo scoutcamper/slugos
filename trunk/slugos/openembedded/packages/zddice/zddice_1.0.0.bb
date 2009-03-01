@@ -1,7 +1,6 @@
 DESCRIPTION = "Zaurus D20 Gaming Dice for Qt/Embedded based Palmtop Environments"
 SECTION = "opie/games"
 PRIORITY = "optional"
-MAINTAINER = "Michael 'Mickey' Lauer <mickey@Vanille.de>"
 LICENSE = "GPL"
 PR = "r1"
 
@@ -11,7 +10,7 @@ S = "${WORKDIR}/zddice-src"
 
 inherit palmtop
 
-EXTRA_QMAKEVARS_POST = 'TMAKE_LIBS-="-luuid" TMAKE_LIBS+="-lqpe" CONFIG+=qt CONFIG-=qtopia'
+EXTRA_QMAKEVARS_POST += 'TMAKE_LIBS-="-luuid" TMAKE_LIBS+="-lqpe" CONFIG+=qt CONFIG-=qtopia'
 
 do_install() {
 	install -d ${D}${palmtopdir}/{bin,pics,apps/Games}

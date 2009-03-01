@@ -1,36 +1,12 @@
-DESCRIPTION = "A full featured personal video recorder system."
-HOMEPAGE = "http://www.mythtv.org"
-LICENSE = "GPL"
-MAINTAINER = "Michael 'Mickey' Lauer <mickey@Vanille.de>"
-SECTION = "x11/multimedia"
-PR = "r1"
+require mythtv.inc
 
-SRC_URI = "http://www.mythtv.org/mc/mythtv-${PV}.tar.bz2 \
-	file://msmpeg-underscore-pic.patch;patch=1 \
-	file://settings.pro"
+inherit qmake2 qt3x11
 
-DEPENDS = "xinerama lame libxv libxxf86vm libxvmc lirc"
-RDEPENDS = "qt-x11-plugins"
+PR = "r2"
 
-inherit qmake qt3x11
+SRC_URI += "file://msmpeg-underscore-pic.patch;patch=1 \
+	    file://settings.pro"
 
-# there is a -march=586 somewhere in the source tree
-COMPATIBLE_HOST = 'i.86.*-linux'
-
-QMAKE_PROFILES = "mythtv.pro"
-
-def mythtv_arch(d):
-        import bb, re
-        arch = bb.data.getVar('TARGET_ARCH', d, 1)
-        if re.match("^i.86$", arch):
-                arch = "x86"
-        elif arch == "x86_64":
-                arch = "x86"
-        elif arch == "arm":
-                arch = "armv4l"
-        return arch
-
-MYTHTV_ARCH := "${@mythtv_arch(d)}"
 
 do_configure_prepend() {
 # it's not autotools anyway, so we call ./configure directly
@@ -72,8 +48,3 @@ do_configure_prepend() {
 	sed 's!PREFIX =.*!PREFIX = ${prefix}!' < settings.pro > settings.pro.new
 	mv settings.pro.new settings.pro
 }
-
-do_install() {
-	oe_runmake INSTALL_ROOT=${D} install
-}
-

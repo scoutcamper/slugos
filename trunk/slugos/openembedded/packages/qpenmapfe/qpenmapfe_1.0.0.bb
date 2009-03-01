@@ -2,7 +2,6 @@ DESCRIPTION = "A frontend for the nmap port scanner, Qt/Embedded based Palmtop E
 SECTION = "opie/applications"
 PRIORITY = "optional"
 LICENSE = "GPL"
-MAINTAINER = "Michael 'Mickey' Lauer <mickey@Vanille.de>"
 AUTHOR = "Dennis Webb"
 APPNAME = "qpenmapfe"
 APPTYPE = "binary"
@@ -19,5 +18,5 @@ inherit opie
 do_install () {
 	install -d ${D}${palmtopdir}/pics/${APPNAME}/
 	install -m 0644 ${WORKDIR}/*.png ${D}${palmtopdir}/pics/
-	
+
 }

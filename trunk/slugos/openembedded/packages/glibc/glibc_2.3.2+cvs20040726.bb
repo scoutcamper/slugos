@@ -1,21 +1,11 @@
-DESCRIPTION = "GNU C Library"
-HOMEPAGE = "http://www.gnu.org/software/libc/libc.html"
-LICENSE = "LGPL"
-SECTION = "libs"
-PRIORITY = "required"
-MAINTAINER = "Phil Blundell <pb@handhelds.org>"
+require glibc.inc
+
+DEFAULT_PREFERENCE_sh3 = "-99"
 
 FILESDIR = "${@os.path.dirname(bb.data.getVar('FILE',d,1))}/glibc-cvs"
-PR = "r17"
+PR = "r30"
 
 GLIBC_ADDONS ?= "linuxthreads"
-GLIBC_EXTRA_OECONF ?= ""
-
-# nptl needs unwind support in gcc, which can't be built without glibc.
-PROVIDES = "virtual/libc ${@['virtual/${TARGET_PREFIX}libc-for-gcc', '']['nptl' in '${GLIBC_ADDONS}']}"
-PROVIDES += "virtual/libintl virtual/libiconv"
-DEPENDS = "${@['virtual/${TARGET_PREFIX}gcc-initial', 'virtual/${TARGET_PREFIX}gcc']['nptl' in '${GLIBC_ADDONS}']} linux-libc-headers"
-INHIBIT_DEFAULT_DEPS = "1"
 
 #	   file://noinfo.patch;patch=1
 #	   file://ldconfig.patch;patch=1;pnum=0
@@ -41,13 +31,11 @@ SRC_URI_append_openmn = " file://ldsocache-varrun.patch;patch=1"
 S = "${WORKDIR}/libc"
 B = "${WORKDIR}/build-${TARGET_SYS}"
 
-inherit autotools
-
 EXTRA_OECONF = "--enable-kernel=${OLDEST_KERNEL} \
 	        --without-cvs --disable-profile --disable-debug --without-gd \
 		--enable-clocale=gnu \
 	        --enable-add-ons=${GLIBC_ADDONS} \
-		--with-headers=${CROSS_DIR}/${TARGET_SYS}/include \
+		--with-headers=${STAGING_INCDIR} \
 		${GLIBC_EXTRA_OECONF}"
 
 do_configure () {
@@ -82,51 +70,6 @@ do_compile () {
 	)
 }
 
-do_stage() {
-	rm -f ${STAGING_LIBDIR}/libc.so.6
-	oe_runmake 'install_root=${STAGING_DIR}/${HOST_SYS}' \
-		   'includedir=/include' 'libdir=/lib' 'slibdir=/lib' \
-		   '${STAGING_LIBDIR}/libc.so.6' \
-		   install-headers install-lib
+require glibc-stage.inc
 
-	install -d ${STAGING_INCDIR}/gnu \
-		   ${STAGING_INCDIR}/bits \
-		   ${STAGING_INCDIR}/rpcsvc
-	install -m 0644 ${S}/include/gnu/stubs.h ${STAGING_INCDIR}/gnu/
-	install -m 0644 ${B}/bits/stdio_lim.h ${STAGING_INCDIR}/bits/
-	install -m 0644 misc/syscall-list.h ${STAGING_INCDIR}/bits/syscall.h
-	for r in ${rpcsvc}; do
-		h=`echo $r|sed -e's,\.x$,.h,'`
-		install -m 0644 ${S}/sunrpc/rpcsvc/$h ${STAGING_INCDIR}/rpcsvc/
-	done
-	for i in libc.a libc_pic.a libc_nonshared.a; do
-		install -m 0644 ${B}/$i ${STAGING_LIBDIR}/ || die "failed to install $i"
-	done
-	echo 'GROUP ( libpthread.so.0 libpthread_nonshared.a )' > ${STAGING_LIBDIR}/libpthread.so
-	echo 'GROUP ( libc.so.6 libc_nonshared.a )' > ${STAGING_LIBDIR}/libc.so
-
-	rm -f ${CROSS_DIR}/${TARGET_SYS}/lib/libc.so.6
-	oe_runmake 'install_root=${CROSS_DIR}/${TARGET_SYS}' \
-		   'includedir=/include' 'libdir=/lib' 'slibdir=/lib' \
-		   '${CROSS_DIR}/${TARGET_SYS}/lib/libc.so.6' \
-		   install-headers install-lib
-
-	install -d ${CROSS_DIR}/${TARGET_SYS}/include/gnu \
-		   ${CROSS_DIR}/${TARGET_SYS}/include/bits \
-		   ${CROSS_DIR}/${TARGET_SYS}/include/rpcsvc
-	install -m 0644 ${S}/include/gnu/stubs.h ${CROSS_DIR}/${TARGET_SYS}/include/gnu/
-	install -m 0644 ${B}/bits/stdio_lim.h ${CROSS_DIR}/${TARGET_SYS}/include/bits/
-	install -m 0644 misc/syscall-list.h ${CROSS_DIR}/${TARGET_SYS}/include/bits/syscall.h
-	for r in ${rpcsvc}; do
-		h=`echo $r|sed -e's,\.x$,.h,'`
-		install -m 0644 ${S}/sunrpc/rpcsvc/$h ${CROSS_DIR}/${TARGET_SYS}/include/rpcsvc/
-	done
-
-	for i in libc.a libc_pic.a libc_nonshared.a; do
-		install -m 0644 ${B}/$i ${CROSS_DIR}/${TARGET_SYS}/lib/ || die "failed to install $i"
-	done
-	echo 'GROUP ( libpthread.so.0 libpthread_nonshared.a )' > ${CROSS_DIR}/${TARGET_SYS}/lib/libpthread.so
-	echo 'GROUP ( libc.so.6 libc_nonshared.a )' > ${CROSS_DIR}/${TARGET_SYS}/lib/libc.so
-}
-
-include glibc-package.bbclass
+require glibc-package.bbclass

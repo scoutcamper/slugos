@@ -2,15 +2,14 @@
 # configuration fails empty (they just contain a comment).
 #
 DESCRIPTION = "Unfreeze the bitbake files in the build"
-MAINTAINER = "John Bowler <jbowler@acm.org>"
-SECTION = "console/networking"
+SECTION = "console/network"
 PRIORITY = "optional"
 LICENSE = "MIT"
 PR = "r1"
 
 INHIBIT_DEFAULT_DEPS = "1"
 PATCH_DEPENDS = ""
-ALLOW_EMPTY = 1
+ALLOW_EMPTY = "1"
 PACKAGES = ""
 
 SRC_URI = "file://unfreeze"
@@ -24,7 +23,7 @@ do_install() {
 do_stage() {
 }
 
-do_build[nostamp] = 1
+do_build[nostamp] = "1"
 do_build() {
 	# export FROZEN_DIR=<place to write conf files>
 	# export PKGDIR=<location of openembedded package source>

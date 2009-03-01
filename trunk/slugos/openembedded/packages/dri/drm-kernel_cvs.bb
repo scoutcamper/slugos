@@ -1,8 +1,11 @@
+# FIXME, consider using kernel staging directory instead of KERNEL_SOURCE which is
+# located in the work directory.  see modules.bbclass
+
 SECTION = "x11/base"
 PR = "r3"
 LICENSE = "MIT"
 
-SRC_URI = "cvs://anoncvs@dri.freedesktop.org/cvs/dri;module=drm;method=pserver \
+SRC_URI = "${FREEDESKTOP_CVS}/dri;module=drm;method=pserver \
 	file://make.patch;patch=1"
 
 inherit module-base

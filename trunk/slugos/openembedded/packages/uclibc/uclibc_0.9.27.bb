@@ -1,7 +1,7 @@
 DEFAULT_PREFERENCE = "1"
-PR = "r7"
+PR = "r12"
 
-include uclibc.inc
+require uclibc.inc
 
 # This patch removes the typedef of __kernel_key_t from
 # include/bits/ipc.h.  Because this removes a typedef some
@@ -19,6 +19,7 @@ SRC_URI += "${PATCH_ipc_h}"
 SRC_URI += " file://thumb-swi.patch;patch=1"
 SRC_URI += " file://thumb-swp.patch;patch=1"
 SRC_URI += " file://arm-thumb-defined.patch;patch=1"
+SRC_URI += " file://uclibc-makevars-in-quotes.patch;patch=1"
 
 # ARM thumb interworking - these changes fix various bugs in the
 # uclibc implementation of thumb interwork support, but they are

@@ -2,7 +2,6 @@
 #
 DESCRIPTION = "OpenLDAP Software is an open source implementation of the Lightweight Directory Access Protocol."
 HOMEPAGE = "http://www.OpenLDAP.org/license.html"
-MAINTAINER = "John Bowler <jbowler@acm.org>"
 PRIORITY = "optional"
 # The OpenLDAP Public License - see the HOMEPAGE - defines
 # the license.  www.openldap.org claims this is Open Source
@@ -12,12 +11,13 @@ PRIORITY = "optional"
 LICENSE = "OpenLDAP"
 SECTION = "libs"
 
-PR = "r1"
+PR = "r4"
 
 LDAP_VER = "${@'.'.join(bb.data.getVar('PV',d,1).split('.')[0:2])}"
 
 SRC_URI = "ftp://ftp.openldap.org/pub/OpenLDAP/openldap-release/${P}.tgz"
 SRC_URI += "file://openldap-m4-pthread.patch;patch=1"
+SRC_URI += "file://initscript"
 # The build tries to run a host executable, this fails.  The patch
 # causes the executable and its data to be installed instead of
 # the output - ucgendat must be run after the ipkg install!
@@ -123,7 +123,7 @@ OPENLDAP_DEPENDS_hdb  ?= "db"
 OPENLDAP_PACKAGE_hdb  ?= "${PN}-backend-hdb"
 FILES_${PN}-backend-hdb = "${md}/back_hdb.so ${md}/back_hdb.la ${md}/back_hdb-*.so.*"
 EXTRA_OECONF += "${OPENLDAP_OPTION_hdb}"
-DEPENDS += ${OPENLDAP_DEPENDS_hdb}
+DEPENDS += "${OPENLDAP_DEPENDS_hdb}"
 PACKAGES += "${OPENLDAP_PACKAGE_hdb}"
 #
 #--enable-ldap         enable ldap backend no|yes|mod no
@@ -217,6 +217,11 @@ PACKAGES += "${PN}-overlay-proxycache"
 EXTRA_OECONF += "${OPENLDAP_OPTIONS}"
 DEPENDS      += "${OPENLDAP_DEPENDS}"
 
+do_configure() {
+	gnu-configize
+	oe_runconf
+}
+
 #FIXME: this is a hack, at present an openldap build will pick up the header
 # files from staging rather than the local ones (bad -I order), so remove
 # the headers (from openldap-old.x) before compiling...
@@ -255,7 +260,7 @@ PACKAGES += "${PN}-slapd ${PN}-slurpd ${PN}-bin"
 
 # Package contents - shift most standard contents to -bin
 FILES_${PN} = "${libdir}/lib*.so.* ${sysconfdir}/openldap/ldap.* ${localstatedir}/openldap-data"
-FILES_${PN}-slapd = "${libexecdir}/slapd ${sbindir} ${localstatedir}/run \
+FILES_${PN}-slapd = "${sysconfdir}/init.d ${libexecdir}/slapd ${sbindir} ${localstatedir}/run \
 	${sysconfdir}/openldap/slapd.* ${sysconfdir}/openldap/schema \
 	${sysconfdir}/openldap/DB_CONFIG.example"
 FILES_${PN}-slurpd = "${libexecdir}/slurpd ${localstatedir}/openldap-slurp ${localstatedir}/run"
@@ -263,6 +268,23 @@ FILES_${PN}-bin = "${bindir}"
 FILES_${PN}-dev = "${includedir} ${libdir}/lib*.so ${libdir}/*.la ${libdir}/*.a ${libexecdir}/openldap/*.a"
 
 do_install_append() {
+	install -d ${D}${sysconfdir}/init.d
+	cat ${WORKDIR}/initscript > ${D}${sysconfdir}/init.d/openldap
+	chmod 755 ${D}${sysconfdir}/init.d/openldap
 	# This is duplicated in /etc/openldap and is for slapd
 	rm -f ${D}${localstatedir}/openldap-data/DB_CONFIG.example
+}
+
+pkg_postinst_${PN}-slapd () {
+        if test -n "${D}"; then
+                D="-r $D"
+        fi
+        update-rc.d $D openldap defaults
+}
+
+pkg_prerm_${PN}-slapd () {
+        if test -n "${D}"; then
+                D="-r $D"
+        fi
+        update-rc.d $D openldap remove
 }

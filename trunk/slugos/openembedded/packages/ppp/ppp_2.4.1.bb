@@ -4,7 +4,7 @@ HOMEPAGE = "http://samba.org/ppp/"
 LICENSE = "BSD GPLv2"
 PR = "r7"
 
-SRC_URI = "ftp://ftp.samba.org/pub/ppp/ppp-2.4.1.tar.gz \
+SRC_URI = "http://ppp.samba.org/ftp/ppp/ppp-${PV}.tar.gz \
 	file://pppd.patch;patch=1 \
 	file://man.patch;patch=1 \
 	file://cifdefroute.dif;patch=1 \
@@ -16,11 +16,13 @@ SRC_URI = "ftp://ftp.samba.org/pub/ppp/ppp-2.4.1.tar.gz \
 	file://ip-down \
 	file://08setupdns \
 	file://92removedns"
-	
+
+SRC_URI_append_nylon = " file://ppp-tdbread.patch;patch=1"
+
 inherit autotools
 
 EXTRA_OEMAKE = "STRIPPROG=${STRIP}"
-EXTRA_OECONF = --disable-strip
+EXTRA_OECONF = "--disable-strip"
 
 do_install_append () {
 	install -d ${D}${bindir}/ ${D}${sysconfdir}/init.d

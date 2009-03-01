@@ -4,12 +4,12 @@ LICENSE = "Unknown"
 DEPENDS = ""
 SECTION = "devel"
 PRIORITY = "optional"
-MAINTAINER = "Chris Larson <kergoth@handhelds.org>"
 
 S = "${WORKDIR}/tmake-${PV}"
 
+# Ick. This .bb file should really have a -native version doing this, even if it is a perl script... RP
 do_stage() {
-	install -m 0755 bin/tmake bin/progen ${STAGING_BINDIR}/
+	install -m 0755 bin/tmake bin/progen ${STAGING_BINDIR_NATIVE}/
 
 	install -d ${STAGING_DATADIR}/tmake
 	cp -R lib/* ${STAGING_DATADIR}/tmake/
@@ -23,6 +23,6 @@ do_install() {
 	cp -R lib/* ${D}${datadir}/tmake/
 }
 
-PACKAGES = "tmake"
+PACKAGES = "${PN}-dbg tmake"
 FILES = ""
 FILES_tmake="${bindir} ${datadir}/tmake"

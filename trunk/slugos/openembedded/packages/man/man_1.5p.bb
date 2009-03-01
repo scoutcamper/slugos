@@ -1,16 +1,18 @@
 LICENSE = "GPL"
 SECTION = "base"
-MAINTAINER = "Inge Arnesen <inge.arnesen@gmail.com>"
 DESCRIPTION = "The man page suite, including man, apropos, \
 and whatis consists of programs that are used to read most \
 of the documentation available on a Linux system."
-PR = "r2"
+PR = "r3"
 RDEPENDS_${PN} = "less groff"
 
 # Note: The default man.conf uses wrong names for GNU eqn and troff,
 # so we install our own
-SRC_URI = "ftp://ftp.kernel.org/pub/linux/utils/man/man-${PV}.tar.bz2 \
+SRC_URI = "${KERNELORG_MIRROR}/pub/linux/utils/man/man-${PV}.tar.bz2 \
 		file://man.conf"
+
+# Disable parallel make or it tries to link objects before they are built
+PARALLEL_MAKE = ""
 
 EXTRA_OEMAKE = ""
 GS = "-DGREPSILENT=\"q\""
@@ -34,6 +36,6 @@ do_install() {
 	install -m 644 ${FILESDIR}/man.conf ${D}/etc
 }
 
-FILES_${PN} = "${bindir} ${sbindir} ${libexecdir} ${libdir}/lib*.so.* \
+FILES_${PN} = "${bindir}/* ${sbindir} ${libexecdir} ${libdir}/lib*.so.* \
 	       ${libdir}/*/ ${sysconfdir} ${sharedstatedir} ${localstatedir} \
 	       /bin /sbin /lib/*/ /lib/*.so*"

@@ -7,31 +7,39 @@ INIT_D_DIR = "${sysconfdir}/init.d"
 
 updatercd_postinst() {
 if test "x$D" != "x"; then
-	D="-r $D"
+	OPT="-r $D"
 else
-	D="-s"
+	OPT="-s"
 fi
-update-rc.d $D ${INITSCRIPT_NAME} ${INITSCRIPT_PARAMS}
+update-rc.d $OPT ${INITSCRIPT_NAME} ${INITSCRIPT_PARAMS}
 }
 
 updatercd_prerm() {
-if test "x$D" != "x"; then
-	D="-r $D"
-else
+if test "x$D" = "x"; then
 	${INIT_D_DIR}/${INITSCRIPT_NAME} stop
 fi
 }
 
 updatercd_postrm() {
-update-rc.d $D ${INITSCRIPT_NAME} remove
+if test "x$D" != "x"; then
+	OPT="-r $D"
+else
+	OPT=""
+fi
+update-rc.d $OPT ${INITSCRIPT_NAME} remove
 }
 
+
+def update_rc_after_parse(d):
+    import bb
+    if bb.data.getVar('INITSCRIPT_PACKAGES', d) == None:
+        if bb.data.getVar('INITSCRIPT_NAME', d) == None:
+            raise bb.build.FuncFailed, "%s inherits update-rc.d but doesn't set INITSCRIPT_NAME" % bb.data.getVar('FILE', d)
+        if bb.data.getVar('INITSCRIPT_PARAMS', d) == None:
+            raise bb.build.FuncFailed, "%s inherits update-rc.d but doesn't set INITSCRIPT_PARAMS" % bb.data.getVar('FILE', d)
+
 python __anonymous() {
-	if bb.data.getVar('INITSCRIPT_PACKAGES', d) == None:
-		if bb.data.getVar('INITSCRIPT_NAME', d) == None:
-			raise bb.build.FuncFailed, "%s inherits update-rc.d but doesn't set INITSCRIPT_NAME" % bb.data.getVar('FILE', d)
-		if bb.data.getVar('INITSCRIPT_PARAMS', d) == None:
-			raise bb.build.FuncFailed, "%s inherits update-rc.d but doesn't set INITSCRIPT_PARAMS" % bb.data.getVar('FILE', d)
+    update_rc_after_parse(d)
 }
 
 python populate_packages_prepend () {
@@ -42,10 +50,12 @@ python populate_packages_prepend () {
 		bb.data.setVar("OVERRIDES", "%s:%s" % (pkg, overrides), localdata)
 		bb.data.update_data(localdata)
 
-		postinst = bb.data.getVar('pkg_postinst', localdata, 1)
-		if not postinst:
-			postinst = '#!/bin/sh\n'
+		postinst = '#!/bin/sh\n'
 		postinst += bb.data.getVar('updatercd_postinst', localdata, 1)
+		try:
+			postinst += bb.data.getVar('pkg_postinst', localdata, 1)
+		except:
+			pass
 		bb.data.setVar('pkg_postinst_%s' % pkg, postinst, d)
 		prerm = bb.data.getVar('pkg_prerm', localdata, 1)
 		if not prerm:

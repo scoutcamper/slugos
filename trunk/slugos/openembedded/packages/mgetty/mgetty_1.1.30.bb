@@ -3,7 +3,7 @@ DESCRIPTION = "The mgetty package contains an intelligent \
 getty for allowing logins over a serial line (such as \
 through a modem) and receiving incoming faxes."
 LICENSE = "GPL"
-PR="r3"
+PR ="r3"
 
 # The source can no longer be found at ${DEBIAN_MIRROR}/main/m/mgetty/mgetty_${PV}.orig.tar.gz
 # so the nslu2-linux project has mirrored it until someone updates this package to a newer version.
@@ -61,7 +61,7 @@ do_compile () {
         -DVARRUNDIR=\"/var/run\" \
         -DAWK=\"awk\" \
         -DPERL=\""${bindir}/perl -w"\" -DTKPERL=\"${bindir}/tkperl\" \
-        -DECHO=\""echo -e"\" \
+        -DECHO=\""printf"\" \
         -DSHELL=\"/bin/bash\" \
 	-o mksed mksed.c
 	./mksed >sedscript

@@ -8,9 +8,96 @@
 # configuration
 #  The following variables control which directories in /var end
 #  up on the rootfs and which end up in a temporary file system.
-INRAM_MEMSTICK="/var/cache /var/lock /var/log /var/run /var/tmp /var/lib/ipkg"
-INRAM_NFS="/var/cache /var/lock /var/run /var/tmp"
-INRAM_DISK=""
+INRAM_MEMSTICK="\
+### SlugOS from-memory-stick boot.
+d root root 0755 /var/backups none
+d root root 0755 /var/volatile/cache none
+l root root 0755 /var/cache /var/volatile/cache
+d root root 0755 /var/lib none
+d root root 2755 /var/local none
+d root root 1777 /var/volatile/lock none
+l root root 1777 /var/lock /var/volatile/lock
+d root root 0755 /var/volatile/log none
+l root root 0755 /var/log /var/volatile/log
+d root root 0755 /var/volatile/run none
+l root root 0755 /var/run /var/volatile/run
+d root root 0755 /var/spool none
+d root root 1777 /var/volatile/tmp none
+l root root 1777 /var/tmp /var/volatile/tmp
+d root root 0755 /var/lock/subsys none
+d root root 0755 /var/lib/dropbear none
+d root root 0755 /var/lib/misc none
+f root root 0664 /var/log/wtmp none
+f root root 0664 /var/log/lastlog none
+f root root 0664 /var/run/utmp none"
+
+INRAM_NFS="\
+### SlugOS from-NFS boot.
+d root root 0755 /var/backups none
+d root root 0755 /var/volatile/cache none
+l root root 0755 /var/cache /var/volatile/cache
+d root root 0755 /var/lib none
+d root root 2755 /var/local none
+d root root 1777 /var/volatile/lock none
+l root root 1777 /var/lock /var/volatile/lock
+d root root 0755 /var/log none
+d root root 0755 /var/volatile/run none
+l root root 0755 /var/run /var/volatile/run
+d root root 0755 /var/spool none
+d root root 1777 /var/volatile/tmp none
+l root root 1777 /var/tmp /var/volatile/tmp
+d root root 0755 /var/lock/subsys none
+d root root 0755 /var/lib/dropbear none
+d root root 0755 /var/lib/misc none
+d root root 0755 /var/lib/opkg none
+f root root 0664 /var/log/wtmp none
+f root root 0664 /var/log/lastlog none
+f root root 0664 /var/run/utmp none"
+
+INRAM_DISK="\
+### SlugOS from-disk boot.
+d root root 0755 /var/backups none
+d root root 0755 /var/cache none
+d root root 0755 /var/lib none
+d root root 2755 /var/local none
+d root root 1777 /var/lock none
+d root root 0755 /var/log none
+d root root 0755 /var/run none
+d root root 0755 /var/spool none
+d root root 1777 /var/tmp none
+d root root 0755 /var/lock/subsys none
+d root root 0755 /var/lib/dropbear none
+d root root 0755 /var/lib/misc none
+d root root 0755 /var/lib/opkg none
+f root root 0664 /var/log/wtmp none
+f root root 0664 /var/log/lastlog none
+f root root 0664 /var/run/utmp none"
+
+INRAM_HEADER="\
+# This configuration file lists filesystem objects that should get verified
+# during startup and be created if missing.
+#
+# Every line must either be a comment starting with #
+# or a definition of format:
+# <type> <owner> <group> <mode> <path> <linksource>
+# where the items are separated by whitespace !
+#
+# <type> : d|f|l : (d)irectory|(f)ile|(l)ink
+#
+# A linking example:
+# l root root 0777 /var/test /tmp/testfile
+# f root root 0644 /var/test none
+#
+# Understanding links:
+# When populate-volatile is to verify/create a directory or file, it will first
+# check it's existence. If a link is found to exist in the place of the target,
+# the path of the target is replaced with the target the link points to.
+# Thus, if a link is in the place to be verified, the object will be created
+# in the place the link points to instead.
+# This explains the order of \"link before object\" as in the example above, where
+# a link will be created at /var/test pointing to /tmp/testfile and due to this
+# link the file defined as /var/test will actually be created as /tmp/testfile.
+#"
 
 #
 # force: override certain checks
@@ -75,7 +162,7 @@ fsoptions() {
 # get_flash <directory> {mount options}
 #  mount the flash device, writeable, on the given directory
 get_flash() {
-	local ffsdir ffsdev
+	local ffsdir ffspart ffsdev
 
 	ffsdir="$1"
 	shift
@@ -84,7 +171,13 @@ get_flash() {
 		return 1
 	}
 
-	ffsdev="$(mtblockdev Flashdisk)"
+	case "$(machine)" in
+	nslu2)	ffspart="Flashdisk";;
+	*)	ffspart="filesystem";;
+	esac
+	ffsdev="$(mtblockdev $ffspart)"
+	[ -n "$ffsdev" ] || \
+	ffsdev="$(mtblockdev rootfs)"
 	umountflash "$ffsdev" &&
 	mountflash "$ffsdev" "$ffsdir" "$@"
 }
@@ -150,7 +243,7 @@ copy_rootfs() {
 	#   /var/*
 	echo "turnup: copying root file system" >&2
 	(	cd "$1"
-		find . -mount -print |
+		find . -xdev -print |
 		sed '\@^./dev/@d;\@^./boot/@d;\@^./boot$@d;\@^./linuxrc@d;\@^./var/@d' |
 		cpio -p -d -m -u "$2"
 	) || {
@@ -181,7 +274,13 @@ setup_dev() {
 	#	/dev/null
 	# syslog, and maybe other things, only work if fd 1 is valid, therefore
 	# we must create these devices here...
-	makedevs --root="$1" --devtable="$2"
+	# (if makedevs is a symlink, it's the busybox version, different syntax)
+	if [ -h /sbin/makedevs ]
+	then
+		makedevs -d "$2" "$1"
+	else
+		makedevs --root="$1" --devtable="$2"
+	fi
 	:>"$1"/dev/.noram
 	return 0
 }
@@ -197,7 +296,13 @@ setup_bootdev() {
 	}
 	# NOTE: this fails silently with 0 return code(!) when a directory
 	# does not exist yet things are created within it.
-	makedevs -r "$1" -D "$2"
+	# (if makedevs is a symlink, it's the busybox version, different syntax)
+	if [ -h /sbin/makedevs ]
+	then
+		makedevs -d "$2" "$1"
+	else
+		makedevs -r "$1" -D "$2"
+	fi
 }
 
 #
@@ -206,7 +311,6 @@ setup_bootdev() {
 #  Removes the /var tmpfs entry from /etc/fstab.
 #  Creates links from /var into /media/ram for NFS and Memstick.
 setup_var() {
-	local ram_targets directory
 
 	test -n "$1" -a -d "$1"/var || {
 		echo "turnup: setup_var($1,$2): expected a directory" >&2
@@ -217,35 +321,30 @@ setup_var() {
 	*)	echo "turnup: setup_var($1,$2): expected 'disk', 'nfs' or 'memstick'" >&2
 		return 1;;
 	esac
-	#
-	# populate /var, there is a shell script to do this, but it uses
-	# absolute path names
-	chroot "$1" /bin/busybox sh /etc/init.d/populate-volatile.sh || {
-		echo "turnup: /var: could not populate directory" >&2
-		return 1
-	}
 
+	# populate /var.  We just need to create the /var/volatile mount
+	# point, the populate-volatile script does the work at boot time.
+	#QUIET: echo "turnup: ensuring /var/volatile mountpoint exists" >&2
+	test -d "$1"/var/volatile || mkdir "$1"/var/volatile
+
+	# we need to put in place the correct configuration file for
+	# the populate-volatile script to use at boot time.  The config
+	# file is already in place for the flash boot, and it's the same
+	# file for the ram boot.
 	case "$2" in
-	disk)	ram_targets="$INRAM_DISK";;
-	nfs)	ram_targets="$INRAM_NFS";;
-	memstick)
-		ram_targets="$INRAM_MEMSTICK";;
+	disk)	  echo "$INRAM_HEADER"   > "$1"/etc/default/volatiles/00_core
+		  echo "$INRAM_DISK"     >>"$1"/etc/default/volatiles/00_core;;
+	nfs)	  echo "$INRAM_HEADER"   > "$1"/etc/default/volatiles/00_core
+		  echo "$INRAM_NFS"      >>"$1"/etc/default/volatiles/00_core;;
+	memstick) echo "$INRAM_HEADER"   > "$1"/etc/default/volatiles/00_core
+	          echo "$INRAM_MEMSTICK" >>"$1"/etc/default/volatiles/00_core;;
 	esac
 
-	for directory in $ram_targets
-	do
-		rm -rf "$1/$directory"
-		ln -s "/media/ram/$directory" "$1/$directory"
-	done
-	# the startup link is left for the moment, this seems safer
-	#rm "$1"/etc/rc?.d/[KS]??populate-var.sh
-	# remove the /var tmpfs entry from the new /etc/fstab
+	# remove the /var tmpfs entry from the new /etc/fstab, if it is
+	# present in the first place.
 	sed -i '\@[ 	]/var[ 	][ 	]*tmpfs[ 	]@d' "$1"/etc/fstab
-	echo "turnup: tmpfs will no longer be mounted on /var" >&2
+	#QUIET: echo "turnup: ensuring tmpfs will not be mounted on /var" >&2
 	#
-	# Previous versions of turnup removed populate-var.sh from the
-	# startup links, this one doesn't, so /var can be made back into
-	# a tmpfs just by a change to /etc/fstab.
 	return 0
 }
 
@@ -268,9 +367,9 @@ setup_syslog() {
 			sed -i 's!DESTINATION="buffer"!DESTINATION="file"!
 				/^ROTATESIZE=/d
 				/^ROTATEGENS=/d' "$1"/etc/syslog.conf
-			echo "turnup: /etc/syslog.conf: changed to file buffering" >&2
-			echo " Old (buffer) version in /etc/syslog.conf.sav" >&2
-			echo " Log messages will be in /var/log/messages" >&2
+			#QUIET: echo "turnup: /etc/syslog.conf: changed to file buffering" >&2
+			#QUIET: echo " Old (buffer) version in /etc/syslog.conf.sav" >&2
+			#QUIET: echo " Log messages will be in /var/log/messages" >&2
 		else
 			echo "turnup: /etc/syslog.conf: failed to make a copy" >&2
 			echo " syslog will log to a buffer" >&2
@@ -345,6 +444,7 @@ boot_rootfs() {
 	sleep="$3"
 	device="$4"
 	uuid=
+	mduuid=
 
 	# test this first as the test does not depend on the correctness
 	# of the other arguments
@@ -365,6 +465,11 @@ boot_rootfs() {
 			return 1
 		}
 		uuid="$3"
+		if (echo "$device" | grep -q '^/dev/md')
+		then
+			# FIXME: should use awk to do the below extraction
+			mduuid=`mdadm --detail --brief "$device" | sed 's/^.*UUID=//'`
+		fi
 		shift 3;;
 	nfs)	shift 2;;
 	flash)	;;
@@ -391,6 +496,8 @@ boot_rootfs() {
 			return 1
 		};;
 	ram)	{	echo '#!/bin/sh'
+			echo 'mount -t proc  proc  /proc'
+			echo 'mount -t sysfs sysfs /sys'
 			echo 'leds beep'
 			echo 'rm -f /linuxrc.new'
 			echo 'ln -s boot/flash /linuxrc.new'
@@ -403,9 +510,12 @@ boot_rootfs() {
 			return 1
 		};;
 	*)	{	echo '#!/bin/sh'
+			echo 'mount -t proc  proc  /proc'
+			echo 'mount -t sysfs sysfs /sys'
 			echo 'leds beep'
 			test "$sleep" -gt 0 && echo -n "sleep='$sleep' "
 			test -n "$uuid" && echo -n "UUID='$uuid' "
+			test -n "$mduuid" && echo -n "MDUUID='$mduuid' "
 			echo -n "exec '/boot/$type' '$device'"
 			for opt in "$@"
 			do
@@ -441,7 +551,7 @@ disk() {
 	local setup_type sleep init device uuid new ffs fst fso
 
 	setup_type=disk
-	sleep=0
+	sleep=10
 	init=
 	while test $# -gt 0
 	do
@@ -491,7 +601,7 @@ disk() {
 	fso="$(fsoptions "$@")"
 	if	if test -n "$uuid"
 		then
-			mount "$@" -U "$uuid" "$new"
+			mount "$@" UUID="$uuid" "$new"
 		else
 			mount "$@" "$device" "$new"
 		fi
@@ -504,7 +614,7 @@ disk() {
 	if test -n "$fst" &&
 		if test -n "$uuid"
 		then
-			mount -t "$fst" -o "$fso" -U "$uuid" "$new"
+			mount -t "$fst" -o "$fso" UUID="$uuid" "$new"
 		else
 			mount -t "$fst" -o "$fso" "$device" "$new"
 		fi
@@ -546,7 +656,7 @@ disk() {
 		then
 			echo "  options used: -t $fst -o $fso [error in this script]" >&2
 			test -n "$uuid" &&
-				echo "  uuid: $uuid (passed with -U)" >&2
+				echo "  uuid: $uuid (passed with UUID=<uuid>)" >&2
 		fi
 	fi
 

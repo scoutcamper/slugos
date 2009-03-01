@@ -1,5 +1,5 @@
 SECTION = "x11/utils"
-DEPENDS = "x11 xt libxft"
+DEPENDS = "virtual/libx11 libxt libxft"
 DESCRIPTION = "rxvt-unicode is a clone of the well known \
 terminal emulator rxvt, modified to store text in Unicode \
 (either UCS-2 or UCS-4) and to use locale-correct input and \
@@ -7,7 +7,7 @@ output. It also supports mixing multiple fonts at the \
 same time, including Xft fonts."
 DEFAULT_PREFERENCE = "-1"
 LICENSE = "GPL"
-SRC_URI = "cvs://anonymous@cvs.schmorp.de/schmorpforge;module=rxvt-unicode \
+SRC_URI = "cvs://anonymous@cvs.schmorp.de/schmorpforge;module=rxvt-unicode;port=636 \
 	   file://xwc.patch;patch=1 \
 	   file://signedchar.patch;patch=1 \
 	   file://makefile.patch;patch=1"

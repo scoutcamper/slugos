@@ -1,9 +1,5 @@
-LICENSE = "GPL"
-SECTION = "gpe"
-inherit gpe
+require gpe-what.inc
 
 SRC_URI += "file://makefile-fix.patch;patch=1"
 
-DESCRIPTION = "GPE modal help"
-DEPENDS = "x11 xpm libmatchbox"
-MAINTAINER = "Phil Blundell <pb@handhelds.org>"
+DEPENDS = "virtual/libx11 libxpm libmatchbox"

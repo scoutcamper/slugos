@@ -1,7 +1,6 @@
 SECTION = "console/network"
 DESCRIPTION = "Small dhcp client and dhcp server.  Designed for embedded use."
 HOMEPAGE = "http://udhcp.busybox.net/"
-MAINTAINER = "Chris Larson <kergoth@handhelds.org>"
 LICENSE = "GPL"
 
 SRC_URI = "http://udhcp.busybox.net/source/udhcp-${PV}.tar.gz \
@@ -20,7 +19,7 @@ EXTRA_OEMAKE = "'CC=${CC}' 'LD=${CCLD}' \
 		'usrbindir=${bindir}' \
 		'datadir=${datadir}'"
 
-PACKAGES = "udhcpc udhcpc-doc udhcpd udhcpd-doc"
+PACKAGES = "${PN}-dbg udhcpc udhcpc-doc udhcpd udhcpd-doc ${PN}"
 FILES_udhcpc = "/sbin/udhcpc ${datadir}/udhcpc"
 FILES_udhcpc-doc = "${mandir}/man8/udhcpc.8"
 FILES_udhcpd = "${sbindir}/udhcpd \

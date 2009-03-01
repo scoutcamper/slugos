@@ -1,14 +1,15 @@
-PR          = "r0"
-SECTION     = "gpe"
+SECTION = "gpe"
 PRIORITY    = "optional"
 DESCRIPTION = "Suspend feature for the application launcher menu."
-MAINTAINER  = "Florian Boor <florian@kernelconcepts.de>"
 LICENSE     = "GPL"
-DEPENDS     = "gpe-conf"
+
+PR          = "r1"
+
 RDEPENDS    = "gpe-conf"
 RRECOMMENDS = "apm"
-PACKAGES    = ${PN}
 
+PACKAGES    = "${PN}"
+PACKAGE_ARCH = "all"
 
 SRC_URI = "file://suspend.desktop \
            file://suspend.sh"
@@ -21,6 +22,6 @@ do_compile() {
 do_install() {
 	install -d ${D}/${bindir}
 	install -d ${D}/${datadir}/applications
-	install -m644 ${WORKDIR}/suspend.desktop ${D}/${datadir}/applications/suspend.desktop
-	install -m755 ${WORKDIR}/suspend.sh ${D}/${bindir}/suspend.sh
+	install -m 644 ${WORKDIR}/suspend.desktop ${D}/${datadir}/applications/suspend.desktop
+	install -m 755 ${WORKDIR}/suspend.sh ${D}/${bindir}/suspend.sh
 }

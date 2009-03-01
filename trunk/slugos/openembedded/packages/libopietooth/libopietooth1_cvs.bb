@@ -1,4 +1,5 @@
 SRC_URI = "${HANDHELDS_CVS};module=opie/noncore/net/opietooth/lib"
 PV = "${OPIE_CVS_PV}"
+PR = "r1"
 
-include libopietooth1.inc
+require libopietooth1.inc

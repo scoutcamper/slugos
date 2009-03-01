@@ -1,12 +1,12 @@
 DESCRIPTION = "Interface software for the TopField TF5000PVRt"
 SECTION = "network"
 PRIORITY = "optional"
-MAINTAINER = "NSLU2 Linux <www.nslu2-linux.org>"
 HOMEPAGE = "http://sf.net/projects/puppy/"
 LICENSE = "GPL"
-PR = "r2"
+PR = "r3"
 
-SRC_URI = "cvs://anonymous:@cvs.sourceforge.net/cvsroot/puppy;module=puppy;tag=PUPPY_1_11"
+SRC_URI = "cvs://anonymous:@puppy.cvs.sourceforge.net/cvsroot/puppy;module=puppy;tag=PUPPY_1_11 \
+	   file://usb-header.patch;patch=1"
 S = "${WORKDIR}/puppy"
 
 inherit autotools

@@ -1,6 +1,5 @@
 # Intel ixp4xx access library software.  Note that this has an Intel
 # license which restricts its use.
-MAINTAINER = "NSLU2 Linux <nslu2-linux@yahoogroups.com>"
 HOMEPAGE = "http://www.intel.com/design/network/products/npfamily/ixp420.htm"
 LICENSE = "http://www.intel.com/design/network/swsup/np_sla/ixp400.htm"
 LICENSE_HOMEPAGE = "http://www.intel.com/design/network/products/npfamily/ixp425swr1.htm"
@@ -28,6 +27,7 @@ S = "${WORKDIR}/ixp400_xscale_sw"
 PR = "r6"
 
 COMPATIBLE_HOST = "^armeb-linux.*"
+COMPATIBLE_MACHINE = "(nslu2|ixp4xx)"
 
 inherit module
 
@@ -54,7 +54,7 @@ do_compile () {
 do_stage () {
 	install -d ${STAGING_INCDIR}/linux/ixp4xx-csr
 	install -m 0644 src/include/*.h ${STAGING_INCDIR}/linux/ixp4xx-csr/
-	cp -rf --dereference src/linux/* ${STAGING_INCDIR}/linux/ixp4xx-csr/
+	cp -RLf src/linux/* ${STAGING_INCDIR}/linux/ixp4xx-csr/
 }
 
 do_install () {

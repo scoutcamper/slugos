@@ -1,11 +1,12 @@
 LICENSE = "LGPL"
 SECTION = "x11/libs"
-# Xt needed to keep autoconf's check for X11 happy
-DEPENDS = "glib-2.0 fontconfig freetype zlib x11 libxft xt gtk-doc cairo"
+DEPENDS = "glib-2.0 fontconfig freetype zlib virtual/libx11 libxft gtk-doc cairo"
 DESCRIPTION = "The goal of the Pango project is to provide an \
 Open Source framework for the layout and rendering of \
 internationalized text."
-PR = "r0"
+PR = "r2"
+
+RRECOMMENDS_${PN} = "pango-module-basic-x pango-module-basic-fc"
 
 # seems to go wrong with default cflags
 FULL_OPTIMIZATION_arm = "-O2"
@@ -19,9 +20,12 @@ EXTRA_OECONF = "--disable-glibtest \
 		--enable-explicit-deps=no \
 	        --disable-debug"
 
-FILES_${PN} = "/etc ${bindir} ${libdir}/libpango*.so.*"
-
+LEAD_SONAME = "libpango-1.0*"
 LIBV = "1.4.0"
+
+FILES_${PN} = "/etc ${bindir}/* ${libdir}/libpango*.so.*"
+FILES_${PN}-dbg += "${libdir}/pango/${LIBV}/modules/.debug"
+FILES_${PN}-dev += "${libdir}/pango/${LIBV}/modules/*.la"
 
 do_stage () {
 autotools_stage_all

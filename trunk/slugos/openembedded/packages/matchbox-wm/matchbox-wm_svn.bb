@@ -1,10 +1,9 @@
-SECTION = "x11/wm"
-DESCRIPTION = "Matchbox window manager"
-LICENSE = "GPL"
-DEPENDS = "libmatchbox x11 xext xcomposite libxfixes xdamage libxrender startup-notification expat gconf matchbox-common"
-RDEPENDS = "matchbox-common"
-PV = "0.9.5+svn${SRCDATE}"
-PR = "r1"
+require matchbox-wm.inc
+
+DEPENDS = "libmatchbox virtual/libx11 libxext libxcomposite libxfixes libxdamage libxrender startup-notification expat gconf "
+RDEPENDS = ""
+PV = "1.1+svn${SRCDATE}"
+PR = "r4"
 DEFAULT_PREFERENCE = "-1"
 
 SRC_URI = "svn://svn.o-hand.com/repos/matchbox/trunk;module=matchbox-window-manager;proto=http \
@@ -19,7 +18,7 @@ ALTERNATIVE_LINK = "${bindir}/x-window-manager"
 ALTERNATIVE_PATH = "${bindir}/matchbox-session"
 ALTERNATIVE_PRIORITY = "10"
 
-FILES_${PN} = "${bindir} \
+FILES_${PN} = "${bindir}/* \
                ${datadir}/matchbox \
                ${sysconfdir}/matchbox \
                ${datadir}/themes/blondie/matchbox \

@@ -1,13 +1,10 @@
 DESCRIPTION = "Meta-package for Enlightenment/X11"
-PACKAGES = "task-e-x11"
-PROVIDES = "task-e-x11"
-PR = "r6"
+SECTION = "x11/base"
+ALLOW_EMPTY = "1"
+PR = "r1"
+PACKAGE_ARCH = "all"
+LICENSE = "MIT"
 
-FEED_URIS += "x11##http://openzaurus.org/official/unstable/3.5.2/feed/x11 \
-              e##http://openzaurus.org/official/unstable/3.5.2/feed/e"
+RDEPENDS = "task-e-x11"
 
-ALLOW_EMPTY = 1
-
-RDEPENDS_task-e-x11  = "task-e-x11-core entice eclair examine evidence e-modules"
-# e-utils elitaire
-
+inherit meta

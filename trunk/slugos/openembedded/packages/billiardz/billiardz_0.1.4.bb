@@ -2,17 +2,17 @@ DESCRIPTION = "Billiard Game for Qt/Embedded based palmtop environments w/ SDL."
 HOMEPAGE = "http://www.chipx86.com/projects/billiardz/"
 SECTION = "opie/games"
 PRIORITY = "optional"
-MAINTAINER = "Michael 'Mickey' Lauer <mickey@Vanille.de>"
 LICENSE = "GPL"
 DEPENDS = "libsdl-qpe libsdl-image"
-PR = "r1"
+PR = "r2"
 
-SRC_URI = "http://www.chipx86.com/packages/ipkg/billiardz-${PV}.tar.gz"
+SRC_URI = "http://www.chipx86.com/packages/ipkg/billiardz-${PV}.tar.gz \
+           file://gcc4.patch;patch=1"
 
 inherit palmtop
 
 QMAKE_PROFILES = "billiardz.arm.pro"
-EXTRA_QMAKEVARS_POST = "DEFINES-=FPM_INTEL" 
+EXTRA_QMAKEVARS_POST += "DEFINES-=FPM_INTEL"
 
 do_install() {
         install -d ${D}${palmtopdir}/bin \

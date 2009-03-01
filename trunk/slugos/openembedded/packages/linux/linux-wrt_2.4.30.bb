@@ -5,7 +5,7 @@ DEPENDS = "lzma-native"
 LICENSE = "GPL"
 PR = "r2"
 
-SRC_URI = "http://www.fi.kernel.org/pub/linux/kernel/v2.4/linux-2.4.30.tar.bz2 \
+SRC_URI = "${KERNELORG_MIRROR}/pub/linux/kernel/v2.4/linux-2.4.30.tar.bz2 \
 	cvs://anonymous@openwrt.org/openwrt;module=openwrt/package/linux/kernel-source;tag=TESTED \
 	http://downloads.openwrt.org/sources/kernel-binary-wl-0.2.tar.gz \
 	http://downloads.openwrt.org/sources/kernel-source-et-0.6.tar.gz \
@@ -75,7 +75,6 @@ COMPATIBLE_HOST = 'mipsel.*-linux'
 
 inherit kernel
 
-KERNEL_IMAGETYPE ?= "zImage"
 KERNEL_OUTPUT = "arch/mips/brcm-boards/bcm947xx/compressed/piggy"
 CMDLINE = "root=/dev/mtdblock2 rootfstype=squashfs,jffs2 console=ttyS0,115200"
 
@@ -97,24 +96,15 @@ addtask unpack_extra after do_unpack before do_patch
 do_configure_prepend() {
 	install -m 0644 ${WORKDIR}/linux.config ${S}/.config
 	echo "CONFIG_CMDLINE=\"${CMDLINE}\"" >> ${S}/.config
-	
-	sed -i -e 's/@expr length/@-expr length/' ${S}/Makefile 
+
+	sed -i -e 's/@expr length/@-expr length/' ${S}/Makefile
 	sed -i -e "s,\-mcpu=,\-mtune=,g;" ${S}/arch/mips/Makefile
 }
 
 do_deploy() {
-	install -d ${DEPLOY_DIR}/images
+	install -d ${DEPLOY_DIR_IMAGE}
 	cat ${KERNEL_OUTPUT} | lzma e -si -so -eos > \
-		${DEPLOY_DIR}/images/wrt-kernel-${PV}.lzma
+		${DEPLOY_DIR_IMAGE}/wrt-kernel-${PV}.lzma
 }
 
-do_deploy[dirs] = "${S}"
-
-addtask deploy before do_build after do_compile
-
-python () {
-	# Don't build kernel unless we're targeting a wrt
-	mach = bb.data.getVar("MACHINE", d, 1)
-	if mach != 'wrt54':
-		raise bb.parse.SkipPackage("Unable to build for non-WRT54 device.")
-}
+COMPATIBLE_MACHINE = "wrt54"

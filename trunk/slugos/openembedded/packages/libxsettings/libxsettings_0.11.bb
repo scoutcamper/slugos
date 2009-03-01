@@ -2,8 +2,7 @@ DESCRIPTION = "Common code for XSETTINGS"
 SECTION = "gpe/libs"
 LICENSE = "BSD-X"
 PRIORITY = "optional"
-MAINTAINER = "Philip Blundell <pb@handhelds.org>"
-DEPENDS = "x11"
+DEPENDS = "virtual/libx11"
 
 inherit gpe
 

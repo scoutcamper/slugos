@@ -1,7 +1,6 @@
 DESCRIPTION = "A flightcomputer application for Qt/E based Palmtop Environments"
 SECTION = "opie/applications"
 PRIORITY = "optional"
-MAINTAINER = "Michael 'Mickey' Lauer <mickey@Vanille.de>"
 LICENSE = "GPL"
 APPTYPE = "binary"
 APPNAME = "cumulus"
@@ -17,7 +16,7 @@ inherit opie
 DEFAULT_PREFERENCE = "-1"
 
 export OE_QMAKE_LINK="${CXX}"
-EXTRA_QMAKEVARS_POST = "INCLUDEPATH+=-I."
+EXTRA_QMAKEVARS_POST += "INCLUDEPATH+=-I."
 
 #
 # nasty hack since cumulus doesn't obey the qmake standard which requires just one .pro file per directory
@@ -26,7 +25,7 @@ do_compile() {
 	echo "#define SHARP_PDA_WARNSOUND 4" >sharp_char.h
 	qmake -makefile -spec ${QMAKESPEC} -after ${EXTRA_QMAKEVARS_POST} cumulus.pro
 	oe_runmake
-	qmake -makefile -spec ${QMAKESPEC} -after ${EXTRA_QMAKEVARS_POST} gpsClient.pro 
+	qmake -makefile -spec ${QMAKESPEC} -after ${EXTRA_QMAKEVARS_POST} gpsClient.pro
 	oe_runmake
 }
 

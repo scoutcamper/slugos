@@ -1,20 +1,18 @@
 DESCRIPTION = "avetanaBT: Bluetooth API implementation for Java (JSR-82)"
 SECTION = "devel"
-DEPENDS = "findutils-native jikes-native kaffeh-native fastjar-native bluez-libs classpath"
-# Matthias Ringwald <mringwal@inf.ethz.ch> was helping me in the first phase. Thanks.
-MAINTAINER = "Mustafa Yuecel <yuecelm@ee.ethz.ch>"
+DEPENDS = "findutils-native virtual/javac-native kaffeh-native fastjar-native bluez-libs classpath"
 LICENSE = "GPL"
 HOMEPAGE = "http://sourceforge.net/projects/avetanabt/"
 
-PV = "0.0+cvs${SRCDATE}"
-PR = "r3"
+DEFAULT_PREFERENCE = "-1"
 
-SRC_URI = "cvs://anonymous@cvs.sourceforge.net/cvsroot/avetanabt;module=avetanabt \
-	   file://maxConnectedDevices.patch;patch=1"
+PV = "20060413+cvs${SRCDATE}"
+PR = "r5"
+
+SRC_URI = "cvs://anonymous@avetanabt.cvs.sourceforge.net/cvsroot/avetanabt;module=avetanabt"
 
 S = "${WORKDIR}/avetanabt"
 
-PACKAGES = "${PN}"
 FILES_${PN} = "${libdir}/libavetanaBT.so ${datadir}/avetanabt/avetanaBT.jar"
 
 do_compile() {
@@ -22,26 +20,25 @@ do_compile() {
   # doing nearly the same as in Makefile written...
 
   # clean build directory
-  ${STAGING_BINDIR}/mkdir -p build
-  ${STAGING_BINDIR}/rm -fr build/*
+  mkdir -p build
+  rm -fr build/*
 
   # generate classes
-  # javac -> jikes
-  ${STAGING_BINDIR}/find {de,javax,com} -iname *.java > file.list
-  ${STAGING_BINDIR}/jikes -verbose --bootclasspath ${STAGING_DIR}/${BUILD_SYS}/share/kaffeh/rt.jar -d build @file.list
+  ${STAGING_BINDIR_NATIVE}/find {de,javax,com} -iname *.java > file.list
+  ${STAGING_BINDIR_NATIVE}/javac -verbose -bootclasspath ${STAGING_DATADIR_NATIVE}/kaffeh/rt.jar -d build @file.list
 
   # create own version.xml (add version information available at runtime)
-  ${STAGING_BINDIR}/head -n 4 version.xml >> build/version.xml
-  ${STAGING_BINDIR}/echo "    <build value=\"cvs${SRCDATE}\" date=\"${SRCDATE}\" time=\"${@time.strftime('%H:%M',time.gmtime())}\"/>" >> build/version.xml
-  ${STAGING_BINDIR}/tail -n 3 version.xml >> build/version.xml
+  head -n 4 version.xml >> build/version.xml
+  echo "    <build value=\"cvs${SRCDATE}\" date=\"${SRCDATE}\" time=\"${@time.strftime('%H:%M',time.gmtime())}\"/>" >> build/version.xml
+  tail -n 3 version.xml >> build/version.xml
 
   # move classes into jar archive
   # jar -> fastjar
-  ${STAGING_BINDIR}/fastjar -v -cf avetanaBT.jar -C build de -C build javax -C build com -C build version.xml
-  
+  ${STAGING_BINDIR_NATIVE}/fastjar -v -cf avetanaBT.jar -C build de -C build javax -C build com -C build version.xml
+
   # JNI generated header file - de_avetana_bluetooth_stack_BlueZ.h
   # javah -> kaffeh
-  ${STAGING_BINDIR}/kaffeh -jni -classpath avetanaBT.jar:${STAGING_DIR}/${BUILD_SYS}/share/kaffeh/rt.jar -d c de.avetana.bluetooth.stack.BlueZ
+  ${STAGING_BINDIR_NATIVE}/kaffeh -jni -classpath avetanaBT.jar:${STAGING_DATADIR_NATIVE}/kaffeh/rt.jar -d c de.avetana.bluetooth.stack.BlueZ
 
   # Native language (C) library - libavetanaBT.so
   ${CXX} ${CXXFLAGS}  -shared -lbluetooth -I${STAGING_INCDIR}/classpath c/BlueZ.cpp -o libavetanaBT.so ${LDFLAGS}
@@ -50,8 +47,8 @@ do_compile() {
 
 do_stage() {
 
-  install -d ${STAGING_DIR}/${BUILD_SYS}/share/avetanabt
-  install avetanaBT.jar ${STAGING_DIR}/${BUILD_SYS}/share/avetanabt/
+  install -d ${STAGING_DATADIR_NATIVE}/avetanabt
+  install avetanaBT.jar ${STAGING_DATADIR_NATIVE}/avetanabt/
 
 }
 
@@ -62,5 +59,5 @@ do_install() {
 
   install -d ${D}${datadir}/avetanabt
   install avetanaBT.jar ${D}${datadir}/avetanabt/
- 
+
 }

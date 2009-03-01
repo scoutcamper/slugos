@@ -1,7 +1,6 @@
 DESCRIPTION = "Opie Network Settings"
 SECTION = "opie/settings"
 PRIORITY = "optional"
-MAINTAINER = "Michael 'Mickey' Lauer <mickey@Vanille.de>"
 LICENSE = "GPL"
 PROVIDES = "opie-networksettings-pppplugin opie-networksettings-wlanplugin"
 APPNAME = "networksettings"
@@ -32,7 +31,7 @@ do_install() {
 	install -m 0644 ${WORKDIR}/pics/${APPNAME}/*.* ${D}${palmtopdir}/pics/${APPNAME}/
 	install -m 0644 ${WORKDIR}/pics/Network/*.* ${D}${palmtopdir}/pics/Network/
 	install -d ${D}${palmtopdir}/lib/
-	oe_libinstall -so libinterfaces ${D}${palmtopdir}/lib
+	oe_libinstall -so libinterfaces ${D}${libdir}
 	install -d ${D}${palmtopdir}/plugins/networksettings/
 	for plugin in kppp wlan
 	do

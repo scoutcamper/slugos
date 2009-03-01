@@ -1,6 +1,5 @@
-SECTION = "net/misc"
+SECTION = "network/misc"
 DESCRIPTION = "Bluetooth scanner"
-MAINTAINER = "Bob Davies <tyggerbob@gmail.com>"
 LICENSE = "GPL"
 RDEPENDS = "perl"
 

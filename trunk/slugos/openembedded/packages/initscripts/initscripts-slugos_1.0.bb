@@ -6,22 +6,28 @@
 # in.
 include initscripts_${PV}.bb
 
-MAINTAINER = "John Bowler <jbowler@acm.org>"
 RCONFLICTS = "initscripts"
+
+# SlugOS uses the busybox makedevs, so until that dependency gets virtualized
+# the below lines serve to remove the dependency on the full makedevs package:
+DEPENDS = ""
+RDEPENDS = ""
+
 # All other standard definitions inherited from initscripts
 # Except the PR which is hacked here.  The format used is
 # a suffix
-PR := "${PR}.9"
+PR := "${PR}.19"
 
 FILESPATH = "${@base_set_filespath([ '${FILE_DIRNAME}/${P}', '${FILE_DIRNAME}/initscripts-${PV}', '${FILE_DIRNAME}/files', '${FILE_DIRNAME}' ], d)}"
 
-PACKAGES = "${PN}"
+PACKAGES = "${PN}-dbg ${PN}"
 
 SRC_URI += "file://alignment.sh"
 SRC_URI += "file://domainname.sh"
 SRC_URI += "file://devices.patch;patch=1"
+SRC_URI += "file://bootclean.sh"
 
-# Without this it is not possible to patch checkroot.sh
+# Without this it is not possible to patch checkroot
 S = "${WORKDIR}"
 
 do_install_append() {
@@ -31,6 +37,8 @@ do_install_append() {
 	# slugos specific scripts
 	install -m 0755 ${WORKDIR}/alignment.sh ${D}${sysconfdir}/init.d
 	install -m 0755 ${WORKDIR}/domainname.sh ${D}${sysconfdir}/init.d
+	install -m 0755 ${WORKDIR}/bootclean.sh ${D}${sysconfdir}/init.d
+	install -m 0755 ${WORKDIR}/checkroot ${D}${sysconfdir}/init.d
 
 	# Remove the do install links (this detects a change to the
 	# initscripts .bb file - it will cause a build failure here.)
@@ -43,36 +51,41 @@ do_install_append() {
 	rm	${D}${sysconfdir}/rc6.d/S20sendsigs
 #	rm	${D}${sysconfdir}/rc6.d/S30urandom
 	rm	${D}${sysconfdir}/rc6.d/S31umountnfs.sh
-#	rm	${D}${sysconfdir}/rc6.d/S40umountfs
-	rm      ${D}${sysconfdir}/rcS.d/S30ramdisk 
+	rm	${D}${sysconfdir}/rc6.d/S40umountfs
+	rm      ${D}${sysconfdir}/rcS.d/S30ramdisk
 	rm	${D}${sysconfdir}/rc6.d/S90reboot
 	rm	${D}${sysconfdir}/rc0.d/S20sendsigs
 #	rm	${D}${sysconfdir}/rc0.d/S30urandom
 	rm	${D}${sysconfdir}/rc0.d/S31umountnfs.sh
-#	rm	${D}${sysconfdir}/rc0.d/S40umountfs
+	rm	${D}${sysconfdir}/rc0.d/S40umountfs
 	rm	${D}${sysconfdir}/rc0.d/S90halt
 	rm	${D}${sysconfdir}/rcS.d/S02banner
-	rm	${D}${sysconfdir}/rcS.d/S10checkroot.sh
+	rm	${D}${sysconfdir}/rcS.d/S10checkroot
 #	rm	${D}${sysconfdir}/rcS.d/S30checkfs.sh
 	rm	${D}${sysconfdir}/rcS.d/S35mountall.sh
 	rm	${D}${sysconfdir}/rcS.d/S39hostname.sh
 	rm	${D}${sysconfdir}/rcS.d/S45mountnfs.sh
 	rm	${D}${sysconfdir}/rcS.d/S55bootmisc.sh
 #	rm	${D}${sysconfdir}/rcS.d/S55urandom
-	rm	${D}${sysconfdir}/rcS.d/S99finish
+	rm	${D}${sysconfdir}/rcS.d/S99finish.sh
 	rm	${D}${sysconfdir}/rcS.d/S05devices
 	# udev will run at S04 if installed
 	rm	${D}${sysconfdir}/rcS.d/S03sysfs
 	rm	${D}${sysconfdir}/rcS.d/S38devpts.sh
-#	rm	${D}${sysconfdir}/rcS.d/S06alignment
+	rm -f	${D}${sysconfdir}/rcS.d/S06alignment
+	rm 	${D}${sysconfdir}/rcS.d/S37populate-volatile.sh
+	rm 	${D}${sysconfdir}/rc0.d/S25save-rtc.sh
+	rm      ${D}${sysconfdir}/rc6.d/S25save-rtc.sh
+
+
 
 	# Check the result
 	find ${D}${sysconfdir}/rc?.d ! -type d -print | {
 		status=0
 		while read d
 		do
-			oenote "initscripts-slugos: unexpected link $f"
-			status = 1
+			oenote "initscripts-slugos: unexpected link $d"
+			status=1
 		done
 		test $status -eq 0 ||
 			oefatal "initscripts-slugos: new links break do_install"
@@ -92,16 +105,19 @@ do_install_append() {
 	# busybox hwclock.sh (slugos-init) starts here (08)
 	# slugos-init umountinitrd runs here (09)
 
-	update-rc.d -r ${D} checkroot.sh	start 10 S .
+	update-rc.d -r ${D} checkroot		start 10 S .
 	# slugos buffer syslog starts here (11)
 	# sysconfsetup runs at S 12
 	# modutils.sh runs at S 20
 	# checkfs.sh is currently disabled from S 30 (and won't work on SlugOS)
 	# ramdisk is not used on SlugOS, would run at S 30
 	update-rc.d -r ${D} mountall.sh		start 35 S .
+	# bootclean must run after mountall but before populate-volatile
+	update-rc.d -r ${D} bootclean.sh	start 36 S .
 	# base-files populate-volatile.sh runs at S37
 	update-rc.d -r ${D} devpts.sh		start 38 S .
 	# slugos file syslog starts here (39)
+	update-rc.d -r ${D} populate-volatile.sh	start 37 S .
 
 	# set hostname and domainname before the network script works (by
 	# entering them at level 40), networking may reset them.
@@ -115,14 +131,14 @@ do_install_append() {
 	# urandom is currently disabled from S 55 (and won't work with tmpfs /var)
 
 	# ipkg-cl configure runs at S 98
-	update-rc.d -r ${D} finish		start 99 S . 
+	update-rc.d -r ${D} finish.sh		start 99 S .
 
 	#
 	# User (2-5) links - UNCHANGED
 	# rmnologin is the only thing added to user levels
 	update-rc.d -r ${D} rmnologin		start 99 2 3 4 5 .
 
-	# 
+	#
 	# Shutdown (0,6) links - !!!CHANGED!!!
 	#
 	# The problem here is that netbase installs K40networking but portmap
@@ -138,6 +154,7 @@ do_install_append() {
 	# This is the special, correct, slugos umountnfs.sh (it looks in
 	# the /proc/mounts information, not /etc/fstab)
 	update-rc.d -r ${D} umountnfs.sh	start 31 0 6 .
+	update-rc.d -r ${D} save-rtc.sh		start 25 0 6 .
 	# portmap stops at 32
 	# slugos network syslog stops here (39)
 	# networking stops at 40 (nothing else does, believe me.)

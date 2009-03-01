@@ -3,9 +3,10 @@ This version is configued for the usage with X11"
 SECTION = "libs"
 PRIORITY = "optional"
 LICENSE = "GPL"
-DEPENDS = "zlib libogg libvorbis tremor libmad libmodplug esound-gpe x11 xext"
+DEPENDS = "zlib libogg libvorbis tremor libmodplug esound virtual/libx11 libxext libpng \
+           ${@base_conditional('ENTERPRISE_DISTRO', '1', '', 'libmad', d)}"
 PROVIDES = "virtual/libxine"
-PR = "r0"
+PR = "r2"
 
 inherit autotools pkgconfig gettext binconfig
 
@@ -17,26 +18,27 @@ SRC_URI = "http://heanet.dl.sourceforge.net/sourceforge/xine/xine-lib-${PV}.tar.
 	file://libxine-ffmpeg-enable-arm.patch;patch=1 \
 	file://no-caca-no-aalib.patch;patch=1 \
 	file://dont-have-xv.patch;patch=1 \
-	file://restore-esd.patch;patch=1 \
+#	file://restore-esd.patch;patch=1 \
 	file://fix-syntax-xine-vorbis-decoder.patch;patch=1 \
 	file://libxine-cut-memusage.patch;patch=1 \
 	file://mpegvideo-static-inlinine.patch;patch=1 \
-	file://libxine-libavcodec.patch;patch=1"
+	file://libxine-libavcodec.patch;patch=1 \
+	file://libxine-gcc4.patch;patch=1"
 S = "${WORKDIR}/xine-lib-${PV}"
 
 SOV = "1.0.7"
 
-EXTRA_OECONF="-with-zlib-path=${STAGING_DIR}/${HOST_SYS} \
-	--with-vorbis-prefix=${STAGING_DIR}/${HOST_SYS} \
+EXTRA_OECONF="-with-zlib-path=${STAGING_EXECPREFIXDIR} \
+	--with-vorbis-prefix=${STAGING_EXECPREFIXDIR} \
 	--disable-oggtest \
-	--with-ogg-prefix=${STAGING_DIR}/${HOST_SYS} \
+	--with-ogg-prefix=${STAGING_EXECPREFIXDIR} \
 	--disable-altivec --disable-vis --disable-mlib \
 	--disable-fb --disable-alsa --disable-vcd \
 	--disable-asf --disable-faad --disable-iconv \
 	--without-v4l --without-arts --without-sdl \
 	--without-xv  --without-xxmc --without-xvmc \
 	--with-x --x-includes=${STAGING_INCDIR}/X11 --x-libraries=${STAGING_LIBDIR}"
-			      
+
 do_compile() {
 	oe_runmake LIBTOOL=${S}/${TARGET_SYS}-libtool
 }

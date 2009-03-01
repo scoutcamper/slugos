@@ -1,9 +1,8 @@
 SECTION = "console/network"
 DESCRIPTION = "Enables PPP dial-in through a serial connection"
-MAINTAINER = "Rene Wagner <rw@handhelds.org>"
 DEPENDS = "ppp"
 RDEPENDS = "ppp"
-PR = "r4"
+PR = "r6"
 LICENSE = "MIT"
 
 SRC_URI = "file://host-peer \
@@ -17,12 +16,13 @@ do_install() {
 	install -m 0755 ${WORKDIR}/ppp-dialin ${D}${sbindir}
 }
 
+PACKAGE_ARCH = "all"
 
 pkg_postinst() {
 if test "x$D" != "x"; then
 	exit 1
 else
-	adduser --system --home /dev/null --no-create-home --empty-password --ingroup nogroup -s ${sbindir}/ppp-dialin ppp
+    grep "^ppp:" /etc/passwd > /dev/null || adduser --system --home /dev/null --no-create-home --empty-password --ingroup nogroup -s ${sbindir}/ppp-dialin ppp 
 fi
 }
 
@@ -30,6 +30,6 @@ pkg_postrm() {
 if test "x$D" != "x"; then
 	exit 1
 else
-	deluser ppp
+	deluser ppp || true
 fi
 }

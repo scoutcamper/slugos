@@ -5,6 +5,7 @@ PV = "2.4.20-rmk2-embedix"
 LICENSE = "GPL"
 KV = "2.4.20"
 PR = "r18"
+COMPATIBLE_MACHINE = "(akita|spitz)"
 
 SRC_URI = "http://developer.ezaurus.com/sl_j/source/c3100/20050602/linux-c3100-20050602-rom1_01.tar.bz2 \
            file://P01-C3000-clockup_050221.patch;pnum=2;patch=1 \
@@ -75,6 +76,7 @@ EXTRA_OEMAKE = "OPENZAURUS_RELEASE=-${DISTRO_VERSION}"
 KERNEL_CCSUFFIX = "-2.95"
 KERNEL_LDSUFFIX = "-2.11.2"
 COMPATIBLE_HOST = "arm.*-linux"
+COMPATIBLE_MACHINE = '(akita|spitz|borzoi)'
 PARALLEL_MAKE = ""
 
 #
@@ -89,12 +91,3 @@ do_configure_prepend() {
         install -m 0644 ${WORKDIR}/defconfig-${MACHINE} ${S}/.config || die "No default configuration for ${MACHINE} available."
         echo "CONFIG_CMDLINE=\"${CMDLINE}\"" >> ${S}/.config
 }
-
-do_deploy() {
-        install -d ${DEPLOY_DIR}/images
-        install -m 0644 arch/${ARCH}/boot/${KERNEL_IMAGETYPE} ${DEPLOY_DIR}/images/${KERNEL_IMAGETYPE}-${PACKAGE_ARCH}-${DATETIME}.bin
-}
-
-do_deploy[dirs] = "${S}"
-
-addtask deploy before do_build after do_compile

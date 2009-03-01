@@ -1,26 +1,26 @@
 SECTION = "base"
-include uclibc_svn.bb
+require uclibc_svn.bb
 
-FILESPATH = "${@base_set_filespath([ '${FILE_DIRNAME}/uclibc-cvs', '${FILE_DIRNAME}/uclibc', '${FILE_DIRNAME}/files', '${FILE_DIRNAME}' ], d)}"
-
-DEPENDS = "linux-libc-headers"
+DEPENDS = "linux-libc-headers ncurses-native virtual/${TARGET_PREFIX}gcc-initial"
 PROVIDES = "virtual/${TARGET_PREFIX}libc-initial"
 PACKAGES = ""
 
 do_stage() {
 	# Install initial headers into the cross dir
-	make PREFIX= DEVEL_PREFIX=${UCLIBC_PREFIX}/ \
-		RUNTIME_PREFIX=${UCLIBC_PREFIX}/ \
-		pregen install_dev
+	make PREFIX= DEVEL_PREFIX=${UCLIBC_STAGE_PREFIX}/ \
+		RUNTIME_PREFIX=${UCLIBC_STAGE_PREFIX}/ \
+		install_headers
+	make PREFIX= DEVEL_PREFIX=${UCLIBC_STAGE_PREFIX}/ \
+		RUNTIME_PREFIX=${UCLIBC_STAGE_PREFIX}/ \
+		lib/crt1.o lib/crti.o lib/crtn.o
 
-	mkdir -p ${CROSS_DIR}/${TARGET_SYS}
-	mkdir -p ${CROSS_DIR}/${TARGET_SYS}/include
-	mkdir -p ${CROSS_DIR}/${TARGET_SYS}/lib
 	ln -sf include ${CROSS_DIR}/${TARGET_SYS}/sys-include
-	rm -rf ${CROSS_DIR}/${TARGET_SYS}/${prefix}
 
 	# This conflicts with the c++ version of this header
-	rm -f ${UCLIBC_PREFIX}/include/bits/atomicity.h
+	rm -f ${UCLIBC_STAGE_PREFIX}/include/bits/atomicity.h
+	install -m 644 lib/crt[1in].o ${UCLIBC_STAGE_PREFIX}/lib
+	${CC} -nostdlib -nostartfiles -shared -x c /dev/null \
+		-o ${UCLIBC_STAGE_PREFIX}/lib/libc.so
 }
 
 do_install() {

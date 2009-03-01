@@ -2,13 +2,13 @@ DESCRIPTION = "Super Nintendo Emulator based on SDL"
 SECTION = "games"
 PRIORITY = "optional"
 DEPENDS = "virtual/libsdl zlib"
-PR = "r2"
 LICENSE = "snes9x"
-SRC_URI = "http://www.vanille.de/mirror/snes9x-sdl-${PV}.tar.bz2 \
-	   file://compile.patch;patch=1"
-S = "${WORKDIR}/snes9x-sdl-${PV}"
+PR = "r3"
 
-FILES_${PN} = "${bindir}/snes9x"
+SRC_URI = "http://www.vanille.de/mirror/snes9x-sdl-${PV}.tar.bz2 \
+	   file://compile.patch;patch=1 \
+	   file://gcc-4.1.patch;patch=1"
+S = "${WORKDIR}/snes9x-sdl-${PV}"
 
 do_compile() {
 	oe_runmake CC="${CC}" CCC="${CXX} -fno-rtti -fno-exceptions" \
@@ -21,3 +21,4 @@ do_install() {
 	install -m 0755 snes9x ${D}${bindir}/snes9x
 }
 
+FILES_${PN} = "${bindir}/snes9x"

@@ -1,14 +1,13 @@
 DESCRIPTION = "Enhanced mailx client."
 SECTION = "console/network"
 PRIORITY = "optional"
-MAINTAINER = "NSLU2 Linux <nslu2-linux@yahoogroups.com>"
 DEPENDS = "openssl"
 PR = "r2"
 LICENSE = "GPL"
 
 SRC_URI = "http://optusnet.dl.sourceforge.net/sourceforge/nail/nail-11.21.tar.bz2 \
 	   file://nail.spec.diff;patch=1"
-	   
+
 S = "${WORKDIR}/nail-11.21/"
 
 inherit autotools

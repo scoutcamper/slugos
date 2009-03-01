@@ -1,7 +1,7 @@
 SECTION = "x11/utils"
 DEPENDS += "gnupg"
 RRECOMMENDS += "gnupg"
-PR = "r0"
+PR = "r1"
 
 EMVER="0.92.0"
 IPCVER="1.1.3"
@@ -11,14 +11,16 @@ http://downloads.mozdev.org/enigmail/src/ipc-${IPCVER}.tar.gz \
 	file://xptcstubs.patch;patch=1 \
 	file://no-xmb.patch;patch=1 \
 	file://extensions-hack.patch;patch=1 \
+	file://firefox-1.0-gcc4-compile.patch;patch=1;pnum=0 \
 	file://mozilla-thunderbird.png file://mozilla-thunderbird.desktop"
 S = "${WORKDIR}/mozilla"
 
-FILES_${PN} += "${libdir}/thunderbird-${PV} ${datadir}/idl"
+FILES_${PN} += "${libdir}/thunderbird-${PV}/* ${datadir}/idl"
+FILES_${PN}-dbg += "${libdir}/thunderbird-${PV}/.debug*"
 
 inherit mozilla
 
-export MOZ_THUNDERBIRD=1
+export MOZ_THUNDERBIRD="1"
 
 do_configure() {
 	for x in ipc enigmail; do

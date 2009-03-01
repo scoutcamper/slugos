@@ -9,11 +9,13 @@ PR = "r1"
 # There are major API changes beween libnet v1.0 and libnet v1.1
 PROVIDES = "libnet-1.0"
 
-SRC_URI = "http://www.packetfactory.net/libnet/dist/deprecated/libnet-${PV}.tar.gz \
+#SRC_URI = "http://www.packetfactory.net/libnet/dist/deprecated/libnet-${PV}.tar.gz \
+SRC_URI = "${DEBIAN_MIRROR}/main/libn/libnet0/libnet0_${PV}.orig.tar.gz \
 	   file://configure.patch;patch=1 \
 	   file://configure.uclibc.patch;patch=1 \
+	   file://configure_x86-64-host.patch;patch=1 \
 	   "
-S = "${WORKDIR}/Libnet-${PV}"
+S = "${WORKDIR}/libnet-${PV}.orig"
 
 inherit autotools
 
@@ -27,7 +29,7 @@ do_configure() {
 }
 
 do_stage() {
-	install -m 0755 libnet-config ${STAGING_BINDIR}/
+	install -m 0755 libnet-config ${STAGING_BINDIR_CROSS}/
 	install -m 0644 include/libnet.h ${STAGING_INCDIR}/
 	install -d ${STAGING_INCDIR}/libnet
 	install -m 0644 include/libnet/libnet-headers.h ${STAGING_INCDIR}/libnet/

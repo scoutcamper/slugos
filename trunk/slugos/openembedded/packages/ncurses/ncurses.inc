@@ -7,6 +7,9 @@ PACKAGES_prepend = "ncurses-tools "
 PACKAGES_append = " ncurses-terminfo"
 FILES_ncurses_append = " ${datadir}/tabset"
 RSUGGESTS_${PN} = "ncurses-terminfo"
+RPROVIDES_${PN} = "libncurses5"
+RCONFLICTS_${PN} = "libncurses5"
+RREPLACES_${PN} = "libncurses5"
 
 inherit autotools
 
@@ -18,7 +21,10 @@ FILES_${PN} = "${bindir}/tput ${bindir}/tset ${libdir}/lib*.so.* usr/share/tabse
 
 PARALLEL_MAKE=""
 
+FILESPATH = "${FILE_DIRNAME}/local:${FILE_DIRNAME}/ncurses-${PV}-${PR}:${FILE_DIRNAME}/ncurses-${PV}:${FILE_DIRNAME}/ncurses:${FILE_DIRNAME}"
+
 EXTRA_OECONF = "--with-shared \
+                --with-libtool \
 	        --without-profile \
 	        --without-debug \
 	        --disable-rpath \
@@ -39,6 +45,10 @@ do_stage() {
 	ln -sf libncurses.so ${STAGING_LIBDIR}/libtermcap.so
 	ln -sf libncurses.a ${STAGING_LIBDIR}/libtermcap.a
 }
+
+# This is necessary so that the "tic" command executed during the install can
+# link with the correct libary in staging.
+export LD_LIBRARY_PATH = "${STAGING_LIBDIR_NATIVE}"
 
 do_install() {
 	autotools_do_install
@@ -67,19 +77,26 @@ do_install() {
 	then
 		ln -sf xterm-color ${D}${sysconfdir}/terminfo/x/xterm
 	fi
+	ln -sf rxvt ${D}${sysconfdir}/terminfo/r/rxvt-unicode
 
-	mv ${D}${bindir}/clear ${D}${bindir}/clear.${PN}
-	mv ${D}${bindir}/reset ${D}${bindir}/reset.${PN}
+	if [ "${PN}" = "ncurses" ]; then
+		mv ${D}${bindir}/clear ${D}${bindir}/clear.${PN}
+		mv ${D}${bindir}/reset ${D}${bindir}/reset.${PN}
+	fi
 }
 		
 		
 pkg_postinst_ncurses-tools () {
-	update-alternatives --install ${bindir}/clear clear clear.${PN} 100
-	update-alternatives --install ${bindir}/reset reset reset.${PN} 100
+	if [ "${PN}" = "ncurses" ]; then
+		update-alternatives --install ${bindir}/clear clear clear.${PN} 100
+		update-alternatives --install ${bindir}/reset reset reset.${PN} 100
+	fi
 }
 				
 			
 pkg_prerm_ncurses-tools () {
-	update-alternatives --remove clear clear.${PN}
-	update-alternatives --remove reset reset.${PN}
+	if [ "${PN}" = "ncurses" ]; then
+		update-alternatives --remove clear clear.${PN}
+		update-alternatives --remove reset reset.${PN}
+	fi
 }

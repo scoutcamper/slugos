@@ -1,6 +1,5 @@
 DESCRIPTION = "User Mode Linux Kernel"
 SECTION = "kernel"
-MAINTAINER = "Michael 'Mickey' Lauer <mickey@Vanille.de>"
 LICENSE = "GPL"
 KV = "${@bb.data.getVar('PV',d,True).split('-')[0]}"
 RCV = "${@bb.data.getVar('PV',d,True).split('-')[1]}"
@@ -8,9 +7,9 @@ MMV = "${@bb.data.getVar('PV',d,True).split('-')[2]}"
 LV = "2.6.10"
 PR = "r3"
 
-SRC_URI = "http://www.kernel.org/pub/linux/kernel/v2.6/linux-${LV}.tar.bz2 \
-           http://www.kernel.org/pub/linux/kernel/v2.6/testing/patch-${KV}-${RCV}.bz2;patch=1 \
-           http://www.kernel.org/pub/linux/kernel/people/akpm/patches/2.6/${KV}-${RCV}/${KV}-${RCV}-${MMV}/${KV}-${RCV}-${MMV}.gz;patch=1 \
+SRC_URI = "${KERNELORG_MIRROR}/pub/linux/kernel/v2.6/linux-${LV}.tar.bz2 \
+           ${KERNELORG_MIRROR}/pub/linux/kernel/v2.6/testing/patch-${KV}-${RCV}.bz2;patch=1 \
+           ${KERNELORG_MIRROR}/pub/linux/kernel/people/akpm/patches/2.6/${KV}-${RCV}/${KV}-${RCV}-${MMV}/${KV}-${RCV}-${MMV}.gz;patch=1 \
            file://defconfig"
 #http://www.suse.de/~kraxel/uml/patches/2.6.10-rc3/uml-core-on-panic;patch=1 \
 #http://www.suse.de/~kraxel/uml/patches/2.6.10-rc3/uml-pretend-to-be-i586;patch=1 \
@@ -22,6 +21,7 @@ S = "${WORKDIR}/linux-${LV}"
 inherit kernel
 
 COMPATIBLE_HOST = 'i.86.*-linux'
+COMPATIBLE_MACHINE = "x86-uml"
 
 export OS = "Linux"
 ARCH = "um"

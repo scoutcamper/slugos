@@ -2,9 +2,9 @@ SECTION = "x11/utils"
 PR = "r4"
 DESCRIPTION = "Matchbox panel"
 LICENSE = "GPL"
-DEPENDS = "libmatchbox x11 xext xpm apmd startup-notification virtual/kernel"
+DEPENDS = "libmatchbox virtual/libx11 libxext libxpm apmd startup-notification virtual/kernel"
 
-SRC_URI = "ftp://ftp.handhelds.org/matchbox/sources/matchbox-panel/0.8/matchbox-panel-${PV}.tar.bz2 \
+SRC_URI = "http://projects.o-hand.com/matchbox/sources/matchbox-panel/0.8/matchbox-panel-${PV}.tar.bz2 \
 	file://automake-lossage.patch;patch=1 \
 	file://more-automake-lossage.patch;patch=1 \
 	file://make-batteryapp-less-strict.patch;patch=1"

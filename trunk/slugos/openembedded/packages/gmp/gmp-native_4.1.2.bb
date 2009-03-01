@@ -1,7 +1,2 @@
-include gmp_${PV}.bb
-
-FILESDIR = "${@os.path.dirname(bb.data.getVar('FILE',d,1))}/gmp-${PV}"
-S = "${WORKDIR}/gmp-${PV}"
-
-inherit native
-
+PV = "4.1.2"
+require gmp-native.inc

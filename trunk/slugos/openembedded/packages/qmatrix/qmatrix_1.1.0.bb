@@ -1,5 +1,4 @@
 DESCRIPTION = "A matrix Game, Qt/Embedded based Palmtop Environments Edition"
-MAINTAINER = "Michael 'Mickey' Lauer <mickey@Vanille.de>"
 SECTION = "opie/games"
 LICENSE = "GPL"
 PRIORITY = "optional"
@@ -15,7 +14,7 @@ MACHTYPE_c7x0    = "sl700"
 MACHTYPE_tosa    = "sl700"
 
 do_configure_append() {
-        ln -v -f -s config/config-${MACHTYPE}.h config.h  
+        ln -v -f -s config/config-${MACHTYPE}.h config.h
         ln -v -f -s config/config.mk-${MACHTYPE} config.mk
         if [ "${MACHTYPE}" = "sl300" ]
         then

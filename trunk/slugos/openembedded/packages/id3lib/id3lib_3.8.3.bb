@@ -1,23 +1,16 @@
 DESCRIPTION = "Library for interacting with ID3 tags."
-SECTION = "libs"
+SECTION = "libs/multimedia"
 PRIORITY = "optional"
-MAINTAINER = "jason haslup <openembedded@haslup.com>"
 DEPENDS = "zlib"
-DESCRIPTION = "Library for interacting with ID3 tags."
 LICENSE = "GPL"
+PR = "r2"
 
 inherit autotools
 
-SRC_URI = "${SOURCEFORGE_MIRROR}/id3lib/id3lib-${PV}.tar.gz"
-S = "${WORKDIR}/id3lib-${PV}"
-
-do_configure() {
-	oe_runconf
-}
+SRC_URI = "${SOURCEFORGE_MIRROR}/id3lib/id3lib-${PV}.tar.gz \
+           http://ftp.de.debian.org/debian/pool/main/i/id3lib3.8.3/id3lib3.8.3_3.8.3-7.2.diff.gz;patch=1 \
+          "
 
 do_stage() {
-	oe_libinstall -a -so -C src libid3 ${STAGING_LIBDIR}
-	install -m 0644 include/id3.h ${STAGING_INCDIR}
-	install -d ${STAGING_INCDIR}/id3/
-	install -m 0644 include/id3/*.h ${STAGING_INCDIR}/id3/
+	autotools_stage_all
 }

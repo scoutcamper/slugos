@@ -3,61 +3,92 @@
 # All packages in here must build with the slugos-???.conf distros,
 # they do not necessarily work.
 DESCRIPTION = "Packages that are compatible with the SlugOS firmware"
-MAINTAINER = "NSLU2 Linux <nslu2-linux@yahoogroups.com>"
 HOMEPAGE = "http://www.nslu2-linux.org"
 LICENSE = "MIT"
-PR = "r3"
+PR = "r63"
 CONFLICTS = "db3"
-PROVIDES += "${SLUGOS_IMAGENAME}-packages"
 
+COMPATIBLE_MACHINE = "nslu2|ixp4xx"
 EXCLUDE_FROM_WORLD = "1"
 INHIBIT_DEFAULT_DEPS = "1"
-ALLOW_EMPTY = 1
-PACKAGES = "${PN}"
+ALLOW_EMPTY = "1"
 
-# The list of packages to build for the ucslugc DISTRO.
+# The list of packages to build for the slugos DISTRO.
 # KEEP IN ALPHABETICAL ORDER
+# Do *not* simply comment out a line. That will break. Instead
+# remove the package and place it in the corresponding "broken" list
+
 SLUGOS_PACKAGES = "\
 	alsa-lib \
+	alsa-utils \
+	apex-env \
+	apr \
+	asterisk \
+	asterisk-core-sounds-en-alaw \
+	asterisk-core-sounds-en-g729 \
+	asterisk-core-sounds-en-gsm \
+	asterisk-core-sounds-en-ulaw \
+	asterisk-extra-sounds-en-alaw \
+	asterisk-extra-sounds-en-g729 \
+	asterisk-extra-sounds-en-gsm \
+	asterisk-extra-sounds-en-ulaw \
+	asterisk-moh-freeplay-alaw \
+	asterisk-moh-freeplay-g729 \
+	asterisk-moh-freeplay-gsm \
+	asterisk-moh-freeplay-ulaw \
 	atftp \
 	audiofile \
 	aumix \
 	autoconf \
+	autofs \
 	automake \
 	bash \
 	beep \
 	bind \
 	binutils \
 	bison \
-	bluez-utils-nodbus \
+	bluez-utils \
+	bluez-hcidump \
+	bluez4 \
 	bogofilter \
+	bonnie++ \
 	boost \
 	bridge-utils \
 	bwmon \
 	bzip2 \
 	ccxstream \
+	cdparanoia \
+	cdstatus \
 	cherokee \
 	coreutils \
 	cron \
-	ctorrent \
+	cryptsetup \
+	ctrlproxy \
+	cups \
+	curl \
 	cvs \
-	cyrus-imapd \
-	cyrus-sasl \
 	db \
+	devio \
 	devlabel \
 	diffstat \
 	diffutils \
+	dircproxy \
 	dnsmasq \
+	dropbear \
 	e2fsprogs \
 	e2fsprogs-libs \
 	expat \
 	ez-ipupdate \
+	fconfig \
 	fetchmail \
 	file \
 	findutils \
+	fis \
 	flac \
 	flex \
+	flite \
 	ftpd-topfield \
+	fuse \
 	gawk \
 	gcc \
 	gdb \
@@ -65,150 +96,182 @@ SLUGOS_PACKAGES = "\
 	glib-2.0 \
 	gnu-config \
 	gphoto2 \
+	gpsd \
 	grep \
+	groff \
 	gtk-doc \
 	gzip \
+	hdparm \
+	hostap-daemon \
 	ifupdown \
+	inetutils \
+	iozone3 \
+	iperf \
 	ipkg-utils \
 	iptables \
+	ircp \
+	irssi \
 	joe \
 	jpeg \
+	kexec-tools \
 	lcdproc \
 	less \
 	libao \
 	libdvb \
-	libgphoto2 \
+	libexif \
 	libid3tag \
 	liblockfile \
 	libmad \
 	libmikmod \
 	libogg \
 	libol \
+	libpam \
+	libpcre \
 	libpng \
 	libtool \
-	libusb \
+	libupnp \
+	libusb1 libusb-compat \
 	libvorbis \
 	libxml2 \
+	lighttpd \
+	litestream \
+	logrotate \
 	lrzsz \
 	lsof \
 	lvm2 \
 	m4 \
+	madplay \
+	madwifi-ng \
 	mailx \
 	make \
+	man man-pages \
 	masqmail \
 	mdadm \
+	mediatomb \
+	memtester \
 	mgetty \
-	miau \ 
+	miau \
 	microcom \
 	minicom \
+	monit \
 	mpd \
 	mt-daapd \
 	mtd-utils \
 	mutt \
+	mysql \
 	nail \
 	nano \
 	ncftp \
 	ncurses \
+	net-tools \
+	netatalk \
+	netcat \
 	netpbm \
+	nfs-utils \
+	ngrep \
 	nmap \
+	ntfs-3g \
 	ntp \
-	obexftp openobex openobex-apps ircp \
-	openldap \
+	ntpclient \
+	obexftp \
+	obexpush \
+	openobex-apps \
 	openntpd \
+	openobex \
 	openssh \
 	openvpn \
 	patch \
 	pciutils \
-	pcre \
 	perl \
+	picocom \
 	pkgconfig \
+	popt \
+	portmap \
 	ppp \
 	procps \
+	psmisc \
 	puppy \
-	pwc \
 	python \
-	qc-usb-messenger \
 	quilt \
 	reiserfsprogs reiser4progs \
+	rng-tools \
 	rsync \
+	rtorrent \
 	samba \
 	sane-backends \
+	screen \
 	sed \
 	setpwc \
+	setserial \
+	sipsak \
+	slugimage \
+	smartmontools \
+	spandsp \
+	sqlite \
+	squid \
+	sshfs-fuse \
 	ssmtp \
 	strace \
 	streamripper \
+	stunnel \
 	sudo \
 	sysfsutils \
 	syslog-ng \
 	tar \
+	task-mokogateway-everything \
+	tcpdump \
 	thttpd \
 	tiff \
-	unionfs-modules unionfs-utils \
+	tzdata \
+	unrar \
 	unzip \
+	upslug2 \
 	usbutils \
+	ushare \
 	util-linux \
 	vim \
 	vlan \
 	vsftpd \
+	w3cam \
 	wakelan \
+	watchdog \
+	webcam-server \
 	wget \
 	wireless-tools \
+	wireshark \
 	wpa-supplicant \
-	zd1211 \
+        wview-sim \
+	wview-vpro \
+	wview-wxt510 \
+	xinetd \
+	yp-tools ypbind ypserv \
+	zd1211-firmware \
 	zip \
 	zlib \
 	"
 
 # Packages currently broken on all platforms
 SLUGOS_BROKEN_PACKAGES = "\
-	groff \
-	icecast \
-	irssi \
-	pvrusb2-mci \
-	watchdog \
-	memtester \
-	"
-
-# These packages will never build because uclibc lacks (and always will lack)
-# appropriate support.  This define is for documentation of this fact!  The
-# normal cause is that the package uses the "NIS" interfaces (once known as
-# YP - a trademark of BT which SUN used without license - the missing function
-# calls often still have 'yp' in the name).
-UCLIBC_UNSUPPORTABLE_PACKAGES = "\
-	libpam \
-	nfs-utils \
-	postfix \
-	yp-tools ypbind ypserv \
-	"
-
-# These packages work with glibc, but break on uclibc.
-UCLIBC_BROKEN_PACKAGES = "\
-	alsa-utils \
-	"
-
-# Packages which build only with glibc (some of these use internal
-# glibc functions and so will probably never run on uclibc).
-SLUGOS_PACKAGES_append_linux = "\
-	${UCLIBC_UNSUPPORTABLE_PACKAGES} \
-	${UCLIBC_BROKEN_PACKAGES} \
-	ctrlproxy \
+	ctorrent \
+	cyrus-imapd \
+	cyrus-sasl \
 	dsniff \
-	iperf \
-	man man-pages \
-	psmisc \
-	screen \
-	timezones \
-	xinetd \
-	"
-
-SLUGOS_PACKAGES_append_linux-uclibc = "\
-	"
-
-# These packages are not in the build because they have a significant compilation
-# time, add them to SLUGOS_EXTRA_PACKAGES if required
-SLUGOS_OPTIONAL_PACKAGES = "\
-	mysql \
+	eciadsl \
+	gspcav1 \
+	linphone \
+	lirc-modules lirc \
+	madfu \
+	motion \
+	openldap \
+	postfix \
+	pvrusb2-mci \
+	pwc \
+	qc-usb-messenger \
+	task-native-sdk \
+	unionfs-modules unionfs-utils \
+	wview-sim-mysql wview-wxt510-mysql wview-vpro-mysql \
+	yeaphone \
+	zd1211 \
 	"
 
 SLUGOS_EXTRA_PACKAGES ?= ""
@@ -218,7 +281,13 @@ SLUGOS_EXTRA_PACKAGES ?= ""
 DEPENDS = "\
 	slugos-image \
 	slugos-native \
+	task-proper-tools \
 	${SLUGOS_PACKAGES} \
 	${SLUGOS_EXTRA_PACKAGES} \
 	package-index \
 	"
+
+inherit meta
+
+do_package_write_ipk() {
+}

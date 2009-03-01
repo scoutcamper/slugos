@@ -2,16 +2,18 @@ DESCRIPTION = "Freetype font rendering library"
 HOMEPAGE = "http://www.freetype.org"
 SECTION = "libs"
 LICENSE = "freetype"
-PR = "r0"
+PR = "r2"
 
 SRC_URI = "${SOURCEFORGE_MIRROR}/freetype/freetype-${PV}.tar.bz2 \
-	   file://configure.patch;patch=1"
+	   file://configure.patch;patch=1 \
+	   file://no-hardcode.patch;patch=1"
 S = "${WORKDIR}/freetype-${PV}"
 
 inherit autotools pkgconfig binconfig
 
 LIBTOOL = "${S}/builds/unix/${HOST_SYS}-libtool"
 EXTRA_OEMAKE = "'LIBTOOL=${LIBTOOL}'"
+EXTRA_OECONF = "--without-zlib"
 
 do_configure() {
 	cd builds/unix

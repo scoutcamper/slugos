@@ -1,7 +1,6 @@
 DESCRIPTION = "Multimedia library using gstreamer""
 HOMEPAGE = "http://bolgo.cent.uji.es/proyectos/eina"
 LICENSE = "GPL"
-MAINTAINER = "Koen Kooi <koen@handhelds.org>"
 
 DEPENDS = "file glib-2.0 gstreamer"
 

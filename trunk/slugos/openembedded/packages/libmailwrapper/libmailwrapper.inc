@@ -1,7 +1,6 @@
 DESCRIPTION = "Qt-based class wrapper of libetpan"
 SECTION = "opie/libs"
 PRIORITY = "optional"
-MAINTAINER = "Team Opie <opie@handhelds.org>"
 LICENSE = "LGPL"
 DEPENDS = "libetpan"
 
@@ -22,3 +21,5 @@ do_stage () {
 do_install() {
 	oe_libinstall -so libmailwrapper ${D}${palmtopdir}/lib
 }
+
+FILES_${PN} = "${palmtopdir}/lib/lib*.so.*"

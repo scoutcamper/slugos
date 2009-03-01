@@ -1,8 +1,8 @@
 DESCRIPTION = "A Type1 Font Rastering Library"
 SECTION = "libs"
 PRIORITY = "optional"
-MAINTAINER = "Michael 'Mickey' Lauer <mickey@Vanille.de>"
-PR = "r2"
+DEPENDS = "virtual/libx11"
+PR = "r4"
 LICENSE = "LGPL GPL"
 SRC_URI = "${DEBIAN_MIRROR}/main/t/t1lib/t1lib_${PV}.orig.tar.gz \
            file://configure.patch;patch=1 \
@@ -11,7 +11,7 @@ SRC_URI = "${DEBIAN_MIRROR}/main/t/t1lib/t1lib_${PV}.orig.tar.gz \
 
 inherit autotools
 
-EXTRA_OECONF = "--without-x --without-athena"
+EXTRA_OECONF = "--with-x --without-athena"
 EXTRA_OEMAKE = "without_doc"
 
 do_configure() {
@@ -20,10 +20,8 @@ do_configure() {
 }
 
 do_stage() {
-	oe_libinstall -so -C lib libt1 ${STAGING_LIBDIR}
-	install lib/t1lib/t1lib.h ${STAGING_INCDIR}/
-	install lib/t1lib/t1libx.h ${STAGING_INCDIR}/
+	autotools_stage_all
 }
 
-FILES_${PN} = "${bindir}/* ${libdir}/* ${datadir}/t1lib/t1lib.config"
+FILES_${PN} = "${bindir}/* ${libdir}/*.so* ${datadir}/t1lib/t1lib.config"
 FILES_${PN}-doc = "${datadir}/t1lib/doc/t1lib_doc.pdf"

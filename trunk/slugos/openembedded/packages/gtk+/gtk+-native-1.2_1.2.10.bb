@@ -3,10 +3,11 @@ HOMEPAGE = "http://www.gtk.org"
 SECTION = "libs"
 LICENSE = "LGPL"
 PRIORITY = "optional"
-MAINTAINER = "Rob Taylor <robtaylor@fastmail.fm>"
-DEPENDS = "glib-1.2 jpeg libpng xext"
-PR = "r0"
+DEPENDS = "glib-1.2 jpeg libpng libxext"
 
+PR = "r1"
+
+FILESPATH =+ "${FILE_DIRNAME}/gtk+-1.2-1.2.10:"
 SRC_URI = "ftp://ftp.gtk.org/pub/gtk/v1.2/gtk+-${PV}.tar.gz \
            file://gtk+1.2-reconf-fix;patch=1 \
            file://no-xwc;patch=1"

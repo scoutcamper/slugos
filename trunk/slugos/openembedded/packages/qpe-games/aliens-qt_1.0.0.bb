@@ -1,7 +1,6 @@
 DESCRIPTION = "Alien ShootOut"
 SECTION = "opie/games"
 PRIORITY = "optional"
-MAINTAINER = "Team Opie <opie@handhelds.org>"
 LICENSE = "GPL"
 AUTHOR = "Bill Kendrick"
 HOMEPAGE = "http://www.linux-solutions.at/projects/zaurus/games-Aliens.html"
@@ -25,7 +24,7 @@ do_compile_prepend () {
 do_install () {
 	install -d ${D}${palmtopdir}/pics/${APPNAME}/
 	install -m 0644 ${S}/*.png ${D}${palmtopdir}/pics/${APPNAME}/
-	
+
 }
 
 inherit opie

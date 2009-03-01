@@ -2,13 +2,15 @@ DESCRIPTION = "GNU Portable Threads"
 SECTION = "libs"
 PRIORITY = "optional"
 LICENSE = "GPL LGPL FDL"
-PR = "r0"
+PR = "r1"
 
-SRC_URI = "${GNU_MIRROR}/pth/pth-${PV}.tar.gz"
+SRC_URI = "${GNU_MIRROR}/pth/pth-${PV}.tar.gz \
+	   file://m4-warning.patch;patch=1 \
+	  "
 
 PARALLEL_MAKE=""
 
-inherit autotools 
+inherit autotools
 
 do_configure() {
 	gnu-configize

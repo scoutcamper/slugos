@@ -1,7 +1,6 @@
 DESCRIPTION = "gxine is a front-end for libxine."
 SECTION = "x11/multimedia"
 LICENSE = "GPL"
-MAINTAINER = "Chris Lord <cwiiis@handhelds.org>"
 DEPENDS = "gtk+ libxine-x11"
 PR = "r1"
 
@@ -27,7 +26,7 @@ RDEPENDS = "libxine-plugin-vo-out-xshm \
 	    libxine-plugin-dmx-ogg \
 	    libxine-plugin-dmx-image \
 	    libxine-plugin-dmx-avi"
-	    
+
 S = "${WORKDIR}/${PN}-0.4.1/"
 
 SRC_URI = "${SOURCEFORGE_MIRROR}/xine/${PN}-0.4.1.tar.gz \
@@ -40,7 +39,7 @@ SRC_URI = "${SOURCEFORGE_MIRROR}/xine/${PN}-0.4.1.tar.gz \
 EXTRA_OECONF = " --includedir=${STAGING_INCDIR} \
 		--libdir=${STAGING_LIBDIR} \
 		--disable-xinetest \
-		--with-xine-prefix=${STAGING_DIR}/${HOST_SYS}"
+		--with-xine-prefix=${STAGING_DIR_HOST}${layout_exec_prefix}"
 
 LDFLAGS += "-lxine"
 

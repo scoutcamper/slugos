@@ -5,12 +5,12 @@ DESCRIPTION_pciutils-ids = 'The list of PCI IDs for pciutils'
 HOMEPAGE = "http://atrey.karlin.mff.cuni.cz/~mj/pciutils.shtml"
 LICENSE = "GPLv2"
 
-PR="r3"
+PR ="r3"
 
 PARALLEL_MAKE = ""
 FILES_pciutils-ids="${prefix}/share/pci.ids"
 PACKAGES =+ "pciutils-ids"
-SRC_URI = "ftp://ftp.kernel.org/pub/software/utils/pciutils/pciutils-${PV}.tar.bz2 \
+SRC_URI = "${KERNELORG_MIRROR}/pub/software/utils/pciutils/pciutils-${PV}.tar.bz2 \
 	   file://configure.patch;patch=1 \
 	   file://configure-uclibc.patch;patch=1 \
 	   file://pcimodules-pciutils-2.1.11.diff;patch=1"
@@ -31,4 +31,4 @@ do_install_append () {
 	install -d ${D}/${prefix}/share
 	install -m 6440 ${WORKDIR}/${PN}-${PV}/pci.ids ${D}/${prefix}/share
 }
-		
+

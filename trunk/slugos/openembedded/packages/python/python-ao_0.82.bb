@@ -1,10 +1,10 @@
-LICENSE = "GPL"
-DESCRIPTION = "Python AO Bindings"
+DESCRIPTION = "Python Bindings for libao"
 SECTION = "devel/python"
 PRIORITY = "optional"
-MAINTAINER = "Michael 'Mickey' Lauer <mickey@Vanille.de>"
+LICENSE = "GPL"
 DEPENDS = "libao"
 SRCNAME = "pyao"
+PR = "ml1"
 
 SRC_URI = "http://www.andrewchatham.com/pyogg/download/${SRCNAME}-${PV}.tar.gz"
 S = "${WORKDIR}/${SRCNAME}-${PV}"
@@ -17,5 +17,3 @@ do_configure_prepend() {
 	echo "ao_lib_dir = ${STAGING_LIBDIR}" >>Setup
 	echo "ao_include_dir = ${STAGING_INCDIR}" >>Setup
 }
-
-

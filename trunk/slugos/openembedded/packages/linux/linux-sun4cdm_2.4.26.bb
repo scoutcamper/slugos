@@ -6,7 +6,7 @@ DEPENDS += "elftoaout-native"
 
 KERNEL_CCSUFFIX = "-3.3.4"
 
-SRC_URI = "ftp://ftp.kernel.org/pub/linux/kernel/v2.4/linux-${PV}.tar.bz2 \
+SRC_URI = "${KERNELORG_MIRROR}/pub/linux/kernel/v2.4/linux-${PV}.tar.bz2 \
            file://defconfig"
 S = "${WORKDIR}/linux-${PV}"
 
@@ -23,10 +23,6 @@ do_configure_prepend() {
 }
 
 do_deploy() {
-	install -d ${DEPLOY_DIR}/images
-	elftoaout -o ${DEPLOY_DIR}/images/linux-aout-${DATETIME} ${KERNEL_IMAGETYPE}
+	install -d ${DEPLOY_DIR_IMAGE}
+	elftoaout -o ${DEPLOY_DIR_IMAGE}/linux-aout-${DATETIME} ${KERNEL_IMAGETYPE}
 }
-
-do_deploy[dirs] = "${S}"
-
-addtask deploy before do_build after do_compile

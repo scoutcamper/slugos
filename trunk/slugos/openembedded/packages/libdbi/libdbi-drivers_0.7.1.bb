@@ -6,7 +6,6 @@ DESCRIPTION = "Database Drivers for libdbi"
 HOMEPAGE = "http://libdbi-drivers.sourceforge.net/"
 LICENSE = "GPLv2"
 SECTION = "libs"
-MAINTAINER = "Eddy Pronk <epronk@muftor.com>"
 
 PROVIDES = "libdbd-sqlite"
 DEPENDS = "libdbi sqlite"
@@ -15,7 +14,7 @@ SRC_URI = "${SOURCEFORGE_MIRROR}/libdbi-drivers/libdbi-drivers-${PV}.tar.gz"
 
 inherit autotools
 
-PACKAGES = "libdbd-sqlite"
+PACKAGES = "${PN}-dbg libdbd-sqlite ${PN}"
 
 EXTRA_OECONF = "--with-dbi-incdir=${STAGING_INCDIR} \
                 --with-sqlite \
@@ -27,7 +26,7 @@ FILES_libdbd-sqlite = "/usr/lib/dbd/libsqlite.so \
                        /usr/lib/dbd/libsqlite.a"
 
 DESCRIPTION_libdbd-sqlite = "SQLite database driver for libdbi"
-        
+
 do_configure_old () {
   ./configure \
 		    --build=${BUILD_SYS} \
@@ -38,4 +37,4 @@ do_configure_old () {
 		    --with-sqlite-libdir=${STAGING_LIBDIR} \
 		    --with-sqlite-incdir=${STAGING_INCDIR}
 }
-        
+

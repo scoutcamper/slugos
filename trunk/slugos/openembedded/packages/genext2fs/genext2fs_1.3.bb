@@ -1,4 +1,4 @@
-include genext2fs.inc
+require genext2fs.inc
 
 PR = "r3"
 
@@ -8,7 +8,7 @@ S = "${WORKDIR}/genext2fs-${PV}.orig"
 
 do_compile () {
 	oe_runmake
-}	
+}
 
 do_install () {
 	oe_runmake 'DESTDIR=${D}' install

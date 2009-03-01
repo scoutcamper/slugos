@@ -4,20 +4,19 @@ PRIORITY = "optional"
 DEPENDS = "libsdl-qpe"
 LICENSE = "GPL"
 SRCDATE = "20040801"
-PR = "r1"
+PR = "r2"
 
-SRC_URI = "cvs://anoncvs:anoncvs@down.physik.uni-mainz.de/cvs;module=Frodo4 \
-           file://m4.patch;patch=1 \
+SRC_URI = "cvs://anoncvs:anoncvs@cvs.cebix.net/home/cvs/cebix;module=Frodo4 \
            file://configure.patch;patch=1 \
            file://frodorc \
            file://Frodo.png \
            file://frodo.desktop"
-	   
+
 S = "${WORKDIR}/Frodo4/Src"
 
 inherit autotools
 
-EXTRA_OECONF = "--disable-sdltest --enable-qtopia --with-sdl-exec-prefix=${STAGING_DIR}/${BUILD_SYS}"
+EXTRA_OECONF = "--disable-sdltest --enable-qtopia"
 
 do_install() {
         install -d ${D}${palmtopdir}/bin \

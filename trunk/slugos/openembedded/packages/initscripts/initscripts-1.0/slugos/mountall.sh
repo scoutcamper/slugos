@@ -1,9 +1,18 @@
-#
+#!/bin/sh
 # mountall.sh	Mount all filesystems.
 #
 # Version:	@(#)mountall.sh  2.83-2  01-Nov-2001  miquels@cistron.nl
 #
 . /etc/default/rcS
+
+# If the right stuff exists, attempt to automatically assemble any
+# RAID devices that might be configured.
+#
+if test -x /sbin/mdadm
+then
+	test "$VERBOSE" != no && echo "Assembling RAID devices..."
+	mdadm --assemble --scan --auto=md
+fi
 
 #
 # Mount local filesystems in /etc/fstab. For some reason, people

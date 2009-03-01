@@ -3,6 +3,7 @@ SECTION = "libs"
 PRIORITY = "optional"
 LICENSE = "GPL QPL"
 DEPENDS = "qmake-native x11-native"
+HOMEPAGE = "http://www.trolltech.com"
 
 FILESDIR = "${@os.path.dirname(bb.data.getVar('FILE',d,1))}/qt-x11-free"
 
@@ -11,7 +12,7 @@ SRC_URI = "ftp://ftp.trolltech.com/qt/source/qt-x11-free-${PV}.tar.bz2 \
 S = "${WORKDIR}/qt-x11-free-${PV}"
 
 #
-# FIXME - This should be updated to use OE's qmake-base.oeclass
+# FIXME - This should be updated to use OE's qmake_base.oeclass
 #         or the full qmake.oeclass.
 #
 
@@ -35,21 +36,21 @@ do_configure() {
 
 do_compile() {
 	LD_LIBRARY_PATH=${S}/lib oe_runmake \
-		QMAKE="${STAGING_BINDIR}/qmake -after INCLUDEPATH+=${STAGING_INCDIR} LIBS+=-I${STAGING_LIBDIR}" \
+		QMAKE="${STAGING_BINDIR_NATIVE}/qmake -after INCLUDEPATH+=${STAGING_INCDIR} LIBS+=-I${STAGING_LIBDIR}" \
 		QMAKESPEC="${THIS_QMAKESPEC}"
 }
 
 do_stage() {
-	install -d ${STAGING_DIR}/${HOST_SYS}/qt3/lib
-	oe_soinstall lib/libqt-mt.so.${PV} ${STAGING_DIR}/${HOST_SYS}/qt3/lib
-	install -d ${STAGING_DIR}/${HOST_SYS}/qt3/include/private
+	install -d ${STAGING_DIR_HOST}/qt3/lib
+	oe_soinstall lib/libqt-mt.so.${PV} ${STAGING_DIR_HOST}/qt3/lib
+	install -d ${STAGING_DIR_HOST}/qt3/include/private
 	for f in include/*.h
 	do
-		install -m 0644 $f ${STAGING_DIR}/${HOST_SYS}/qt3/include/
+		install -m 0644 $f ${STAGING_DIR_HOST}/qt3/include/
 	done
 	for f in include/private/*.h
 	do
-	        install -m 0644 $f ${STAGING_DIR}/${HOST_SYS}/qt3/include/private
+	        install -m 0644 $f ${STAGING_DIR_HOST}/qt3/include/private
 	done
 }
 

@@ -4,7 +4,6 @@ DESCRIPTION_slbl = "A command-line utility to control the BackLight on Linux 2.4
 DESCRIPTION_sltime = "A ustility to save and restore the time on Sharp Linux based Zaurii"
 SECTION = "console/utils"
 PRIORITY = "optional"
-MAINTAINER = "Michael 'Mickey' Lauer <mickey@Vanille.de>"
 LICENSE = "GPL"
 PR = "r4"
 
@@ -21,13 +20,13 @@ do_fetch() {
 	for u in ${UTILS}
 	do
 		install -d ${S}/$u
-		cp -dfR `ls -dp ${FILESDIR}/$u/*|grep -v SCCS` ${S}/$u/
+		cp -PfR `ls -dp ${FILESDIR}/$u/*|grep -v SCCS` ${S}/$u/
 	done
 }
 
 do_configure_prepend() {
 	cd ${S}/
-        echo -e "TEMPLATE=subdirs\nSUBDIRS=${UTILS}\n" >slutils.pro
+        printf "TEMPLATE=subdirs\nSUBDIRS=${UTILS}\n" >slutils.pro
 }
 
 do_install() {

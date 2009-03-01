@@ -1,8 +1,8 @@
 DESCRIPTION = "multi threaded daap server for POSIX Systems: iTunes Server."
 SECTION = "console/network"
 PRIORITY = "optional"
-MAINTAINER = "NSLU2 Linux <nslu2-linux@yahoogroups.com>"
-DEPENDS = "zlib gdbm libid3tag"
+DEPENDS = "zlib gdbm libid3tag \
+           ${@base_conditional('ENTERPRISE_DISTRO', '1', '', 'libid3tag', d)}"
 LICENSE = "GPL"
 
 SRC_URI = "${SOURCEFORGE_MIRROR}/${PN}/${P}.tar.gz \

@@ -1,16 +1,11 @@
-LICENSE = "GPL"
-SECTION = "x11/gnome"
+require gnome-desktop.inc
+
 PR = "r0"
-DESCRIPTION = "GNOME library for reading .desktop files"
+
 inherit gnome
 
-DEPENDS = "gnome-common libgnomeui"
-
-EXTRA_AUTORECONF = "-I ${STAGING_DIR}/${HOST_SYS}/share/aclocal/gnome2-macros"
-
-do_configure_prepend () {
-	cp ${STAGING_DIR}/${HOST_SYS}/share/gnome-common/data/omf.make ${S}
-}
+EXTRA_OECONF = ""
+EXTRA_AUTORECONF = "-I ${STAGING_DATADIR}/aclocal/gnome2-macros"
 
 do_stage () {
 	install -d ${STAGING_INCDIR}/gnome-desktop-2.0/libgnome/
@@ -19,6 +14,6 @@ do_stage () {
 #	install -m 0644 libgnome-desktop/libgnomeui/gnome-ditem-edit.h ${STAGING_INCDIR}/gnome-desktop-2.0/libgnomeui/
 #	install -m 0644 libgnome-desktop/libgnomeui/gnome-hint.h ${STAGING_INCDIR}/gnome-desktop-2.0/libgnomeui/
 	oe_libinstall -C libgnome-desktop/.libs -so libgnome-desktop-2 ${STAGING_LIBDIR}
-	
- 
+
+
 }

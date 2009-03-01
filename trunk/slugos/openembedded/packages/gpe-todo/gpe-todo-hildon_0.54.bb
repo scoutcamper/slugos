@@ -3,8 +3,7 @@ PR          = "r0"
 DESCRIPTION = "GPE to-do list"
 DEPENDS     = "libgpewidget-hildon libgpepimc-hildon libtododb sdk-default-icons libosso"
 RDEPENDS    = "sdk-default-icons"
-MAINTAINER  = "Florian Boor <florian@kernelconcepts.de>"
-SECTION     = "gpe"
+SECTION = "gpe"
 PRIORITY    = "optional"
 
 inherit gpe autotools pkgconfig

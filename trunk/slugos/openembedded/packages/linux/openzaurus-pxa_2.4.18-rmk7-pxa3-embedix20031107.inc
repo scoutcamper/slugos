@@ -1,5 +1,4 @@
 DESCRIPTION = "Linux kernel for OpenZaurus PXA processor based devices."
-MAINTAINER = "Michael 'Mickey' Lauer <mickey@Vanille.de>"
 SECTION = "kernel"
 LICENSE = "GPL"
 PV = "2.4.18-rmk7-pxa3-embedix"
@@ -8,13 +7,14 @@ KV = "2.4.18"
 RMKV = "7"
 PXAV = "3"
 SHARPV = "20031107"
+COMPATIBLE_MACHINE = "(poodle|corgi|shepherd|husky|poodle255|tosa)"
 
 FILESDIR = "${@os.path.dirname(bb.data.getVar('FILE',d,1))}/openzaurus-pxa-${KV}-rmk${RMKV}-pxa${PXAV}-embedix${SHARPV}"
 
-SRC_URI = "ftp://ftp.kernel.org/pub/linux/kernel/v2.4/linux-${KV}.tar.bz2 \
+SRC_URI = "${KERNELORG_MIRROR}/pub/linux/kernel/v2.4/linux-${KV}.tar.bz2 \
            ftp://ftp.linux.org.uk/pub/armlinux/source/kernel-patches/v2.4/patch-${KV}-rmk${RMKV}.gz;patch=1 \
            ftp://source.mvista.com/pub/xscale/pxa/diff-${KV}-rmk${RMKV}-pxa${PXAV}.gz;patch=1 \
-           http://developer.ezaurus.com/sl_j/source/c860/${SHARPV}/linux-${PV}-slc860-${SHARPV}-rom1_10.bz2;patch=1 \
+           http://openzaurus.org/mirror/linux-${PV}-slc860-${SHARPV}-rom1_10.bz2;patch=1 \
            file://piro.patch;patch=1 \
            file://swap-performance.patch;patch=1 \
            file://bluetooth-2.4.18-mh15.patch;patch=1 \
@@ -89,6 +89,7 @@ EXTRA_OEMAKE = " EMBEDIXRELEASE=-${DISTRO_VERSION}"
 KERNEL_CCSUFFIX = "-2.95"
 KERNEL_LDSUFFIX = "-2.11.2"
 COMPATIBLE_HOST = "arm.*-linux"
+COMPATIBLE_MACHINE = '(corgi|husky|shepherd|poodle|poodle255)'
 PARALLEL_MAKE = ""
 
 #
@@ -103,15 +104,6 @@ do_configure_prepend() {
         install -m 0644 ${WORKDIR}/defconfig-${MACHINE} ${S}/.config || die "No default configuration for ${MACHINE} available."
         echo "CONFIG_CMDLINE=\"${CMDLINE}\"" >> ${S}/.config
 }
-
-do_deploy() {
-        install -d ${DEPLOY_DIR}/images
-        install -m 0644 arch/${ARCH}/boot/${KERNEL_IMAGETYPE} ${DEPLOY_DIR}/images/${KERNEL_IMAGETYPE}-${MACHINE}-${DATETIME}.bin
-}
-
-do_deploy[dirs] = "${S}"
-
-addtask deploy before do_build after do_compile
 
 PACKAGE_ARCH_corgi    = "c7x0"
 PACKAGE_ARCH_shepherd = "c7x0"

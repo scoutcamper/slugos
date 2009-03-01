@@ -1,7 +1,6 @@
 DESCRIPTION = "Tickypip levels from NetWalk Group"
 SECTION = "opie/games"
 PRIORITY = "optional"
-MAINTAINER = "Marcin Juszkiewicz <openembedded@hrw.one.pl>"
 LICENSE = "${PN}"
 SRC_DISTRIBUTE_LICENSES += "${PN}"
 AUTHOR = "NetWalk Group <netwalkgroup@hotmail.com>"
@@ -9,7 +8,7 @@ RDEPENDS = "tickypip"
 PACKAGE_ARCH = "all"
 PR = "r1"
 
-SRC_URI = "http://www.hrw.one.pl/_pliki/oe/files/tickypip-levels_${PV}.tar.bz2"
+SRC_URI = "http://www.openzaurus.org/download/3.5.4/sources/tickypip-levels_${PV}.tar.bz2"
 
 S = "${WORKDIR}/"
 
@@ -20,7 +19,7 @@ S = "${WORKDIR}/"
 # packs in PalmGear.
 #
 # Packs available on PalmGear: Pak1, Pak3, Pak8, Pak9, Pak10
-# 
+#
 # URL: http://palmgear.com/index.cfm?fuseaction=software.developer&userID=862314499
 #
 # I also got permission to distribute rest of levelpacks which was available

@@ -4,7 +4,6 @@ DESCRIPTION_append_lcdd = " This package contains the LCDd server."
 HOMEPAGE = "http://lcdproc.org"
 LICENSE = "GPL"
 PRIORITY = "optional"
-MAINTAINER = "Rene Wagner <rw@handhelds.org>"
 SECTION = "utils"
 PV = "0.4.99+cvs${SRCDATE}"
 
@@ -13,7 +12,7 @@ DEFAULT_PREFERENCE = "-1"
 DEPENDS = "${@((bb.data.getVar('LCDPROC_DRIVERS',d) or 'curses,text').find('curses') != -1) and 'ncurses' or ''}"
 RRECOMMENDS_lcdproc = "lcdd"
 
-SRC_URI = "cvs://anonymous@cvs.sourceforge.net/cvsroot/lcdproc;module=lcdproc"
+SRC_URI = "cvs://anonymous@lcdproc.cvs.sourceforge.net/cvsroot/lcdproc;module=lcdproc"
 S = "${WORKDIR}/lcdproc"
 
 inherit autotools update-rc.d

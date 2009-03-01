@@ -1,9 +1,9 @@
-include changedfiles.inc
+require changedfiles.inc
 PR = "r1"
 
 SRC_URI += "file://autofoo.patch;patch=1"
 
-inherit autotools 
+inherit autotools
 
 do_compile() {
 	oe_runmake daemon

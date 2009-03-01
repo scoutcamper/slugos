@@ -1,5 +1,7 @@
-SRC_URI = "http://www.lart.tudelft.nl/lartware/port/devmem2.c"
+DESCRIPTION = "Simple program to read/write from/to any location in memory."
+SRC_URI = "http://www.lartmaker.nl/lartware/port/devmem2.c"
 LICENSE = "GPL"
+PR = "r1"
 
 S = "${WORKDIR}"
 
@@ -11,5 +13,3 @@ do_install() {
 	install -d ${D}${bindir}
 	install devmem2 ${D}${bindir}
 }
-
-

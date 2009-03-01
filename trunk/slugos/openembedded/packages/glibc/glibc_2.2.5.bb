@@ -1,14 +1,11 @@
+require glibc.inc
+
 FILESDIR = "${@os.path.dirname(bb.data.getVar('FILE',d,1))}/glibc-cvs"
-PR = "r5"
-DESCRIPTION = "GNU C Library"
-HOMEPAGE = "http://www.gnu.org/software/libc/libc.html"
-LICENSE = "LGPL"
-SECTION = "libs"
-PRIORITY = "required"
-MAINTAINER = "Phil Blundell <pb@handhelds.org>"
+PR = "r20"
+
+DEFAULT_PREFERENCE_sh3 = "-99"
 
 GLIBC_ADDONS ?= "linuxthreads"
-GLIBC_EXTRA_OECONF ?= ""
 
 #
 # For now, we will skip building of a gcc package if it is a uclibc one
@@ -26,14 +23,7 @@ python __anonymous () {
                                    bb.data.getVar('TARGET_OS', d, 1))
 }
 
-PACKAGES = "glibc catchsegv sln nscd ldd localedef glibc-utils glibc-dev glibc-doc glibc-locale libsegfault glibc-extra-nss glibc-thread-db glibc-pcprofile"
-
-# nptl needs unwind support in gcc, which can't be built without glibc.
-PROVIDES = "virtual/libc ${@['virtual/${TARGET_PREFIX}libc-for-gcc', '']['nptl' in '${GLIBC_ADDONS}']}"
-PROVIDES_unslung = "virtual/libc virtual/${TARGET_PREFIX}libc-for-gcc"
-PROVIDES += "virtual/libintl virtual/libiconv"
-DEPENDS = "${@['virtual/${TARGET_PREFIX}gcc-initial', 'virtual/${TARGET_PREFIX}gcc']['nptl' in '${GLIBC_ADDONS}']} linux-libc-headers"
-INHIBIT_DEFAULT_DEPS = "1"
+PROVIDES_unslung = "virtual/libc virtual/${TARGET_PREFIX}libc-for-gcc libc6-unslung"
 
 libc_baselibs = "/lib/libc* /lib/libm* /lib/ld* /lib/libpthread* /lib/libresolv* /lib/librt* /lib/libutil* /lib/libnsl* /lib/libnss_files* /lib/libnss_compat* /lib/libnss_dns* /lib/libdl* /lib/libanl* /lib/libBrokenLocale*"
 
@@ -73,6 +63,7 @@ SRC_URI = "${GNU_MIRROR}/glibc/glibc-${PV}.tar.gz \
 	   file://errlist-arm.patch;patch=1 \
 	   file://glibc-2.2.5-allow-gcc-3.4-fixup.patch;patch=1 \
 	   file://glibc-2.2.5-allow-gcc-3.4-grp.patch;patch=1 \
+	   file://glibc-2.2.5-allow-gcc-4.x-configure.patch;patch=1 \
 	   file://glibc-2.2.5-alpha-pwrite64.patch;patch=1 \
 	   file://glibc-2.2.5-arm-pwrite64.patch;patch=1 \
 	   file://glibc-2.2.5-crosstest.patch;patch=1 \
@@ -105,6 +96,7 @@ SRC_URI = "${GNU_MIRROR}/glibc/glibc-${PV}.tar.gz \
 	   file://threadparam.patch;patch=1 \
 	   file://initfini-flags.patch;patch=1 \
 	   file://pt-initfini-flags.patch;patch=1 \
+	   file://glibc-2.3.2-allow-solaris.patch;patch=1 \
 	   \
            file://etc/ld.so.conf \
 	   file://generate-supported.mk"
@@ -117,29 +109,22 @@ SRC_URI = "${GNU_MIRROR}/glibc/glibc-${PV}.tar.gz \
 S = "${WORKDIR}/glibc-${PV}"
 B = "${WORKDIR}/build-${TARGET_SYS}"
 
-inherit autotools
-
 EXTRA_OECONF = "--enable-kernel=${OLDEST_KERNEL} \
 	        --without-cvs --disable-profile --disable-debug --without-gd \
 		--enable-clocale=gnu \
 	        --enable-add-ons=${GLIBC_ADDONS} \
-		--with-headers=${CROSS_DIR}/${TARGET_SYS}/include \
+		--with-headers=${STAGING_INCDIR} \
 		${GLIBC_EXTRA_OECONF}"
 
 EXTRA_OECONF += "${@get_glibc_fpu_setting(bb, d)}"
-
-def get_glibc_fpu_setting(bb, d):
-	if bb.data.getVar('TARGET_FPU', d, 1) in [ 'soft' ]:
-		return "--without-fp"
-	return ""
 
 glibc_do_unpack () {
 	mv ${WORKDIR}/linuxthreads ${WORKDIR}/linuxthreads_db ${S}/
 }
 
 python do_unpack () {
-	bb.build.exec_func('base_do_unpack', d)	
-	bb.build.exec_func('glibc_do_unpack', d)	
+	bb.build.exec_func('base_do_unpack', d)
+	bb.build.exec_func('glibc_do_unpack', d)
 }
 
 do_configure () {
@@ -175,10 +160,10 @@ do_compile () {
 }
 
 do_stage() {
-	rm -f ${STAGING_LIBDIR}/libc.so.6
-	oe_runmake 'install_root=${STAGING_DIR}/${HOST_SYS}' \
-		   'includedir=/include' 'libdir=/lib' 'slibdir=/lib' \
-		   '${STAGING_LIBDIR}/libc.so.6' \
+	rm -f ${STAGING_DIR_HOST}${layout_base_libdir}/libc.so.6
+	oe_runmake 'install_root=${STAGING_DIR_HOST}' \
+		   'includedir=${layout_includedir}' 'libdir=${layout_libdir}' 'slibdir=${layout_base_libdir}' \
+		   '${STAGING_DIR_HOST}${layout_base_libdir}/libc.so.6' \
 		   '${STAGING_INCDIR}/bits/errno.h' \
 		   '${STAGING_INCDIR}/bits/libc-lock.h' \
 		   '${STAGING_INCDIR}/gnu/stubs.h' \
@@ -204,53 +189,19 @@ do_stage() {
 		install -m 0644 ${S}/sunrpc/rpcsvc/$h ${STAGING_INCDIR}/rpcsvc/
 	done
 	for i in libc.a libc_pic.a libc_nonshared.a; do
-		install -m 0644 ${B}/$i ${STAGING_LIBDIR}/ || die "failed to install $i"
+		install -m 0644 ${B}/$i ${STAGING_DIR_HOST}/${layout_base_libdir}/ || die "failed to install $i"
 	done
-	echo 'GROUP ( libc.so.6 libc_nonshared.a )' > ${STAGING_LIBDIR}/libc.so
-
-	rm -f ${CROSS_DIR}/${TARGET_SYS}/lib/libc.so.6
-	oe_runmake 'install_root=${CROSS_DIR}/${TARGET_SYS}' \
-		   'includedir=/include' 'libdir=/lib' 'slibdir=/lib' \
-		   '${CROSS_DIR}/${TARGET_SYS}/lib/libc.so.6' \
-		   '${CROSS_DIR}/${TARGET_SYS}/include/bits/errno.h' \
-		   '${CROSS_DIR}/${TARGET_SYS}/include/bits/libc-lock.h' \
-		   '${CROSS_DIR}/${TARGET_SYS}/include/gnu/stubs.h' \
-		   install-headers install-lib
-
-	install -d ${CROSS_DIR}/${TARGET_SYS}/include/gnu \
-		   ${CROSS_DIR}/${TARGET_SYS}/include/bits \
-		   ${CROSS_DIR}/${TARGET_SYS}/include/sys \
-		   ${CROSS_DIR}/${TARGET_SYS}/include/rpcsvc
-	install -m 0644 ${B}/bits/stdio_lim.h ${CROSS_DIR}/${TARGET_SYS}/include/bits/
-	install -m 0644 misc/syscall-list.h ${CROSS_DIR}/${TARGET_SYS}/include/bits/syscall.h
-	install -m 0644 ${S}/include/bits/xopen_lim.h ${CROSS_DIR}/${TARGET_SYS}/include/bits/
-	install -m 0644 ${B}/gnu/lib-names.h ${CROSS_DIR}/${TARGET_SYS}/include/gnu/
-	install -m 0644 ${S}/include/limits.h ${CROSS_DIR}/${TARGET_SYS}/include/
-	install -m 0644 ${S}/include/gnu/libc-version.h ${CROSS_DIR}/${TARGET_SYS}/include/gnu/
-	install -m 0644 ${S}/include/gnu-versions.h ${CROSS_DIR}/${TARGET_SYS}/include/
-	install -m 0644 ${S}/include/values.h ${CROSS_DIR}/${TARGET_SYS}/include/
-	install -m 0644 ${S}/include/errno.h ${CROSS_DIR}/${TARGET_SYS}/include/
-	install -m 0644 ${S}/include/sys/errno.h ${CROSS_DIR}/${TARGET_SYS}/include/sys/
-	install -m 0644 ${S}/include/features.h ${CROSS_DIR}/${TARGET_SYS}/include/
-	for r in ${rpcsvc}; do
-		h=`echo $r|sed -e's,\.x$,.h,'`
-		install -m 0644 ${S}/sunrpc/rpcsvc/$h ${CROSS_DIR}/${TARGET_SYS}/include/rpcsvc/
-	done
-
-	for i in libc.a libc_pic.a libc_nonshared.a; do
-		install -m 0644 ${B}/$i ${CROSS_DIR}/${TARGET_SYS}/lib/ || die "failed to install $i"
-	done
-	echo 'GROUP ( libc.so.6 libc_nonshared.a )' > ${CROSS_DIR}/${TARGET_SYS}/lib/libc.so
+	echo 'GROUP ( libc.so.6 libc_nonshared.a )' > ${STAGING_DIR_HOST}/${layout_base_libdir}/libc.so
 }
 
-include glibc-package.bbclass
+require glibc-package.bbclass
 
 
 # Unslung distribution specific packages follow ...
 
-PACKAGES_unslung = "libc6-unslung"
-PACKAGE_ARCH_nslu2 = "nslu2"
-MAINTAINER_libc6-unslung = "NSLU2 Linux <www.nslu2-linux.org>"
+PACKAGES_unslung = "libc6-unslung libsegfault"
+PACKAGE_ARCH_unslung = "nslu2"
+PACKAGE_NO_GCONV_unslung = "1"
 RDEPENDS_libc6-unslung = "nslu2-linksys-libs"
 RPROVIDES_libc6-unslung = "libc6"
 

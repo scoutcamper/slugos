@@ -2,12 +2,15 @@ DESCRIPTION = "Lua is a powerful light-weight programming language designed \
 for extending applications."
 LICENSE = "MIT"
 HOMEPAGE = "http://www.lua.org/"
-MAINTAINER = "Chris Larson <kergoth@handhelds.org>"
 
-PACKAGES = "${PN} liblua ${PN}-doc liblua-dev \
-	    liblualib liblualib-dev"
-FILES_${PN} = "${bindir}/lua ${bindir}/luac"
-FILES_${PN}-doc = "${mandir}/man1/lua.1 ${mandir}/man1/luac.1"
+PACKAGES = "liblua-dbg liblualib-dbg ${PN}-dbg \
+liblua-dev liblua liblualib-dev liblualib ${PN}-doc ${PN}"
+
+FILES_${PN}-dbg += "${bindir}/.debug ${libdir}/.debug/liblua.so.* ${libdir}/.debug/liblualib.so.*"
+
+FILES_${PN} = "${bindir}"
+FILES_${PN}-doc = "${mandir}"
+
 FILES_liblua = "${libdir}/liblua.so.*"
 FILES_liblua-dev = "${libdir}/liblua.so ${libdir}/liblua.a \
 		    ${includedir}/lua.h"

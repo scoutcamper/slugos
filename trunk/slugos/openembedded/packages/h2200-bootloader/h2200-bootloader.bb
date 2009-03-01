@@ -1,13 +1,15 @@
 DESCRIPTION = "Bootloader firmware extractor for the h2200 iPAQ"
-RRECOMMENDS = "kernel-module-mtdblock kernel-module-hamcop-nand"
+RRECOMMENDS_${PN} = "kernel-module-mtdblock"
 ALLOW_EMPTY = "1"
-MAINTAINER = "Koen Kooi <koen@handhelds.org>"
-PR="r1"
+PR = "r3"
+
+COMPATIBLE_MACHINE = "h2200"
+#it is a shell script, but lets protect the innocent some more
+PACKAGE_ARCH = "h2200"
 
 pkg_postinst() {
 #!/bin/sh
-modprobe mtdblock
-modprobe hamcop_nand
 mkdir -p /lib/firmware
-dd if=/dev/mtdblock0 of=/lib/firmware/hamcop_bootloader.bin
+modprobe mtdblock
+dd if=/dev/mtdblock0 of=/lib/firmware/h2200_bootloader.bin 2>/dev/null
 }

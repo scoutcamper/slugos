@@ -1,7 +1,6 @@
 DESCRIPTION = "Runs a shell in an environment as emitted by BitBake to execute tasks"
 LICENSE = "GPL"
-MAINTAINER = "Rene Wagner <rw@handhelds.org>"
-PR = "r1"
+PR = "r3"
 
 inherit autotools pkgconfig
 
@@ -39,7 +38,7 @@ python do_compile() {
 
 	workdir = bb.data.getVar('WORKDIR', d, 1)
 	shellfile = os.path.join(workdir, bb.data.expand("${TARGET_PREFIX}${DISTRO}-${MACHINE}-devshell", d))
-	
+
 	f = open(shellfile, "w")
 
 	# emit variables and shell functions
@@ -56,7 +55,7 @@ do_stage() {
 	:
 }
 
-do_package() {
+do_deploy() {
 	shellfile="${TARGET_PREFIX}${DISTRO}-${MACHINE}-devshell"
 
 	cd ${WORKDIR}
@@ -64,7 +63,7 @@ do_package() {
 	cp $shellfile tmpfile
 	echo "#!/bin/bash --rcfile" > $shellfile
 	sed -e "s:${S}:.:g" -e "s:exit 1:true:" tmpfile >> $shellfile
-	
+
 	echo "export PS1='[OE::${TARGET_PREFIX}${DISTRO}-${MACHINE}]:\w\$ '" >> $shellfile
 	echo "alias ./configure=oe_runconf" >> $shellfile
 	echo "alias make=oe_runmake" >> $shellfile
@@ -72,3 +71,5 @@ do_package() {
 	mkdir -p ${DEPLOY_DIR}/addons
 	install -m 755 $shellfile ${DEPLOY_DIR}/addons
 }
+
+addtask deploy after do_install before do_package

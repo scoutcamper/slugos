@@ -1,16 +1,23 @@
-SECTION = "libs"
-DESCRIPTION = "The popt library exists essentially \
-for parsing command line options."
-LICENSE = "MIT"
-PR = "r3"
+require popt.inc
 
-SRC_URI = "ftp://ftp.rpm.org/pub/rpm/dist/rpm-4.1.x/popt-${PV}.tar.gz \
-	   file://m4.patch;patch=1 \
-	   file://intl.patch;patch=1"
+PR = "r1"
 
-inherit autotools 
+DEPENDS = "gettext virtual/libintl"
 
-do_stage () {
-	oe_libinstall -a -so libpopt ${STAGING_LIBDIR}
-	install -m 0644 popt.h ${STAGING_INCDIR}/
+inherit autotools autotools_stage
+
+SRC_URI = "\
+  http://rpm.org/releases/historical/rpm-4.1.x/popt-${PV}.tar.gz \
+  file://m4.patch;patch=1 \
+  file://intl.patch;patch=1 \
+  file://mkinstalldirs.patch;patch=1 \
+"
+
+do_configure() {
+       gnu-configize
+       aclocal
+       libtoolize --copy --force
+       automake --add-missing
+       autoreconf
+       oe_runconf
 }

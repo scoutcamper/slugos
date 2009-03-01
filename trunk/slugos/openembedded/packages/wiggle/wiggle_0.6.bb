@@ -1,7 +1,6 @@
 LICENSE = "GPL"
 DESCRIPTION = "Wiggle is a program for applying patches that patch cannot \
 apply because of conflicting changes."
-MAINTAINER = "Chris Larson <kergoth@handhelds.org>"
 SECTION = "console/utils"
 PR = "r1"
 
@@ -15,7 +14,7 @@ S = "${WORKDIR}/wiggle-${PV}"
 
 export MANDIR = "${mandir}"
 export BINDIR = "${bindir}"
-EXTRA_OEMAKE += "'STRIP=/bin/true'"
+EXTRA_OEMAKE += "'STRIP='"
 
 do_compile () {
 #	oe_runmake wiggle wiggle.man # requires nroff

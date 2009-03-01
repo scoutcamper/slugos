@@ -1,4 +1,3 @@
-SECTION = "base"
 DESCRIPTION = "Sudo (superuser do) allows a system \
 administrator to give certain users (or groups of \
 users) the ability to run some (or all) commands \
@@ -20,5 +19,10 @@ do_configure_prepend () {
 }
 
 pkg_postinst() {
-	chmod 0440 ${sysconfdir}/sudoers
+	if [ "x$D" != "x" ]; then
+		exit 1
+	fi
+
+	chmod 4111 /usr/bin/sudo
+	chmod 0440 /etc/sudoers
 }

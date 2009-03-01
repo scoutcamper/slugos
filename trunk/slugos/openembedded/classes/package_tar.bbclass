@@ -1,12 +1,11 @@
 inherit package
 
-PACKAGEFUNCS += "do_package_tar"
+IMAGE_PKGTYPE ?= "tar"
 
 python package_tar_fn () {
 	import os
 	from bb import data
-	fn = os.path.join(bb.data.getVar('DEPLOY_DIR_TAR', d), "%s-%s-%s.tar.gz" % (bb.data.getVar('PKG', d), bb.data.getVar('PV', d), bb.data.getVar('PR', d)))
-	fn = bb.data.expand(fn, d)
+	fn = os.path.join(bb.data.getVar('DEPLOY_DIR_TAR', d, True), bb.data.expand('${PKG}-${PV}-${PR}${DISTRO_PR}.tar.gz', d, True))
 	bb.data.setVar('PKGFN', fn, d)
 }
 
@@ -75,7 +74,7 @@ python do_package_tar () {
 		bb.data.setVar('OVERRIDES', '%s:%s' % (overrides, pkg), localdata)
 
 		bb.data.update_data(localdata)
-# stuff
+
 		root = bb.data.getVar('ROOT', localdata)
 		bb.mkdirhier(root)
 		basedir = os.path.dirname(root)
@@ -83,17 +82,29 @@ python do_package_tar () {
 		bb.mkdirhier(pkgoutdir)
 		bb.build.exec_func('package_tar_fn', localdata)
 		tarfn = bb.data.getVar('PKGFN', localdata, 1)
-#		if os.path.exists(tarfn):
-#			del localdata
-#			continue
 		os.chdir(root)
 		from glob import glob
 		if not glob('*'):
-			bb.note("Not creating empty archive for %s-%s-%s" % (pkg, bb.data.getVar('PV', localdata, 1), bb.data.getVar('PR', localdata, 1)))
+			bb.note("Not creating empty archive for %s-%s" % (pkg, bb.data.expand('${PV}-${PR}${DISTRO_PR}', d, True)))
 			continue
-		ret = os.system("tar -czvf %s %s" % (tarfn, '.'))
+		ret = os.system("tar -czf %s %s" % (tarfn, '.'))
 		if ret != 0:
 			bb.error("Creation of tar %s failed." % tarfn)
-# end stuff
-		del localdata
 }
+
+python () {
+    import bb
+    if bb.data.getVar('PACKAGES', d, True) != '':
+        deps = (bb.data.getVarFlag('do_package_write_tar', 'depends', d) or "").split()
+        deps.append('tar-native:do_populate_staging')
+        deps.append('fakeroot-native:do_populate_staging')
+        bb.data.setVarFlag('do_package_write_tar', 'depends', " ".join(deps), d)
+}
+
+
+python do_package_write_tar () {
+	bb.build.exec_func("read_subpackage_metadata", d)
+	bb.build.exec_func("do_package_tar", d)
+}
+do_package_write_tar[dirs] = "${D}"
+addtask package_write_tar before do_build after do_package

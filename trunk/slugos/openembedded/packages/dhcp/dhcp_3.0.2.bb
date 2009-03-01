@@ -1,15 +1,23 @@
 SECTION = "console/network"
 DESCRIPTION = "Internet Software Consortium DHCP package"
 HOMEPAGE = "http://www.isc.org/"
-MAINTAINER = "Bruno Randolf <bruno.randolf@4g-systems.biz>"
 LICENSE = "BSD"
-PR = "r2"
+PR = "r8"
 SRC_URI = "ftp://ftp.isc.org/isc/dhcp/dhcp-3.0-history/dhcp-${PV}.tar.gz \
 	   file://noattrmode.patch;patch=1 \
 	   file://fixincludes.patch;patch=1 \
+           file://dhclient-script-exit-status.dpatch;patch=1 \
+	   file://dhcp-3.0.3-dhclient-dbus.patch;patch=1;pnum=0 \
 	   file://init-relay file://default-relay \
 	   file://init-server file://default-server \
 	   file://dhclient.conf file://dhcpd.conf"
+
+
+inherit update-rc.d
+
+INITSCRIPT_PACKAGES = "dhcp-server"
+INITSCRIPT_NAME_dhcp-server = dhcp-server
+INITSCRIPT_PARAMS_dhcp-server = "start 30 2 3 4 5 . stop 30 0 1 6 ."
 
 do_configure() {
 	./configure
@@ -34,12 +42,17 @@ do_install() {
 	install -m 0644 ${WORKDIR}/default-server ${D}${sysconfdir}/default/dhcp-server
 	install -m 0644 ${WORKDIR}/dhclient.conf ${D}${sysconfdir}/dhcp/dhclient.conf
 	install -m 0644 ${WORKDIR}/dhcpd.conf ${D}${sysconfdir}/dhcp/dhcpd.conf
+	install -d ${D}/var/lib/dhcp
 }
 
-PACKAGES = "dhcp-server dhcp-client dhcp-relay dhcp-omshell dhcp-dev dhcp-doc"
-FILES_dhcp-server = "${sbindir}/dhcpd /etc/init.d/dhcp-server /etc/default/dhcp-server /etc/dhcp/dhcpd.conf"
-FILES_dhcp-relay = "${sbindir}/dhcrelay /etc/init.d/dhcp-relay /etc/default/dhcp-relay"
-FILES_dhcp-client = "/sbin/ /etc/dhcp/dhclient.conf"
+PACKAGES += "dhcp-server dhcp-client dhcp-relay dhcp-omshell"
+FILES_${PN} = ""
+FILES_dhcp-server = "${sbindir}/dhcpd ${sysconfdir}/init.d/dhcp-server ${sysconfdir}/default/dhcp-server ${sysconfdir}/dhcp/dhcpd.conf"
+FILES_dhcp-relay = "${sbindir}/dhcrelay ${sysconfdir}/init.d/dhcp-relay ${sysconfdir}/default/dhcp-relay"
+
+FILES_dhcp-client = "${base_sbindir}/dhclient ${base_sbindir}/dhclient-script ${sysconfdir}/dhcp/dhclient.conf /var/lib/dhcp"
+RDEPENDS_dhcp-client = "bash"
+
 FILES_dhcp-omshell = "${bindir}/omshell"
 
 CONFFILES_dhcp-server_nylon = "/etc/dhcp/dhcpd.conf"

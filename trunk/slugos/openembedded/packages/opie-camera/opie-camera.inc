@@ -1,15 +1,16 @@
 DESCRIPTION = "Opie Camera, Photo and Video Capturing Application for the Sharp CF-AG06 camera"
 SECTION = "opie/applications"
 PRIORITY = "optional"
-MAINTAINER = "Michael 'Mickey' Lauer <mickey@vanille.de>"
 LICENSE = "GPL"
 RDEPENDS = "sharp-camera-support"
 APPNAME = "camera"
 APPTYPE = "binary"
 
+COMPATIBLE_MACHINE = "collie"
+
 S = "${WORKDIR}/camera"
 
-EXTRA_QMAKEVARS_POST=" LIBS+=-L.. "
+EXTRA_QMAKEVARS_POST += "LIBS+=-L.."
 PARALLEL_MAKE = ""
 
 inherit opie

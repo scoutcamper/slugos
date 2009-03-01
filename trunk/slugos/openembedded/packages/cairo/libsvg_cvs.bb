@@ -1,7 +1,6 @@
 PV = "0.0+cvs${SRCDATE}"
 SECTION = "libs"
 PRIORITY = "optional"
-MAINTAINER = "Phil Blundell <pb@debian.org>"
 DEPENDS = "expat jpeg zlib libpng"
 DESCRIPTION = "SVG parser library"
 LICENSE = "LGPL"
@@ -11,7 +10,7 @@ PR = "r2"
 
 EXTRA_OECONF = "--with-expat"
 
-inherit autotools pkgconfig 
+inherit autotools pkgconfig
 
 do_stage () {
 	autotools_stage_all

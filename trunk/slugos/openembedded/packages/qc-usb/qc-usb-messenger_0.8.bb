@@ -1,7 +1,6 @@
 DESCRIPTION = "Driver for QuickCam Messenger and Communicate usb cameras"
 PRIORITY = "optional"
 SECTION = "kernel/modules"
-MAINTAINER = "Oyvind Repvik <nail@nslu2-linux.org>"
 LICENSE = "GPL"
 PR = "r2"
 
@@ -19,10 +18,10 @@ do_compile () {
                    'CC="${KERNEL_CC}"' \
                    'LD="${KERNEL_LD}"' \
 		   'LINUX_DIR=${STAGING_KERNEL_DIR}' \
-		   all 
+		   all
 }
 
-do_install() {   
+do_install() {
         install -d ${D}${base_libdir}/modules/${KERNEL_VERSION}/kernel/drivers/misc
         install -m 0644 *${KERNEL_OBJECT_SUFFIX} ${D}${base_libdir}/modules/${KERNEL_VERSION}/kernel/drivers/misc
 }

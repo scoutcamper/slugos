@@ -57,15 +57,24 @@ then
 fi
 
 #
-# Update dynamic library cache
+# Update dynamic library cache, but only if ld.so.conf is present
 #
-/sbin/ldconfig
+if [ -e /etc/ld.so.conf ] ; then
+	/sbin/ldconfig
+fi
 
-# 
-# Recover the time, if there is a time file                 
-#
+# Set the system clock from hardware clock
+# If the timestamp is 1 day or more recent than the current time,
+# use the timestamp instead.
+/etc/init.d/hwclock.sh start
 if test -e /etc/timestamp
 then
-	date -s `cat /etc/timestamp`
+	SYSTEMDATE=`date "+%Y%m%d"`
+	TIMESTAMP=`cat /etc/timestamp | awk '{ print substr($0,9,4) substr($0,1,4);}'`
+        NEEDUPDATE=`expr \( $TIMESTAMP \> $SYSTEMDATE \)`                                                 
+        if [ $NEEDUPDATE -eq 1 ]; then 
+		date `cat /etc/timestamp`
+		/etc/init.d/hwclock.sh stop
+	fi
 fi
 : exit 0

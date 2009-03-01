@@ -2,7 +2,6 @@ DESCRIPTION = "A highly-portable Java virtual machine implementing the Java virt
 HOMEPAGE = "http://sablevm.org"
 LICENSE = "LGPL"
 PRIORITY = "optional"
-MAINTAINER = "Rene Wagner <rw@handhelds.org>"
 SECTION = "interpreters"
 
 DEPENDS = "libffi libtool popt \
@@ -10,7 +9,7 @@ DEPENDS = "libffi libtool popt \
 #          unzip"
 RRECOMMENDS = "sablevm-classpath (>= ${PV})"
 
-SRC_URI = "http://sablevm.org/download/release/${PV}/${PN}-${PV}.tar.gz \
+SRC_URI = "${SOURCEFORGE_MIRROR}/sablevm/${PN}-${PV}.tar.gz \
            file://no-internal-libs.patch;patch=1"
 
 inherit autotools update-alternatives
@@ -23,7 +22,7 @@ ALTERNATIVE_NAME = "java"
 ALTERNATIVE_PATH = "${bindir}/java-sablevm"
 ALTERNATIVE_PRIORITY = "350"
 
-PACKAGES = "${PN} ${PN}-doc lib${PN} lib${PN}-dev"
+PACKAGES = "${PN}-dbg ${PN} ${PN}-doc lib${PN} lib${PN}-dev"
 
 FILES_${PN} = "${bindir} \
 	       ${libdir}/${PN}/bin"

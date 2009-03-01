@@ -6,22 +6,20 @@ loop abstraction, and so on. It works on many \
 UNIX-like platforms, Windows, OS/2 and BeOS."
 SECTION = "libs"
 PRIORITY = "optional"
-MAINTAINER = "Philip Blundell <pb@handhelds.org>"
 DEPENDS = "glib-2.0-native"
 DEPENDS += "virtual/libiconv virtual/libintl"
 
 SRC_URI = "http://ftp.gnome.org/pub/gnome/sources/glib/2.2/glib-${PV}.tar.bz2 \
            file://automake-lossage.patch;patch=1 \
-           file://glibconfig-sysdefs.h"
+           file://glibconfig-sysdefs.h \
+           file://configure-libtool.patch;patch=1"
 
 S = "${WORKDIR}/glib-${PV}"
+PR = "r1"
 
 inherit autotools  pkgconfig gettext
 
-python () {
-	if bb.data.getVar("USE_NLS", d, 1) == "no":
-		raise bb.parse.SkipPackage("${PN} requires native language support.")
-}
+require glib-2.0.inc
 
 acpaths = ""
 do_configure_prepend () {

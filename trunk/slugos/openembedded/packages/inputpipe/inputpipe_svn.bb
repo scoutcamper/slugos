@@ -1,7 +1,6 @@
 SECTION = "base"
 PRIORITY = "optional"
 DESCRIPTION = "Inputpipe is a network transparency layer for linux input devices"
-MAINTAINER = "Micah Dowty <micah@navi.cx>"
 LICENSE = "GPL"
 #Remove the dash below when 0.5 changes in PV
 PV = "0.5+svn-${SRCDATE}"
@@ -19,7 +18,7 @@ do_install() {
 	install	inputpipe-client ${D}${bindir}
 }
 
-PACKAGES = "inputpipe-server inputpipe-client"
+PACKAGES = "${PN}-dbg inputpipe-server inputpipe-client ${PN}"
 
 FILES_inputpipe-client = "${bindir}/inputpipe-client"
 FILES_inputpipe-server = "${bindir}/inputpipe-server"
