@@ -17,6 +17,12 @@ REQUIRED_DIRS = bitbake openembedded
 FIRMWARE_DEPS = create-topdir $(BUILD_DIRS) $(REQUIRED_DIRS)
 BITBAKE = bitbake -k
 
+slugosbe-image:
+	${MAKE} setup-machine-nslu2be ; ${MAKE} image
+
+slugosle-image:
+	${MAKE} setup-machine-nslu2le ; ${MAKE} image
+
 image: $(FIRMWARE_DEPS)
 ifdef IMAGE_TARGET
 	. ./setup-env; exec ${BITBAKE} $(IMAGE_TARGET)
@@ -24,12 +30,24 @@ else
 	. ./setup-env; exec ${BITBAKE} $(DISTRO)-image
 endif
 
+slugosbe-distro:
+	${MAKE} setup-machine-nslu2be ; ${MAKE} distro
+
+slugosle-distro:
+	${MAKE} setup-machine-nslu2le ; ${MAKE} distro
+
 distro: $(FIRMWARE_DEPS)
 ifdef DISTRO_TARGET
 	. ./setup-env; exec ${BITBAKE} $(DISTRO_TARGET)
 else
 	. ./setup-env; exec ${BITBAKE} $(DISTRO)-packages
 endif
+
+slugosbe-kernel:
+	${MAKE} setup-machine-nslu2be ; ${MAKE} kernel
+
+slugosle-kernel:
+	${MAKE} setup-machine-nslu2le ; ${MAKE} kernel
 
 kernel: $(FIRMWARE_DEPS)
 ifdef KERNEL_TARGET
@@ -40,6 +58,12 @@ endif
 
 index:
 	. ./setup-env; exec ${BITBAKE} package-index
+
+slugosbe-prefetch:
+	${MAKE} setup-machine-nslu2be ; ${MAKE} prefetch
+
+slugosle-prefetch:
+	${MAKE} setup-machine-nslu2le ; ${MAKE} prefetch
 
 prefetch: $(FIRMWARE_DEPS)
 ifdef DISTRO_TARGET
