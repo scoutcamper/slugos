@@ -6,9 +6,9 @@ SRC_URI = "\
   http://busybox.net/downloads/fixes-1.13.2/busybox-1.13.2-depmod.patch;patch=1 \
   http://busybox.net/downloads/fixes-1.13.2/busybox-1.13.2-init.patch;patch=1 \
   http://busybox.net/downloads/fixes-1.13.2/busybox-1.13.2-mdev.patch;patch=1 \
-  http://busybox.net/downloads/fixes-1.13.2/busybox-1.13.2-modprobe.patch;patch=1 \
   http://busybox.net/downloads/fixes-1.13.2/busybox-1.13.2-tar.patch;patch=1 \
   \
+  file://busybox-1.13.2-modprobe.patch;patch=1 \
   file://udhcpscript.patch;patch=1 \
   file://udhcpc-fix-nfsroot.patch;patch=1 \
   file://B921600.patch;patch=1 \
