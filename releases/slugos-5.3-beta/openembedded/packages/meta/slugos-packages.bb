@@ -5,7 +5,7 @@
 DESCRIPTION = "Packages that are compatible with the SlugOS firmware"
 HOMEPAGE = "http://www.nslu2-linux.org"
 LICENSE = "MIT"
-PR = "r63"
+PR = "r64"
 CONFLICTS = "db3"
 
 COMPATIBLE_MACHINE = "nslu2|ixp4xx"
@@ -198,7 +198,7 @@ SLUGOS_PACKAGES = "\
 	rsync \
 	rtorrent \
 	samba \
-	samba-essentials \
+	samba-essential \
 	sane-backends \
 	screen \
 	sed \
