@@ -1,0 +1,68 @@
+#! /bin/sh 
+#
+# This is an init script for openembedded
+# Copy it to /etc/init.d/samba and type
+# > update-rc.d samba defaults 60
+#
+
+
+smbd=/usr/sbin/smbd
+test -x "$smbd" || exit 0
+nmbd=/usr/sbin/nmbd
+test -x "$nmbd" || exit 0
+
+
+if test -e /etc/samba/private/smbpasswd
+then
+	if test -n "`cat /etc/samba/private/smbpasswd`"
+	then
+		CONFIG_FILE="/etc/samba/smb.conf"
+	fi
+fi
+
+test -z "$CONFIG_FILE" && CONFIG_FILE="/etc/samba/smb-essential-inactive.conf"		
+
+case "$1" in
+  start)
+    echo -n "Starting Samba: smbd"
+    start-stop-daemon -S --quiet -x $smbd -- -s $CONFIG_FILE
+    echo -n " nmbd"
+    start-stop-daemon -S --quiet -x $nmbd -- -s $CONFIG_FILE
+    echo "."
+    ;;
+  stop)
+    echo -n "Stopping Samba: smbd"
+    start-stop-daemon -K --quiet -x $smbd
+    echo -n " nmbd"
+    start-stop-daemon -K --quiet -x $nmbd
+    echo "."
+    ;;
+  reload|force-reload)
+    start-stop-daemon -K --quiet -s 1 -x $smbd -- -s $CONFIG_FILE
+    start-stop-daemon -K --quiet -s 1 -x $nmbd -- -s $CONFIG_FILE
+    ;;
+  restart)
+    echo -n "Stopping Samba: smbd"
+    start-stop-daemon -K --quiet -x $smbd
+    echo -n " nmbd"
+    start-stop-daemon -K --quiet -x $nmbd
+    echo ""
+    echo -n "Waiting for samba processes to die off"
+    for i in 1 2 3 4 5 6 7 8;
+    do
+        sleep 1
+        echo -n "."
+    done
+    echo ""
+    echo -n "Starting Samba: smbd"
+    start-stop-daemon -S --quiet -x $smbd -- -s $CONFIG_FILE
+    echo -n " nmbd"
+    start-stop-daemon -S --quiet -x $nmbd -- -s $CONFIG_FILE
+    echo "."
+    ;;
+  *)
+    echo "Usage: /etc/init.d/samba {start|stop|reload|restart|force-reload}"
+    exit 1
+esac
+
+exit 0

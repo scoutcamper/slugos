@@ -198,6 +198,7 @@ SLUGOS_PACKAGES = "\
 	rsync \
 	rtorrent \
 	samba \
+	samba-essentials \
 	sane-backends \
 	screen \
 	sed \
